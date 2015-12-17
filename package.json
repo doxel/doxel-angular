@@ -1,5 +1,6 @@
 {
-  "name": "doxelangular",
+  "name": "doxel-angular",
+  "license": "AGPL-3.0",
   "private": true,
   "devDependencies": {
     "autoprefixer-core": "^5.2.1",
