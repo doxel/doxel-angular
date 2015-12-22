@@ -1,5 +1,5 @@
 {
-  "name": "doxel-angular",
+  "name": "doxel",
   "license": "AGPL-3.0",
   "private": true,
   "devDependencies": {
@@ -28,8 +28,8 @@
     "grunt-usemin": "^3.0.0",
     "grunt-wiredep": "^2.0.0",
     "jit-grunt": "^0.9.1",
-    "time-grunt": "^1.0.0",
-    "jshint-stylish": "^1.0.0"
+    "jshint-stylish": "^1.0.0",
+    "time-grunt": "^1.0.0"
   },
   "engines": {
     "node": ">=0.10.0"

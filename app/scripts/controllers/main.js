@@ -2,16 +2,22 @@
 
 /**
  * @ngdoc function
- * @name doxelAngularApp.controller:MainCtrl
+ * @name doxelApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the doxelAngularApp
+ * Controller of the doxelApp
  */
-angular.module('doxelAngularApp')
-  .controller('MainCtrl', function () {
+angular.module('doxelApp')
+  .controller('MainCtrl', [ '$scope', '$location', 'Member', function ($scope,$location,Member) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-  });
+
+    if (!Member.isAuthenticated()) {
+        $location.path('/login');
+        return;
+    }
+
+  }]);
