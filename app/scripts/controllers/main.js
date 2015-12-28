@@ -8,7 +8,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('MainCtrl', function ($scope,$location,Member,$rootScope) {
+  .controller('MainCtrl', function ($scope, $location, User, $rootScope) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -19,10 +19,10 @@ angular.module('doxelApp')
     // trying to access a public route. Otherwise she will be redirected to
     // login.    
     $rootScope.$on('$routeChangeStart', function (event, next) {
-      $scope.authenticated=Member.isAuthenticated();
+      $scope.authenticated=User.isAuthenticated();
       var path=$location.path();
 
-      if (Member.isAuthenticated()) {
+      if (User.isAuthenticated()) {
         if (path=='/login') {
           event.preventDefault();
           return;

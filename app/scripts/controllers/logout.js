@@ -8,14 +8,14 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('LogoutCtrl', function ($scope, $rootScope, $location, Member, LoopBackAuth) {
+  .controller('LogoutCtrl', function ($scope, $location, User, LoopBackAuth) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
 
-    Member.logout({
+    User.logout({
       accessToken: LoopBackAuth.accessTokenId
 
     }, function(resource){

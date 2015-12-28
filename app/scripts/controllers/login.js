@@ -8,7 +8,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('LoginCtrl', function ($scope, Member, LoopBackAuth, $location) {
+  .controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -34,7 +34,7 @@ angular.module('doxelApp')
     $scope.button_signup_click=function(){
         $scope.getBrowserFingerprint(function(fingerprint){
             $scope.fingerprint=fingerprint;
-            Member.signup({
+            User.signup({
                 fingerprint: $scope.fingerprint
 
             },function(res) {
@@ -53,7 +53,7 @@ angular.module('doxelApp')
     }
 
     $scope.button_login_click=function(){
-        Member.login({
+        User.login({
             email: $scope.username,
             password: $scope.password
         },
