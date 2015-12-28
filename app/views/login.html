@@ -1,30 +1,38 @@
 <div id="authentication" ng-show="visible">
 
-
-    <form method="POST" autocomplete="on">
-        <button class="button signup">
-            Instant Access
-        </button>
-        <hr>
-        <div class="hr">or</div>
+<form method="POST" autocomplete="on">
+    <section>
+        <button class="btn btn-block signup" ng-click="button_signup_click()">Instant Access</button>
+    </section>
+    <hr>
+    <section>
         <div class="field user">
             <label for="username">Username</label>
-            <input name="username" id="username" type="text">
+            <input name="username" id="username" type="text" ng-model="username">
         </div>
 
         <div class="field password">
             <label for="password">Password</label>
-            <input name="password" id="password" type="password">
+            <input name="password" id="password" type="password" ng-model="password">
         </div>
 
-        <input type="hidden" name="fingerprint" id="fingerprint" type="text">
-        <input type="hidden" name="token" id="token" type="text">
-        <input type="hidden" name="action" id="action" type="text">
+        <input type="hidden" name="fingerprint" id="fingerprint" type="text" ng-model="fingerprint">
+        <input type="hidden" name="token" id="token" type="text" ng-model="token">
+        <input type="hidden" name="action" id="action" type="text" ng-model="action">
 
-        <button class="button login">Login</button>
+        <button class="btn btn-block" ng-click="button_login_click()">Login</button>
+    </section>
+    <hr>
+    <section>
 
+        <a class="btn btn-block btn-social btn-facebook" ng-href="/auth/facebook">
+            <span class="fa fa-facebook"></span> Login with Facebook
+        </a>
 
-    </form>
-
+        <a class="btn btn-block btn-social btn-twitter" ng-href="/auth/twitter">
+            <span class="fa fa-twitter"></span> Login with Twitter
+        </a>
+    </section>
+</form>
 
 </div>

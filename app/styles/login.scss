@@ -1,0 +1,58 @@
+div#authentication {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 10;
+}
+
+div#authentication form {
+  position: relative;
+  left: 50%;
+  top: 50%;
+  width: 280px;
+  height : 386px;
+  margin-left: -140px;
+  margin-top: -193px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: aquamarine 10px 10px 10px;
+  padding: 13px;
+}
+
+div#authentication .field {
+  margin-top: 10px;
+}
+
+div#authentication input {
+    border-radius: 4px;
+}
+
+div#authentication label {
+    font-style: normal;
+}
+
+div#authentication .field * {
+  width: 100%;
+}
+
+div#authentication input#password {
+    margin-bottom: 10px;
+}
+
+div#authentication button {
+  background-color: cyan;
+  margin-left: 0;
+
+}
+
+div#authentication a:hover {
+    color: #eee;
+}
+
+div#authentication a:active {
+    color: #ccc;
+}
+

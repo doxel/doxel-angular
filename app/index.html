@@ -9,21 +9,26 @@
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap3-dialog/dist/css/bootstrap-dialog.min.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap-social/bootstrap-social.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <link rel="stylesheet" href="styles/useful.css">
     <!-- endbuild -->
 
   </head>
-  <body ng-app="doxelApp" ng-controller="MainCtrl">
+  <body ng-app="doxelApp" ng-controller="MainCtrl" ng-cloak>
     <!--[if lte IE 8]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     <!-- Add your site or application content here -->
     <div class="header">
-      <div class="navbar navbar-default" role="navigation">
+      <div class="navbar navbar-default disable-selection" role="navigation" ng-controller="NavBarCtrl">
         <div class="container">
           <div class="navbar-header">
 
@@ -34,17 +39,17 @@
               <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="#/">DOXEL</a>
+            <a class="navbar-brand">DOXEL</a>
           </div>
 
           <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#/">Home</a></li>
-              <li><a ng-href="#/upload">Upload</a></li>
-              <li><a ng-href="#/viewer">Viewer</a></li>
-              <li><a ng-href="#/contact">Contact</a></li>
-              <li><a ng-href="#/termsAndConditions">Terms</a></li>
+              <li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
+              <li ng-class="getClass('/viewer')"><a ng-click="goto('/viewer')" class="viewer fa fa-eye"><span>Viewer</span></a></li>
+              <li ng-class="getClass('/upload')"><a ng-click="goto('/upload')" class="upload fa fa-upload"><span>Upload</span></a></li>
+              <li ng-class="getClass('/account')" ng-show="authenticated" class="ng-hide"><a class="account fa fa-user" ng-click="goto('/account')"><span>Account</span></a></li>
+              <li ng-class="getClass('/logout')" ng-show="authenticated" class="ng-hide"><a class="logout fa fa-sign-out" ng-click="goto('/logout')"><span>Logout</span></a></li>
             </ul>
           </div>
         </div>
@@ -57,7 +62,8 @@
 
     <div class="footer">
       <div class="container">
-        <p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
+        <p>&copy; 2015<a href="https://doxel.org/wordpress/" title="DOXEL.org – Dynamic Volumetric Pixel">
+                  DOXEL.org – Dynamic Volumetric Pixel      </a></p>
       </div>
     </div>
 
@@ -90,15 +96,22 @@
     <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
     <script src="bower_components/ui-leaflet/dist/ui-leaflet.js"></script>
     <script src="bower_components/ui-scroll/dist/ui-scroll.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/bootstrap3-dialog/dist/js/bootstrap-dialog.min.js"></script>
+    <script src="bower_components/fingerprintjs2/dist/fingerprint2.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="scripts/lb-services.js"></script>
         <script src="scripts/app.js"></script>
         <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/about.js"></script>
+        <script src="scripts/controllers/viewer.js"></script>
+        <script src="scripts/controllers/upload.js"></script>
         <script src="scripts/controllers/login.js"></script>
-        <script src="scripts/lb-services.js"></script>
+        <script src="scripts/controllers/account.js"></script>
+        <script src="scripts/controllers/logout.js"></script>
+        <script src="scripts/controllers/navbar.js"></script>
         <!-- endbuild -->
 
 </body>
