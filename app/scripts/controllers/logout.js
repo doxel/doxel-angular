@@ -21,12 +21,13 @@ angular.module('doxelApp')
     }, function(resource){
       LoopBackAuth.clearUser();
       LoopBackAuth.clearStorage();
-      $location.path('/main');
+      $location.path('/');
 
     }, function(err){
       console.log('logout failed',err)
+      LoopBackAuth.clearUser();
+      LoopBackAuth.clearStorage();
+      $location.path('/');
     });
-
-    $location.path('/main');
 
 });
