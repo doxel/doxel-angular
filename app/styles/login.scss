@@ -5,7 +5,7 @@ div#authentication {
     width: 100%;
     height: 100%;
     background-color: white;
-    z-index: 10;
+    z-index: 0;
 }
 
 div#authentication form {
@@ -13,46 +13,58 @@ div#authentication form {
   left: 50%;
   top: 50%;
   width: 280px;
-  height : 386px;
+  height : 360px;
   margin-left: -140px;
   margin-top: -193px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-shadow: aquamarine 10px 10px 10px;
+  box-shadow: aquamarine 6px 6px 6px;
   padding: 13px;
 }
 
 div#authentication .field {
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 div#authentication input {
     border-radius: 4px;
 }
 
-div#authentication label {
-    font-style: normal;
-}
-
-div#authentication .field * {
+div#authentication .field input {
   width: 100%;
 }
 
-div#authentication input#password {
-    margin-bottom: 10px;
-}
-
 div#authentication button {
-  background-color: cyan;
-  margin-left: 0;
+  box-shadow: aquamarine 2px 2px 4px;
+  margin: 3px 5px;
+  width: 40%;
+}
+
+div#authentication .btn-social {
+  width: 100%;
+  color: white;
+  margin-top: 10px;
 
 }
 
-div#authentication a:hover {
-    color: #eee;
+div#authentication span#or {
+  background-color: white;
+  width: 2em;
+  padding: 4px;
 }
 
-div#authentication a:active {
-    color: #ccc;
+div#authentication hr {
+  margin: 20px 26px 13px 26px;
 }
 
+div#authentication div.hr,
+div#authentication section.social {
+  position: relative;
+  top: -25px;
+  z-index: 0;
+}
+
+div#authentication section.social button {
+  margin-left: 0px;
+
+}

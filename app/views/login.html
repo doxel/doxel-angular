@@ -1,38 +1,51 @@
 <div id="authentication" ng-show="visible">
 
-<form method="POST" autocomplete="on">
+  <form name="loginForm" ng-submit="submit($event)" autocomplete="on">
+
+    <input type="hidden" name="fingerprint" id="fingerprint" ng-model="fingerprint">
+    <input type="hidden" name="token" id="token" ng-model="token">
+
     <section>
-        <button class="btn btn-block signup" ng-click="button_signup_click()">Instant Access</button>
+      <div class="field user">
+        <input name="username" class="form-control" placeholder="Usename" id="username" type="text" ng-model="username">
+      </div>
+
+      <div class="field password">
+        <input name="password" class="form-control" placeholder="Password" id="password" type="password" ng-model="password">
+      </div>
+
+      <div class="field email">
+        <input name="email" class="form-control" placeholder="Email (optional)" id="email" type="email" ng-model="email">
+        <ng-messages for="loginForm.email.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+          <ng-message when="emailExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="errmsg.emailExists"></div></ng-message>
+        </ng-messages>
+      </div>
+
+      <div style="text-align:center;">
+        <button class="btn btn-primary raise login" ng-click="login($event)">Login</button>
+        <button class="btn btn-success raise register" ng-click="signup($event)">Register</button>
+      </div>
+  </section>
+
+    <hr></hr>
+    <div class="hr" style="text-align:center;">
+      <span id="or">Or login with</span>
+    </div>
+
+    <section class="social">
+      <button class="btn btn-block btn-social btn-facebook" ng-click="facebook($event)">
+        <span class="disable-selection fa fa-facebook"></span>Facebook
+      </button>
+
+      <button class="btn btn-block btn-social btn-twitter" ng-click="twitter($event)">
+        <span class="disable-selection fa fa-twitter"></span>Twitter
+      </button>
+
+      <button class="btn btn-block btn-social btn-google" ng-click="google($event)">
+        <span class="disable-selection fa fa-google"></span>Google
+      </button>
     </section>
-    <hr>
-    <section>
-        <div class="field user">
-            <label for="username">Username</label>
-            <input name="username" id="username" type="text" ng-model="username">
-        </div>
 
-        <div class="field password">
-            <label for="password">Password</label>
-            <input name="password" id="password" type="password" ng-model="password">
-        </div>
-
-        <input type="hidden" name="fingerprint" id="fingerprint" type="text" ng-model="fingerprint">
-        <input type="hidden" name="token" id="token" type="text" ng-model="token">
-        <input type="hidden" name="action" id="action" type="text" ng-model="action">
-
-        <button class="btn btn-block" ng-click="button_login_click()">Login</button>
-    </section>
-    <hr>
-    <section>
-
-        <a class="btn btn-block btn-social btn-facebook" ng-href="/auth/facebook">
-            <span class="fa fa-facebook"></span> Login with Facebook
-        </a>
-
-        <a class="btn btn-block btn-social btn-twitter" ng-href="/auth/twitter">
-            <span class="fa fa-twitter"></span> Login with Twitter
-        </a>
-    </section>
-</form>
+  </form>
 
 </div>

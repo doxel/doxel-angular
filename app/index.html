@@ -12,107 +12,123 @@
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/bootstrap3-dialog/dist/css/bootstrap-dialog.min.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-social/bootstrap-social.css" />
+    <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/viewer.css">
+    <link rel="stylesheet" href="styles/upload.css">
+    <link rel="stylesheet" href="styles/account.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="styles/useful.css">
     <!-- endbuild -->
 
   </head>
-  <body ng-app="doxelApp" ng-controller="MainCtrl" ng-cloak>
-    <!--[if lte IE 8]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
+  <body>
+    <div ng-app="doxelApp" ng-controller="MainCtrl" ng-cloak>
+      <!--[if lte IE 8]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
 
-    <!-- Add your site or application content here -->
-    <div class="header">
-      <div class="navbar navbar-default disable-selection" role="navigation" ng-controller="NavBarCtrl">
-        <div class="container">
-          <div class="navbar-header">
+        <!-- Add your site or application content here -->
+        <div class="header">
+          <div class="navbar navbar-default navbar-fixed-top disable-selection" role="navigation" ng-controller="NavBarCtrl">
+            <div class="navbar-inner">
+              <div class="container">
+                <div class="navbar-header">
 
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
 
-            <a class="navbar-brand">DOXEL</a>
-          </div>
+                  <a class="navbar-brand">DOXEL</a>
+                </div>
 
-          <div class="collapse navbar-collapse" id="js-navbar-collapse">
+                <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
-            <ul class="nav navbar-nav">
-              <li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
-              <li ng-class="getClass('/viewer')"><a ng-click="goto('/viewer')" class="viewer fa fa-eye"><span>Viewer</span></a></li>
-              <li ng-class="getClass('/upload')"><a ng-click="goto('/upload')" class="upload fa fa-upload"><span>Upload</span></a></li>
-              <li ng-class="getClass('/account')" ng-show="authenticated" class="ng-hide"><a class="account fa fa-user" ng-click="goto('/account')"><span>Account</span></a></li>
-              <li ng-class="getClass('/logout')" ng-show="authenticated" class="ng-hide"><a class="logout fa fa-sign-out" ng-click="goto('/logout')"><span>Logout</span></a></li>
-            </ul>
+                  <ul class="nav navbar-nav">
+                    <li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
+                    <li ng-class="getClass('/viewer')"><a ng-click="goto('/viewer')" class="viewer fa fa-eye"><span>Viewer</span></a></li>
+                    <li ng-class="getClass('/upload')"><a ng-click="goto('/upload')" class="upload fa fa-upload"><span>Upload</span></a></li>
+                    <li ng-class="getClass('/account')" ng-show="authenticated"><a class="account fa fa-user" ng-click="goto('/account')"><span>Account</span></a></li>
+                    <li ng-class="getClass('/logout')" ng-show="authenticated"><a class="logout fa fa-sign-out" ng-click="goto('/logout')"><span>Logout</span></a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+
+        <div class="container" ui-view>
+          <div ng-view=""></div>
+        </div>
+
+        <div class="views">
+          <iframe class="upload" ng-src="/doxel-webapp/index.php" ng-show="view=='upload'"></iframe>
+          <iframe class="viewer" ng-show="view=='viewer'"></iframe>
+        </div>
+
+        <div class="footer">
+          <div class="container">
+            <p>&copy; 2015<a href="https://doxel.org/wordpress/" title="DOXEL.org – Dynamic Volumetric Pixel">
+              DOXEL.org – Dynamic Volumetric Pixel      </a></p>
+          </div>
+        </div>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+        <!--script>
+          !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
+          (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
+          r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
+          }(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-XXXXX-X');
+          ga('send', 'pageview');
+          </script-->
+
+          <!-- build:js(.) scripts/vendor.js -->
+          <!-- bower:js -->
+          <script src="bower_components/jquery/dist/jquery.js"></script>
+          <script src="bower_components/angular/angular.js"></script>
+          <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+          <script src="bower_components/angular-animate/angular-animate.js"></script>
+          <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+          <script src="bower_components/angular-messages/angular-messages.js"></script>
+          <script src="bower_components/angular-resource/angular-resource.js"></script>
+          <script src="bower_components/angular-route/angular-route.js"></script>
+          <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+          <script src="bower_components/angular-touch/angular-touch.js"></script>
+          <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+          <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+          <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
+          <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
+          <script src="bower_components/ui-leaflet/dist/ui-leaflet.js"></script>
+          <script src="bower_components/ui-scroll/dist/ui-scroll.js"></script>
+          <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+          <script src="bower_components/bootstrap3-dialog/dist/js/bootstrap-dialog.min.js"></script>
+          <script src="bower_components/fingerprintjs2/dist/fingerprint2.min.js"></script>
+          <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+          <script src="bower_components/ng-scrollbar/dist/ng-scrollbar.js"></script>
+          <script src="bower_components/ui-router-extras/release/ct-ui-router-extras.js"></script>
+          <!-- endbower -->
+          <!-- endbuild -->
+
+          <!-- build:js({.tmp,app}) scripts/scripts.js -->
+          <script src="scripts/lb-services.js"></script>
+          <script src="scripts/app.js"></script>
+          <script src="scripts/controllers/main.js"></script>
+          <script src="scripts/controllers/viewer.js"></script>
+          <script src="scripts/controllers/upload.js"></script>
+          <script src="scripts/controllers/login.js"></script>
+          <script src="scripts/controllers/account.js"></script>
+          <script src="scripts/controllers/logout.js"></script>
+          <script src="scripts/controllers/navbar.js"></script>
+          <!-- endbuild -->
+
     </div>
-
-    <div class="container">
-    <div ng-view=""></div>
-    </div>
-
-    <div class="footer">
-      <div class="container">
-        <p>&copy; 2015<a href="https://doxel.org/wordpress/" title="DOXEL.org – Dynamic Volumetric Pixel">
-                  DOXEL.org – Dynamic Volumetric Pixel      </a></p>
-      </div>
-    </div>
-
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <!--script>
-       !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
-       (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
-       r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
-       }(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script-->
-
-    <!-- build:js(.) scripts/vendor.js -->
-    <!-- bower:js -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
-    <script src="bower_components/angular-animate/angular-animate.js"></script>
-    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="bower_components/angular-messages/angular-messages.js"></script>
-    <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-touch/angular-touch.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-    <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
-    <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
-    <script src="bower_components/ui-leaflet/dist/ui-leaflet.js"></script>
-    <script src="bower_components/ui-scroll/dist/ui-scroll.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/bootstrap3-dialog/dist/js/bootstrap-dialog.min.js"></script>
-    <script src="bower_components/fingerprintjs2/dist/fingerprint2.min.js"></script>
-    <!-- endbower -->
-    <!-- endbuild -->
-
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
-        <script src="scripts/lb-services.js"></script>
-        <script src="scripts/app.js"></script>
-        <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/viewer.js"></script>
-        <script src="scripts/controllers/upload.js"></script>
-        <script src="scripts/controllers/login.js"></script>
-        <script src="scripts/controllers/account.js"></script>
-        <script src="scripts/controllers/logout.js"></script>
-        <script src="scripts/controllers/navbar.js"></script>
-        <!-- endbuild -->
-
-</body>
+  </body>
 </html>
