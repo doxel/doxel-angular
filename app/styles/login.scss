@@ -13,7 +13,7 @@ div#authentication form {
   left: 50%;
   top: 50%;
   width: 280px;
-  height : 360px;
+  height : 300px;
   margin-left: -140px;
   margin-top: -193px;
   border: 1px solid #ccc;
@@ -36,12 +36,15 @@ div#authentication .field input {
 
 div#authentication button {
   box-shadow: aquamarine 2px 2px 4px;
-  margin: 3px 5px;
-  width: 40%;
+  margin: 3px 10px;
+  }
+
+div#authentication button.login,
+div#authentication button.register {
+    width: 40%;
 }
 
-div#authentication .btn-social {
-  width: 100%;
+div#authentication .btn-social-icon {
   color: white;
   margin-top: 10px;
 
@@ -64,7 +67,7 @@ div#authentication section.social {
   z-index: 0;
 }
 
-div#authentication section.social button {
-  margin-left: 0px;
+div#authentication section.main {
+  padding-bottom: 10px;
 
 }

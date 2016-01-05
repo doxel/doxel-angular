@@ -1,23 +1,31 @@
 <div id="authentication" ng-show="visible">
 
-  <form name="loginForm" ng-submit="submit($event)" autocomplete="on">
+  <form name="loginForm" ng-submit="submit($event)" autocomplete="on" novalidate>
 
     <input type="hidden" name="fingerprint" id="fingerprint" ng-model="fingerprint">
     <input type="hidden" name="token" id="token" ng-model="token">
 
-    <section>
+    <section class="main">
       <div class="field user">
         <input name="username" class="form-control" placeholder="Usename" id="username" type="text" ng-model="username">
+        <ng-messages for="loginForm.username.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+            <ng-message when="usernameExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.usernameExists.msg"></div></ng-message>
+            <ng-message when="noUsername" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noUsername.msg"></div></ng-message>
+        </ng-messages>
       </div>
 
       <div class="field password">
         <input name="password" class="form-control" placeholder="Password" id="password" type="password" ng-model="password">
+        <ng-messages for="loginForm.password.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+          <ng-message when="noPassword" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noPassword.msg"></div></ng-message>
+        </ng-messages>
       </div>
 
       <div class="field email">
         <input name="email" class="form-control" placeholder="Email (optional)" id="email" type="email" ng-model="email">
         <ng-messages for="loginForm.email.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
-          <ng-message when="emailExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="errmsg.emailExists"></div></ng-message>
+          <ng-message when="emailExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailExists.msg"></div></ng-message>
+          <ng-message when="emailInvalid" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailInvalid.msg"></div></ng-message>
         </ng-messages>
       </div>
 
@@ -25,24 +33,24 @@
         <button class="btn btn-primary raise login" ng-click="login($event)">Login</button>
         <button class="btn btn-success raise register" ng-click="signup($event)">Register</button>
       </div>
-  </section>
+    </section>
 
-    <hr></hr>
+    <hr>
     <div class="hr" style="text-align:center;">
       <span id="or">Or login with</span>
     </div>
 
-    <section class="social">
-      <button class="btn btn-block btn-social btn-facebook" ng-click="facebook($event)">
-        <span class="disable-selection fa fa-facebook"></span>Facebook
+    <section class="social" style="text-align:center">
+      <button class="btn btn-social-icon btn-facebook btn-lg" ng-click="facebook($event)">
+        <span class="disable-selection fa fa-facebook"></span>
       </button>
 
-      <button class="btn btn-block btn-social btn-twitter" ng-click="twitter($event)">
-        <span class="disable-selection fa fa-twitter"></span>Twitter
+      <button class="btn btn-social-icon btn-twitter btn-lg" ng-click="twitter($event)">
+        <span class="disable-selection fa fa-twitter"></span>
       </button>
 
-      <button class="btn btn-block btn-social btn-google" ng-click="google($event)">
-        <span class="disable-selection fa fa-google"></span>Google
+      <button class="btn btn-social-icon btn-google btn-lg" ng-click="google($event)">
+        <span class="disable-selection fa fa-google"></span>
       </button>
     </section>
 

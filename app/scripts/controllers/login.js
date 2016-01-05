@@ -51,9 +51,29 @@ angular.module('doxelApp')
   ];
 
   var loginScope=$scope;
+  loginScope.visible=true;
   loginScope.serverErrors={};
-  loginScope.errmsg={
-    emailExists: "This email address is already registered."
+  loginScope.error={
+    invalidEmail: {
+      field: 'email',
+      msg: 'Enter a valid email address.'
+    },
+    emailExists: {
+      field: 'username',
+      msg: "This email address is already registered."
+    },
+    usernameExists: {
+      field: 'username',
+      msg: "This username is already registered."
+    },
+    noPassword: {
+      field: 'password',
+      msg: "Please enter your password."
+    },
+    noUsername: {
+      field: 'username',
+      msg: "Please enter a username."
+    }
   };
 
   /**
@@ -69,10 +89,38 @@ angular.module('doxelApp')
   }, // getBrowserFingerprint
 
 
-  loginScope.visible=true;
+  /**
+  * @method loginScope.errorMessage
+  */
+  loginScope.errorMessage=function(err){
+    if (!err) {
+      for(err in loginScope.error) {
+        if (!loginScope.error.hasOwnProperty(err)) {
+          continue;
+        }
+        loginScope.loginForm[loginScope.error[err].field].$setValidity(err,true);
+      }
+      return;
+    }
+
+    var field=loginScope.error[err].field;
+    if (field) {
+      loginScope.loginForm[field].$setValidity(err,false);
+      loginScope.hideMessages=false;
+      setTimeout(function(){
+        loginScope.hideMessages=true;
+        $scope.$apply();
+      },3000);
+
+    } else {
+      alert(loginScope.errmsg[err]||err);
+    }
+
+  };
 
   loginScope.signup=function(e){
     e.preventDefault();
+    loginScope.errorMessage(null);
     loginScope.getBrowserFingerprint(function(fingerprint){
       loginScope.fingerprint=fingerprint;
       User.signup({
@@ -83,12 +131,7 @@ angular.module('doxelApp')
       },
       function(res) {
         if (res.result.error) {
-          loginScope.hideMessages=false;
-          loginScope.loginForm.email.$setValidity('emailExists',false);
-          setTimeout(function(){
-            loginScope.hideMessages=true;
-            $scope.$apply();
-          },3000);
+          loginScope.errorMessage(res.result.error);
           return;
         }
         LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
@@ -102,19 +145,33 @@ angular.module('doxelApp')
 
       });
     });
-
   };
 
   loginScope.signin=function($event){
     if ($event) {
       $event.preventDefault();
     }
+
+    loginScope.errorMessage(null);
+    if (!loginScope.password || !loginScope.password.length) {
+      loginScope.errorMessage('noPassword');
+      return;
+    }
+    if (!loginScope.username || !loginScope.username.trim().length) {
+      loginScope.errorMessage('noUsername');
+      return;
+    }
+
     User.signin({
       email: loginScope.email,
       username: loginScope.username,
       password: loginScope.password
     },
-    function(session) {
+    function(res) {
+      if (res.result.error) {
+        loginScope.errorMessage(res.result.error);
+        return;
+      }
       console.log(session);
       $location.path($location.pathAfterSignin||'/');
     },
