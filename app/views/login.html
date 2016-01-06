@@ -7,10 +7,10 @@
 
     <section class="main">
       <div class="field user">
-        <input name="username" class="form-control" placeholder="Usename" id="username" type="text" ng-model="username">
+        <input name="username" class="form-control" placeholder="Username" id="username" type="text" ng-model="username">
         <ng-messages for="loginForm.username.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
-            <ng-message when="usernameExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.usernameExists.msg"></div></ng-message>
-            <ng-message when="noUsername" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noUsername.msg"></div></ng-message>
+            <ng-message when="usernameExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.usernameExists.msg"></div></ng-message>
+            <ng-message when="noUsername" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.noUsername.msg"></div></ng-message>
         </ng-messages>
       </div>
 
@@ -18,6 +18,7 @@
         <input name="password" class="form-control" placeholder="Password" id="password" type="password" ng-model="password">
         <ng-messages for="loginForm.password.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
           <ng-message when="noPassword" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noPassword.msg"></div></ng-message>
+          <ng-message when="loginFailed" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.loginFailed.msg"></div></ng-message>
         </ng-messages>
       </div>
 

@@ -43,7 +43,7 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location) {
+.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
@@ -73,6 +73,10 @@ angular.module('doxelApp')
     noUsername: {
       field: 'username',
       msg: "Please enter a username."
+    },
+    loginFailed: {
+      field: 'password',
+      msg: 'Login Failed !<br>Maybe you mispelled the password.'
     }
   };
 
@@ -95,7 +99,7 @@ angular.module('doxelApp')
   loginScope.errorMessage=function(err){
     if (!err) {
       for(err in loginScope.error) {
-        if (!loginScope.error.hasOwnProperty(err)) {
+        if (!loginScope.error.hasOwnProperty(err) || !loginScope.error[err].field) {
           continue;
         }
         loginScope.loginForm[loginScope.error[err].field].$setValidity(err,true);
@@ -103,8 +107,8 @@ angular.module('doxelApp')
       return;
     }
 
-    var field=loginScope.error[err].field;
-    if (field) {
+    if (loginScope.error[err] && loginScope.error[err].field) {
+      var field=loginScope.error[err].field;
       loginScope.loginForm[field].$setValidity(err,false);
       loginScope.hideMessages=false;
       setTimeout(function(){
@@ -113,7 +117,19 @@ angular.module('doxelApp')
       },3000);
 
     } else {
-      alert(loginScope.errmsg[err]||err);
+      var title=loginScope.error[err]&&loginScope.error[err].title||err;
+      var message=loginScope.error[err]&&loginScope.error[err].msg||"Unexpected error.";
+      BootstrapDialog.show({
+        title: title,
+        size: BootstrapDialog.SIZE_SMALL,
+        buttons: [{
+          label: 'OK',
+          action: function(){
+            this.dialog.close();
+          }
+        }],
+        message: message
+      });
     }
 
   };
@@ -153,12 +169,12 @@ angular.module('doxelApp')
     }
 
     loginScope.errorMessage(null);
-    if (!loginScope.password || !loginScope.password.length) {
-      loginScope.errorMessage('noPassword');
-      return;
-    }
     if (!loginScope.username || !loginScope.username.trim().length) {
       loginScope.errorMessage('noUsername');
+      return;
+    }
+    if (!loginScope.password || !loginScope.password.length) {
+      loginScope.errorMessage('noPassword');
       return;
     }
 
@@ -172,7 +188,10 @@ angular.module('doxelApp')
         loginScope.errorMessage(res.result.error);
         return;
       }
-      console.log(session);
+      console.log(res.result.session);
+      LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
+      LoopBackAuth.rememberMe=true;
+      LoopBackAuth.save();
       $location.path($location.pathAfterSignin||'/');
     },
     function(err){
