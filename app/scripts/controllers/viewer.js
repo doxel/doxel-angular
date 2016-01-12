@@ -58,7 +58,7 @@ angular.module('doxelApp')
     $scope.$on('$routeChangeSuccess',function(e, next, current){
       var iframe=$('iframe.viewer');
       if (!iframe.attr('src')) {
-        iframe.attr('src','/viewer');
+        iframe.attr('src','/viewer/deploy/index1.html');
       }
       iframe.show().height($('body').height()-102);
         $(window).off('resize.viewer').on('resize.viewer',function(){

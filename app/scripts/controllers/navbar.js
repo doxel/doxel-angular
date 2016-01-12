@@ -1,5 +1,5 @@
 /*
- * migrate.js
+ * navbar.js
  *
  * Copyright (c) 2015 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
@@ -51,7 +51,6 @@ angular.module('doxelApp')
     ];
 
     $scope.getClass = function (path) {
-      console.log($location.path());
       if ($location.path() === path) {
           return 'active';
       } else {

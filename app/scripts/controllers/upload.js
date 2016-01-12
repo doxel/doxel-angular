@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('UploadCtrl', function ($scope) {
+  .controller('UploadCtrl', function ($scope, Picture) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -51,7 +51,27 @@ angular.module('doxelApp')
     ];
 
     $scope.isHashUnique=function(options){
-      options.success({result: true});
+      Picture.findOne({
+        filter: {
+          where: {
+            sha256: options.sha256
+          }
+        }
+      }, function(picture) {
+        // exists already
+        options.success({result: false});
+
+      }, function(err) {
+        if (err.status==404) {
+          // not found
+          options.success({result: true});
+
+        } else {
+          console.log(err);
+          alert(err.data && err.data.error && err.data.error.message);
+        }
+
+      });
     };
 
     // yeah its ugly but faster than rewriting the uploader

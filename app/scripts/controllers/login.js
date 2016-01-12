@@ -51,7 +51,11 @@ angular.module('doxelApp')
   ];
 
   var loginScope=$scope;
-  loginScope.visible=true;
+  if (!loginScope.visible) {
+    loginScope.visible=true;
+    angular.element('#username').focus();
+  }
+
   loginScope.serverErrors={};
   loginScope.error={
     invalidEmail: {
@@ -60,19 +64,19 @@ angular.module('doxelApp')
     },
     emailExists: {
       field: 'username',
-      msg: "This email address is already registered."
+      msg: 'This email address is already registered.'
     },
     usernameExists: {
       field: 'username',
-      msg: "This username is already registered."
+      msg: 'This username is already registered.'
     },
     noPassword: {
       field: 'password',
-      msg: "Please enter your password."
+      msg: 'Please enter your password.'
     },
     noUsername: {
       field: 'username',
-      msg: "Please enter a username."
+      msg: 'Please enter a username.'
     },
     loginFailed: {
       field: 'password',
@@ -118,7 +122,7 @@ angular.module('doxelApp')
 
     } else {
       var title=loginScope.error[err]&&loginScope.error[err].title||err;
-      var message=loginScope.error[err]&&loginScope.error[err].msg||"Unexpected error.";
+      var message=loginScope.error[err]&&loginScope.error[err].msg||'Unexpected error.';
       BootstrapDialog.show({
         title: title,
         size: BootstrapDialog.SIZE_SMALL,
