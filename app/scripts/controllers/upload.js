@@ -1,7 +1,7 @@
 /*
  * upload.js
  *
- * Copyright (c) 2015 ALSENET SA - http://doxel.org
+ * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
  *
  * Author(s):
@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('UploadCtrl', function ($scope, Picture) {
+  .controller('UploadCtrl', function ($scope, $location, Picture) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -51,24 +51,23 @@ angular.module('doxelApp')
     ];
 
     $scope.isHashUnique=function(options){
-      Picture.findOne({
-        filter: {
-          where: {
-            sha256: options.sha256
-          }
-        }
-      }, function(picture) {
+      Picture.isHashUnique({
+        sha256: options.sha256
+
+      }, function(resource) {
         // exists already
-        options.success({result: false});
+        options.success((resource.result && resource.result.unique)?{result: resource.result.unique}:{error: {code: 904}});
 
       }, function(err) {
-        if (err.status==404) {
-          // not found
-          options.success({result: true});
+        if (err.status==401) {
+          // authentication needed
+          $location.nextAfterLogin=$location.path();
+          $location.path('/login');
 
         } else {
           console.log(err);
-          alert(err.data && err.data.error && err.data.error.message);
+          options.success({error: {code: 500, message: "Internal server error", original: err}});
+//          alert((err.data && err.data.error && err.data.error.message));
         }
 
       });
