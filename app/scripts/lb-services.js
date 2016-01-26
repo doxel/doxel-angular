@@ -4110,6 +4110,65 @@ module.factory(
           url: urlBase + "/MysqlPictures/change-stream",
           method: "POST"
         },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.findById() instead.
+        "::findById::MysqlUser::mysqlPictures": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.destroyById() instead.
+        "::destroyById::MysqlUser::mysqlPictures": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.updateById() instead.
+        "::updateById::MysqlUser::mysqlPictures": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures() instead.
+        "::get::MysqlUser::mysqlPictures": {
+          isArray: true,
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "GET"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.create() instead.
+        "::create::MysqlUser::mysqlPictures": {
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "POST"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.createMany() instead.
+        "::createMany::MysqlUser::mysqlPictures": {
+          isArray: true,
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "POST"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.destroyAll() instead.
+        "::delete::MysqlUser::mysqlPictures": {
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.count() instead.
+        "::count::MysqlUser::mysqlPictures": {
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/count",
+          method: "GET"
+        },
       }
     );
 
@@ -4280,6 +4339,58 @@ module.factory(
       urlBase + "/MysqlUsers/:id",
       { 'id': '@id' },
       {
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.findById() instead.
+        "prototype$__findById__mysqlPictures": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.destroyById() instead.
+        "prototype$__destroyById__mysqlPictures": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.updateById() instead.
+        "prototype$__updateById__mysqlPictures": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures() instead.
+        "prototype$__get__mysqlPictures": {
+          isArray: true,
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "GET"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.create() instead.
+        "prototype$__create__mysqlPictures": {
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "POST"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.destroyAll() instead.
+        "prototype$__delete__mysqlPictures": {
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use MysqlUser.mysqlPictures.count() instead.
+        "prototype$__count__mysqlPictures": {
+          url: urlBase + "/MysqlUsers/:id/mysqlPictures/count",
+          method: "GET"
+        },
 
         /**
          * @ngdoc method
@@ -4844,6 +4955,307 @@ module.factory(
     */
     R.modelName = "MysqlUser";
 
+    /**
+     * @ngdoc object
+     * @name lbServices.MysqlUser.mysqlPictures
+     * @header lbServices.MysqlUser.mysqlPictures
+     * @object
+     * @description
+     *
+     * The object `MysqlUser.mysqlPictures` groups methods
+     * manipulating `MysqlPictures` instances related to `MysqlUser`.
+     *
+     * Call {@link lbServices.MysqlUser#mysqlPictures MysqlUser.mysqlPictures()}
+     * to query all related instances.
+     */
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser#mysqlPictures
+         * @methodOf lbServices.MysqlUser
+         *
+         * @description
+         *
+         * Queries mysqlPictures of MysqlUser.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `MysqlPictures` object.)
+         * </em>
+         */
+        R.mysqlPictures = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::get::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#count
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Counts mysqlPictures of MysqlUser.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `count` – `{number=}` - 
+         */
+        R.mysqlPictures.count = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::count::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#create
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Creates a new instance in mysqlPictures of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `MysqlPictures` object.)
+         * </em>
+         */
+        R.mysqlPictures.create = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::create::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#createMany
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Creates a new instance in mysqlPictures of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `MysqlPictures` object.)
+         * </em>
+         */
+        R.mysqlPictures.createMany = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::createMany::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#destroyAll
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Deletes all mysqlPictures of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.mysqlPictures.destroyAll = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::delete::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#destroyById
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Delete a related item by id for mysqlPictures.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         *  - `fk` – `{*}` - Foreign key for mysqlPictures
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.mysqlPictures.destroyById = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::destroyById::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#findById
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Find a related item by id for mysqlPictures.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         *  - `fk` – `{*}` - Foreign key for mysqlPictures
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `MysqlPictures` object.)
+         * </em>
+         */
+        R.mysqlPictures.findById = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::findById::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.MysqlUser.mysqlPictures#updateById
+         * @methodOf lbServices.MysqlUser.mysqlPictures
+         *
+         * @description
+         *
+         * Update a related item by id for mysqlPictures.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - PersistedModel id
+         *
+         *  - `fk` – `{*}` - Foreign key for mysqlPictures
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `MysqlPictures` object.)
+         * </em>
+         */
+        R.mysqlPictures.updateById = function() {
+          var TargetResource = $injector.get("MysqlPictures");
+          var action = TargetResource["::updateById::MysqlUser::mysqlPictures"];
+          return action.apply(R, arguments);
+        };
 
     return R;
   }]);
