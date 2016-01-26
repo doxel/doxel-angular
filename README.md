@@ -39,9 +39,19 @@ Read the [COPYRIGHT.md](https://github.com/doxel/doxel-angular/blob/master/COPYR
 This project is powered by [yo angular generator](https://github.com/yeoman/generator-angular)
 version 0.15.1.
 
+## Prerequisite
+
+sudo apt-get ruby-dev php5-cgi
+gem install compass
+
+## installation
+
+npm i .
+bower i .
+
 ## Build & development
 
-Run `grunt` for building and `grunt serve` for preview.
+Run `grunt` for building the dist directory and `grunt serve` for preview.
 
 ## Testing
 
