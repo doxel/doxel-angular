@@ -22,7 +22,8 @@
     "fingerprintjs2": "~1.0.3",
     "jquery-ui": "~1.11.4",
     "ng-scrollbar": "~0.0.8",
-    "ui-router-extras": "~0.1.0"
+    "ui-router-extras": "~0.1.0",
+    "remarkable-bootstrap-notify": "~3.1.3"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
