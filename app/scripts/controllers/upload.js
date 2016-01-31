@@ -59,6 +59,8 @@ angular.module('doxelApp')
         options.success((resource.result && resource.result.unique)?{result: resource.result.unique}:{error: {code: 904}});
 
       }, function(err) {
+        options.success({error: {code: err.status, original: err}});
+
         if (err.status==401) {
           // authentication needed
           $location.pathAfterSignin=$location.path();
