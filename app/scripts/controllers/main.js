@@ -84,7 +84,7 @@ angular.module('doxelApp')
         switch(path) {
           case '/upload':
           case '/account':
-            $location.nextAfterLogin=path;
+            $location.pathAfterSignin=path;
             event.preventDefault();
             $location.path('/login');
             return;

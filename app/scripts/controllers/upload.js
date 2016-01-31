@@ -61,7 +61,7 @@ angular.module('doxelApp')
       }, function(err) {
         if (err.status==401) {
           // authentication needed
-          $location.nextAfterLogin=$location.path();
+          $location.pathAfterSignin=$location.path();
           $location.path('/login');
 
         } else {
