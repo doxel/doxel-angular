@@ -65,11 +65,6 @@ angular.module('doxelApp')
           // authentication needed
           $location.pathAfterSignin=$location.path();
           $location.path('/login');
-
-        } else {
-          console.log(err);
-          options.success({error: {code: 500, message: "Internal server error", original: err}});
-//          alert((err.data && err.data.error && err.data.error.message));
         }
 
       });
