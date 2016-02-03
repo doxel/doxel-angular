@@ -47,6 +47,33 @@ module.factory(
       { 'id': '@id' },
       {
 
+        // INTERNAL. Use User.thirdparty.findById() instead.
+        "prototype$__findById__thirdparty": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/users/:id/thirdparty/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use User.thirdparty.destroyById() instead.
+        "prototype$__destroyById__thirdparty": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/users/:id/thirdparty/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use User.thirdparty.updateById() instead.
+        "prototype$__updateById__thirdparty": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/users/:id/thirdparty/:fk",
+          method: "PUT"
+        },
+
         /**
          * @ngdoc method
          * @name lbServices.User#prototype$__findById__accessTokens
@@ -241,6 +268,31 @@ module.factory(
           },
           url: urlBase + "/users/:id/segments/:fk",
           method: "PUT"
+        },
+
+        // INTERNAL. Use User.thirdparty() instead.
+        "prototype$__get__thirdparty": {
+          isArray: true,
+          url: urlBase + "/users/:id/thirdparty",
+          method: "GET"
+        },
+
+        // INTERNAL. Use User.thirdparty.create() instead.
+        "prototype$__create__thirdparty": {
+          url: urlBase + "/users/:id/thirdparty",
+          method: "POST"
+        },
+
+        // INTERNAL. Use User.thirdparty.destroyAll() instead.
+        "prototype$__delete__thirdparty": {
+          url: urlBase + "/users/:id/thirdparty",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use User.thirdparty.count() instead.
+        "prototype$__count__thirdparty": {
+          url: urlBase + "/users/:id/thirdparty/count",
+          method: "GET"
         },
 
         /**
@@ -1126,6 +1178,65 @@ module.factory(
           method: "POST"
         },
 
+        // INTERNAL. Use User.thirdparty.findById() instead.
+        "::findById::user::thirdparty": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/users/:id/thirdparty/:fk",
+          method: "GET"
+        },
+
+        // INTERNAL. Use User.thirdparty.destroyById() instead.
+        "::destroyById::user::thirdparty": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/users/:id/thirdparty/:fk",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use User.thirdparty.updateById() instead.
+        "::updateById::user::thirdparty": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/users/:id/thirdparty/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use User.thirdparty() instead.
+        "::get::user::thirdparty": {
+          isArray: true,
+          url: urlBase + "/users/:id/thirdparty",
+          method: "GET"
+        },
+
+        // INTERNAL. Use User.thirdparty.create() instead.
+        "::create::user::thirdparty": {
+          url: urlBase + "/users/:id/thirdparty",
+          method: "POST"
+        },
+
+        // INTERNAL. Use User.thirdparty.createMany() instead.
+        "::createMany::user::thirdparty": {
+          isArray: true,
+          url: urlBase + "/users/:id/thirdparty",
+          method: "POST"
+        },
+
+        // INTERNAL. Use User.thirdparty.destroyAll() instead.
+        "::delete::user::thirdparty": {
+          url: urlBase + "/users/:id/thirdparty",
+          method: "DELETE"
+        },
+
+        // INTERNAL. Use User.thirdparty.count() instead.
+        "::count::user::thirdparty": {
+          url: urlBase + "/users/:id/thirdparty/count",
+          method: "GET"
+        },
+
         // INTERNAL. Use UserCredential.user() instead.
         "::get::userCredential::user": {
           url: urlBase + "/userCredentials/:id/user",
@@ -1371,6 +1482,307 @@ module.factory(
     */
     R.modelName = "User";
 
+    /**
+     * @ngdoc object
+     * @name lbServices.User.thirdparty
+     * @header lbServices.User.thirdparty
+     * @object
+     * @description
+     *
+     * The object `User.thirdparty` groups methods
+     * manipulating `User` instances related to `User`.
+     *
+     * Call {@link lbServices.User#thirdparty User.thirdparty()}
+     * to query all related instances.
+     */
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User#thirdparty
+         * @methodOf lbServices.User
+         *
+         * @description
+         *
+         * Queries thirdparty of user.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `User` object.)
+         * </em>
+         */
+        R.thirdparty = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::get::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#count
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Counts thirdparty of user.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `where` – `{object=}` - Criteria to match model instances
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `count` – `{number=}` - 
+         */
+        R.thirdparty.count = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::count::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#create
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Creates a new instance in thirdparty of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `User` object.)
+         * </em>
+         */
+        R.thirdparty.create = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::create::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#createMany
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Creates a new instance in thirdparty of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `User` object.)
+         * </em>
+         */
+        R.thirdparty.createMany = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::createMany::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#destroyAll
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Deletes all thirdparty of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.thirdparty.destroyAll = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::delete::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#destroyById
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Delete a related item by id for thirdparty.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `fk` – `{*}` - Foreign key for thirdparty
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        R.thirdparty.destroyById = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::destroyById::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#findById
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Find a related item by id for thirdparty.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `fk` – `{*}` - Foreign key for thirdparty
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `User` object.)
+         * </em>
+         */
+        R.thirdparty.findById = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::findById::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.User.thirdparty#updateById
+         * @methodOf lbServices.User.thirdparty
+         *
+         * @description
+         *
+         * Update a related item by id for thirdparty.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `fk` – `{*}` - Foreign key for thirdparty
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `User` object.)
+         * </em>
+         */
+        R.thirdparty.updateById = function() {
+          var TargetResource = $injector.get("User");
+          var action = TargetResource["::updateById::user::thirdparty"];
+          return action.apply(R, arguments);
+        };
     /**
      * @ngdoc object
      * @name lbServices.User.credentials

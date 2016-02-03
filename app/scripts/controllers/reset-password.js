@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc function
- * @name doxelApp.controller:AccountCtrl
+ * @name doxelApp.controller:ResetPasswordCtrl
  * @description
- * # AccountCtrl
+ * # ResetPasswordCtrl
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('AccountCtrl', function () {
+  .controller('ResetPasswordCtrl', function () {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',

@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('MainCtrl', function ($scope, $location, User, $rootScope, $cookies, LoopBackAuth) {
+  .controller('MainCtrl', function ($scope, $location, $q, User, $rootScope, $cookies, LoopBackAuth, errorMessage) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -54,24 +54,69 @@ angular.module('doxelApp')
     // trying to access a public route. Otherwise she will be redirected to
     // login.
     $rootScope.$on('$routeChangeStart', function (event, next) {
-      $scope.authenticated=User.isAuthenticated();
+      $rootScope.authenticated=User.isAuthenticated();
       var path=$location.path();
 
-      // When the user just logged in with passport, set user and delete cookies
-      if (!User.isAuthenticated()) {
-        try {
-          var cookies=$cookies.getAll();
-          if (cookies && cookies['pp-access_token']) {
-            LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
-            LoopBackAuth.save();
-            $cookies.remove('pp-access_token',{path:'/'});
-            $cookies.remove('pp-userId',{path:'/'});
-            $location.path($location.pathAfterSignin||'/upload');
-            return;
-          }
-        } catch(e) {
-          console.log(e);
+      // When the user just logged in with passport,
+      // bind and switch to parent user if any
+      var cookies=$cookies.getAll();
+      if (cookies && cookies['pp-access_token']) {
+
+        var q=$q.defer();
+
+        if (User.isAuthenticated()) {
+          User.addThirdPartyAccount({
+            access_token: cookies['pp-access_token']
+
+          }, function(result){
+            if (result.error) {
+              q.reject(error);
+
+            } else {
+              q.resolve();
+            }
+
+          }, function(error) {
+            q.reject(error);
+
+          });
+
+        } else {
+          LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
+          LoopBackAuth.save();
+
+          // if parent account is known, switch to it
+          User.getParent(function(result){
+            if (result.error) {
+              q.reject(error);
+
+            } else {
+              if (result.accessToken) {
+                LoopBackAuth.setUser(result.accessToken.id, result.accessToken.userId, null);
+                LoopBackAuth.save();
+              }
+              q.resolve();
+            }
+
+          },function(error){
+            q.reject(error);
+
+          });
         }
+
+        q.promise.then(function(){
+          $location.path($location.pathAfterSignin||'/upload');
+
+        }).catch(function(error){
+            errorMessage.show(error);
+
+        }).finally(function(){
+          console.log('finally')
+          $cookies.remove('pp-access_token',{path:'/'});
+          $cookies.remove('pp-userId',{path:'/'});
+        });
+
+        return;
       }
 
       if (User.isAuthenticated()) {
@@ -83,7 +128,7 @@ angular.module('doxelApp')
       } else {
         switch(path) {
           case '/upload':
-          case '/account':
+          case '/profile':
             $location.pathAfterSignin=path;
             event.preventDefault();
             $location.path('/login');
@@ -100,6 +145,7 @@ angular.module('doxelApp')
       if (next.$$route) {
         $scope.view=next.$$route.controllerAs;
         $scope.$broadcast('rebuild:scrollbar');
+        
       } else {
         $scope.view=null;
       }

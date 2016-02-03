@@ -43,21 +43,20 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce) {
+.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce, errorMessage) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
     'Karma'
   ];
 
-  var loginScope=$scope;
-  if (!loginScope.visible) {
-    loginScope.visible=true;
+  if (!$scope.visible) {
+    $scope.visible=true;
     angular.element('#username').focus();
   }
 
-  loginScope.serverErrors={};
-  loginScope.error={
+  $scope.serverErrors={};
+  $scope.error={
     invalidEmail: {
       field: 'email',
       msg: 'Enter a valid email address.'
@@ -90,7 +89,7 @@ angular.module('doxelApp')
   * generate browser fingerprint
   *
   */
-  loginScope.getBrowserFingerprint=function getBrowserFingerprint(callback) {
+  $scope.getBrowserFingerprint=function getBrowserFingerprint(callback) {
     new Fingerprint2().get(function(result){
       callback(result);
     });
@@ -98,60 +97,30 @@ angular.module('doxelApp')
 
 
   /**
-  * @method loginScope.errorMessage
+  * @method $scope.errorMessage
   */
-  loginScope.errorMessage=function(err){
-    if (!err) {
-      for(err in loginScope.error) {
-        if (!loginScope.error.hasOwnProperty(err) || !loginScope.error[err].field) {
-          continue;
-        }
-        loginScope.loginForm[loginScope.error[err].field].$setValidity(err,true);
-      }
-      return;
-    }
+  $scope.errorMessage=function(err){
+    errorMessage.show({
+      scope: $scope,
+      form: $scope.loginForm,
+      err: err
+    });
+  }
 
-    if (loginScope.error[err] && loginScope.error[err].field) {
-      var field=loginScope.error[err].field;
-      loginScope.loginForm[field].$setValidity(err,false);
-      loginScope.hideMessages=false;
-      setTimeout(function(){
-        loginScope.hideMessages=true;
-        $scope.$apply();
-      },3000);
-
-    } else {
-      var title=loginScope.error[err]&&loginScope.error[err].title||err;
-      var message=loginScope.error[err]&&loginScope.error[err].msg||'Unexpected error.';
-      BootstrapDialog.show({
-        title: title,
-        size: BootstrapDialog.SIZE_SMALL,
-        buttons: [{
-          label: 'OK',
-          action: function(){
-            this.dialog.close();
-          }
-        }],
-        message: message
-      });
-    }
-
-  };
-
-  loginScope.signup=function(e){
+  $scope.signup=function(e){
     e.preventDefault();
-    loginScope.errorMessage(null);
-    loginScope.getBrowserFingerprint(function(fingerprint){
-      loginScope.fingerprint=fingerprint;
+    $scope.errorMessage(null);
+    $scope.getBrowserFingerprint(function(fingerprint){
+      $scope.fingerprint=fingerprint;
       User.signup({
-        email: loginScope.email,
-        username: loginScope.username,
-        password: loginScope.password,
-        fingerprint: loginScope.fingerprint
+        email: $scope.email,
+        username: $scope.username,
+        password: $scope.password,
+        fingerprint: $scope.fingerprint
       },
       function(res) {
         if (res.result.error) {
-          loginScope.errorMessage(res.result.error);
+          $scope.errorMessage(res.result.error);
           return;
         }
         LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
@@ -167,29 +136,29 @@ angular.module('doxelApp')
     });
   };
 
-  loginScope.signin=function($event){
+  $scope.signin=function($event){
     if ($event) {
       $event.preventDefault();
     }
 
-    loginScope.errorMessage(null);
-    if (!loginScope.username || !loginScope.username.trim().length) {
-      loginScope.errorMessage('noUsername');
+    $scope.errorMessage(null);
+    if (!$scope.username || !$scope.username.trim().length) {
+      $scope.errorMessage('noUsername');
       return;
     }
-    if (!loginScope.password || !loginScope.password.length) {
-      loginScope.errorMessage('noPassword');
+    if (!$scope.password || !$scope.password.length) {
+      $scope.errorMessage('noPassword');
       return;
     }
 
     User.signin({
-      email: loginScope.email,
-      username: loginScope.username,
-      password: loginScope.password
+      email: $scope.email,
+      username: $scope.username,
+      password: $scope.password
     },
     function(res) {
       if (res.result.error) {
-        loginScope.errorMessage(res.result.error);
+        $scope.errorMessage(res.result.error);
         return;
       }
       console.log(res.result.session);
@@ -204,23 +173,39 @@ angular.module('doxelApp')
     });
   };
 
-  loginScope.submit=function(){
-    loginScope.signin();
+  $scope.submit=function(){
+    $scope.signin();
   };
 
-  loginScope.facebook=function($event){
+  $scope.facebook=function($event){
     $event.preventDefault();
     document.location.assign('/auth/facebook');
   }
 
-  loginScope.twitter=function($event){
+  $scope.twitter=function($event){
     $event.preventDefault();
     document.location.assign('/auth/twitter');
   }
 
-  loginScope.google=function($event){
+  $scope.google=function($event){
     $event.preventDefault();
     document.location.assign('/auth/google');
   }
+
+  $scope.resetPassword=function(email){
+    //send an email with instructions to reset an existing user's password
+    User.resetPassword({
+      email: email
+
+    }, function() {
+      $scope.emailSent=true;
+      errorMessage.show("Check your email and follow the instructions.");
+
+    }, function(err) {
+      console.log(err);
+      errorMessage.show(err);
+
+    });
+  }; 
 
 });

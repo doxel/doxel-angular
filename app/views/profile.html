@@ -1,0 +1,69 @@
+<div id="profile" ng-show="visible">
+
+  <form name="profileForm" ng-submit="submit($event)" autocomplete="off" novalidate>
+
+    <section class="main">
+      <fieldset>
+        <legend>User Profile</legend>
+        <label for="username">User Name</label>
+        <div class="field user">
+          <input name="username" class="form-control" placeholder="(required)" id="username" type="text" ng-model="username">
+          <ng-messages for="loginForm.username.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+              <ng-message when="usernameExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.usernameExists.msg"></div></ng-message>
+              <ng-message when="noUsername" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.noUsername.msg"></div></ng-message>
+          </ng-messages>
+        </div>
+
+        <label for="password">Current Password</label>
+        <div class="field password">
+          <input name="password" class="form-control" placeholder="(required)" id="password" type="password" ng-model="currentPassword">
+          <ng-messages for="profileForm.password.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+            <ng-message when="noPassword" ng-show="profileForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noPassword.msg"></div></ng-message>
+            <ng-message when="invalidPassword" ng-show="profileForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.invalidPassword.msg"></div></ng-message>
+          </ng-messages>
+        </div>
+
+        <label for="newPassword">New Password</label>
+        <div class="field newPassword">
+          <input name="newPassword" class="form-control" placeholder="(optional)" id="newPassword" type="password" ng-model="newPassword">
+          <ng-messages for="profileForm.newPassword.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+          </ng-messages>
+        </div>
+
+        <label for="email">E-Mail</label>
+        <div class="field email">
+          <input name="email" class="form-control" placeholder="(optional)" id="email" type="email" ng-model="email">
+          <ng-messages for="profileForm.email.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
+            <ng-message when="emailExists" ng-show="profileForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailExists.msg"></div></ng-message>
+            <ng-message when="emailInvalid" ng-show="profileForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailInvalid.msg"></div></ng-message>
+          </ng-messages>
+        </div>
+
+        <div style="text-align:center;">
+          <button class="btn btn-primary raise updateProfile" ng-click="updateProfile($event)">Update User Profile</button>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="social">
+      <fieldset>
+        <legend>Bind Third-Party Account</legend>
+          <button class="btn btn-social-icon btn-facebook btn-lg" ng-click="facebook($event)">
+            <span class="disable-selection fa fa-facebook"></span>
+          </button>
+
+          <button class="btn btn-social-icon btn-twitter btn-lg" ng-click="twitter($event)">
+            <span class="disable-selection fa fa-twitter"></span>
+          </button>
+
+          <button class="btn btn-social-icon btn-google btn-lg" ng-click="google($event)">
+            <span class="disable-selection fa fa-google"></span>
+          </button>
+
+      </fieldset>
+    </section>
+    <hr>
+
+  </form>
+
+</div>

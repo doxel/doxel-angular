@@ -91,12 +91,17 @@ angular
         controller: 'LogoutCtrl',
         controllerAs: 'logout'
       })
-      .when('/account', {
-        templateUrl: 'views/account.html',
-        controller: 'AccountCtrl',
-        controllerAs: 'account'
+      .when('/profile', {
+        templateUrl: 'views/profile.html',
+        controller: 'ProfileCtrl',
+        controllerAs: 'profile'
       })
-      .when('/viewer', {
+      .when('/reset-password', {
+        templateUrl: 'views/reset-password.html',
+        controller: 'ResetPasswordCtrl',
+        controllerAs: 'resetPassword'
+      })
+     .when('/viewer', {
         templateUrl: 'views/viewer.html',
         controller: 'ViewerCtrl',
         controllerAs: 'viewer'

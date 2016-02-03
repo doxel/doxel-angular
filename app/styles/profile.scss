@@ -1,0 +1,24 @@
+div#profile {
+  margin-top: 64px;
+  margin-left: 25%;
+  width: 50%;
+}
+
+div#profile label {
+  padding-top:0.2em;
+  font-weight:bold;
+}
+
+div#profile button.updateProfile {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+div#profile input {
+  width: 100%;
+}
+
+div#profile section.social {
+  margin-top: 1em;
+  text-align: center;
+}
