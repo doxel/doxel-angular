@@ -8,10 +8,13 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('ResetPasswordCtrl', function () {
+  .controller('ResetPasswordCtrl', function ($scope) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
+
+    $scope.visible=true;
+
   });
