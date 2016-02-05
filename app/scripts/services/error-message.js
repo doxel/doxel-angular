@@ -13,7 +13,8 @@ angular.module('doxelApp')
 
     this.show=function(options){
       var scope=options.scope;
-      if (!options.err) {
+      var err=options.err;
+      if (!err) {
         for(var err in scope.error) {
           if (!scope.error.hasOwnProperty(err) || !scope.error[err].field) {
             continue;
