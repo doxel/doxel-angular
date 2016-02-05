@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('LogoutCtrl', function ($scope, $location, User, LoopBackAuth) {
+  .controller('LogoutCtrl', function ($scope, $rootScope, $location, User, LoopBackAuth) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -56,6 +56,7 @@ angular.module('doxelApp')
     }, function(resource){
       LoopBackAuth.clearUser();
       LoopBackAuth.clearStorage();
+      $rootScope.authenticated=false;
       $location.path('/');
 
     }, function(err){
