@@ -73,17 +73,17 @@ angular.module('doxelApp')
 
     $scope.facebook=function($event){
       $event.preventDefault();
-      document.location.assign('/auth/facebook');
+      document.location.assign('/link/facebook');
     };
 
     $scope.twitter=function($event){
       $event.preventDefault();
-      document.location.assign('/auth/twitter');
+      document.location.assign('/link/twitter');
     };
 
     $scope.google=function($event){
       $event.preventDefault();
-      document.location.assign('/auth/google');
+      document.location.assign('/link/google');
     };
 
   });
