@@ -23,7 +23,10 @@
     "jquery-ui": "~1.11.4",
     "ng-scrollbar": "~0.0.8",
     "ui-router-extras": "~0.1.0",
-    "remarkable-bootstrap-notify": "~3.1.3"
+    "remarkable-bootstrap-notify": "~3.1.3",
+    "html5-sortable-angularjs": "*",
+    "ng-table": "^0.8.3",
+    "bLazy": "blazy#^1.5.2"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
@@ -38,5 +41,8 @@
         "dist/js/bootstrap.js"
       ]
     }
+  },
+  "resolutions": {
+    "ng-table": "1.0.0-beta.9"
   }
 }
