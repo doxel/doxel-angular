@@ -1,0 +1,88 @@
+
+<div class="view" id="segments">
+
+  <div class="tree">
+    <ul class="year" ng-show="viewMode=='tree'">
+      <li ng-repeat="(year, month) in tree">
+        <a ng-click="toggle($event,year)">
+          <i ng-class="expanded[year] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
+          <i ng-class="expanded[year] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
+          <span>{{year}}</span>
+        </a>
+        <ul class="month" ng-show="expanded[year]">
+          <li ng-repeat="(month, day) in tree[year]">
+            <a ng-click="toggle($event,year+month)">
+              <i ng-class="expanded[year+month] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
+              <i ng-class="expanded[year+month] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
+              <span>{{month}}</span>
+            </a>
+            <ul class="day" ng-show="expanded[year+month]">
+              <li ng-repeat="(day, timestamp) in tree[year][month]">
+                <a ng-click="toggle($event,year+month+day)">
+                  <i ng-class="expanded[year+month+day] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
+                  <i ng-class="expanded[year+month+day] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
+                  <span>{{day}}<span>
+                </a>
+                <ul class="timestamp" ng-show="expanded[year+month+day]">
+                  <li ng-repeat="(timestamp, segmentId) in tree[year][month][day]">
+                    <a ng-click="toggle($event,year+month+day+timestamp)">
+                      <i ng-class="expanded[year+month+day+timestamp] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
+                      <i ng-class="expanded[year+month+day+timestamp] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
+                      <span>{{timestamp | formatTimestamp : 'hms'}}</span>
+                    </a>
+                    <ul class="segmentId" ng-show="expanded[year+month+day+timestamp]">
+                      <li ng-repeat="(segmentId, segment) in tree[year][month][day][timestamp]">
+                        <a ng-click="toggle($event,year+month+day+timestamp+segmentId)">
+                          <i ng-class="expanded[year+month+day+timestamp+segmentId] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
+                          <i ng-class="expanded[year+month+day+timestamp+segmentId] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
+                        <span>{{segmentId}}</span>
+                        </a>
+                        <ul class="picture" ng-show="expanded[year+month+day+timestamp+segmentId]">
+                          <li ng-repeat="(index, picture) in tree[year][month][day][timestamp][segmentId]">
+                            <a ng-click="toggle($event,year+month+day+timestamp+segmentId+picture.id,index)">
+                              <!--i ng-class="expanded[year+month+day+timestamp+segmentId+picture.id] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i-->
+                              <i class="fa""></i>
+                              <i class="fa fa-file-image-o"></i>
+                              <span>{{picture.timestamp | formatTimestamp : 'hms'}}</span>
+                            </a>
+                            <ul class="picture_detail">
+                              <li></li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="details">
+    <div ng-show="view=='year'" class="year">
+    </div>
+    <div ng-show="view=='month'" class="month">
+    </div>
+    <div ng-show="view=='day'" class="day">
+    </div>
+    <div ng-show="view=='timestamp'" class="timestamp">
+    </div>
+    <div ng-show="view=='segment'" class="segment">
+    </div>
+    <div ng-show="view=='picture'" class="picture">
+      <img ng-src="{{picture.url}}" imgonload="imgloaded($event)">
+    </div>
+  </div>
+
+<!--table ng-show="viewMode=='list'" ng-table="tableParams" show-filter="true" class="table table-condensed table-bordered table-striped">
+  <tr ng-repeat="row in data">
+    <td data-title="'Date'" filter="{ '_timestamp': 'text' }" sortable="'_timestamp'">{{row._timestamp}}</td>
+    <td data-title="'Timestamp'" filter="{ 'timestamp': 'text' }" sortable="'timestamp'">{{row.timestamp}}</td>
+  </tr>
+</table-->
+
+</div>
