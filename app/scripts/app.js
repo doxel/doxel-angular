@@ -55,9 +55,15 @@ angular
     'lbServices',
     'ui.router',
     'ui.bootstrap',
-    'ngScrollbar'
+    'ngScrollbar',
+    'ngTable'
+
   ])
   .config(function ($httpProvider, $routeProvider, $stateProvider) {
+
+    var bLazy = new Blazy({
+        src: 'data-blazy' // Default is data-src
+    });
 
     // Inside app config block
     $httpProvider.interceptors.push(function($q, $location, LoopBackAuth) {
@@ -110,6 +116,11 @@ angular
         templateUrl: 'views/upload.html',
         controller: 'UploadCtrl',
         controllerAs: 'upload'
+      })
+      .when('/segments', {
+        templateUrl: 'views/segments.html',
+        controller: 'SegmentsCtrl',
+        controllerAs: 'segments'
       })
       .otherwise({
         redirectTo: '/'
