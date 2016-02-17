@@ -1,0 +1,32 @@
+#segments ul {
+    list-style: none;
+    padding-left: 20px;
+}
+#segments span.selected {
+  background: cyan;
+}
+
+#segments a * {
+  cursor: pointer;
+}
+
+#segments a .fa-caret-right {
+  width: 8px;
+}
+
+#segments a .fa-folder {
+  width: 15px;
+}
+
+#segments div.tree,
+#segments div.details {
+  float: left;
+}
+
+#segments div.details {
+  margin-left: 64px;
+}
+
+#segments div.details > div {
+  position: fixed;
+}

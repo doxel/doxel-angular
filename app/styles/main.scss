@@ -17,17 +17,20 @@ html, body {
   height: 100%;
 }
 
+.view {
+  margin-top: 64px;
+}
 /* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
+div.header,
 .marketing,
-.footer {
+div.footer {
   padding-left: 15px;
   padding-right: 15px;
   z-index: 10;
 }
 
 /* Custom page header */
-.header {
+div.header {
   position: fixed;
   width: 100%;
   height: 55px;
@@ -57,7 +60,7 @@ body > div.container > div.ng-scope {
 }
 
 /* Custom page footer */
-.footer {
+div.footer {
   position: fixed;
   bottom: 0px;
   width: 100%;
@@ -98,9 +101,9 @@ body > div.container > div.ng-scope {
   }
 
   /* Remove the padding we set earlier */
-  .header,
+  div.header,
   .marketing,
-  .footer {
+  div.footer {
     padding-left: 0;
     padding-right: 0;
   }
@@ -195,4 +198,5 @@ ng-message {
 @import "../styles/viewer.scss";
 @import "../styles/profile.scss";
 @import "../styles/reset-password.scss";
+@import "../styles/segments.scss";
 @import "../styles/useful.scss";
