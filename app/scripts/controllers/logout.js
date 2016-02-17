@@ -50,20 +50,27 @@ angular.module('doxelApp')
       'Karma'
     ];
 
+    User.signout({all: true},function(err,result){
+      if (err) {
+        return console.log(err);
+      }
+      if (result && result.error) {
+        console.log(result.error);
+      }
+
+    });
+
     User.logout({
       accessToken: LoopBackAuth.accessTokenId
 
     }, function(resource){
-      LoopBackAuth.clearUser();
-      LoopBackAuth.clearStorage();
       $rootScope.authenticated=false;
       $location.path('/');
 
     }, function(err){
       console.log('logout failed',err)
-      LoopBackAuth.clearUser();
-      LoopBackAuth.clearStorage();
       $location.path('/');
     });
+
 
 });

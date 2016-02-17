@@ -79,7 +79,7 @@ angular.module('doxelApp')
     },
     loginFailed: {
       field: 'password',
-      msg: 'Login Failed !<br>Maybe you mispelled the password.'
+      msg: 'No matching user or password.'
     }
   };
 
@@ -173,8 +173,8 @@ angular.module('doxelApp')
     });
   };
 
-  $scope.submit=function(){
-    $scope.signin();
+  $scope.submit=function($event){
+    $scope.signin($event);
   };
 
   $scope.facebook=function($event){
@@ -206,6 +206,6 @@ angular.module('doxelApp')
       errorMessage.show(err);
 
     });
-  }; 
+  };
 
 });

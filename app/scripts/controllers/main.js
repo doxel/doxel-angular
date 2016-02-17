@@ -61,7 +61,7 @@ angular.module('doxelApp')
       // bind and switch to parent user if any
       var cookies=$cookies.getAll();
       if (cookies && cookies['pp-access_token']) {
-
+/*
         var q=$q.defer();
 
         if (User.isAuthenticated()) {
@@ -82,9 +82,10 @@ angular.module('doxelApp')
           });
 
         } else {
+*/
           LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
           LoopBackAuth.save();
-
+/*
           // if parent account is known, switch to it
           User.getParent(function(result){
             if (result.error) {
@@ -105,7 +106,11 @@ angular.module('doxelApp')
         }
 
         q.promise.then(function(){
+        */
+          $cookies.remove('pp-access_token',{path:'/'});
+          $cookies.remove('pp-userId',{path:'/'});
           $location.path($location.pathAfterSignin||'/upload');
+          /*
 
         }).catch(function(error){
             errorMessage.show(error);
@@ -114,7 +119,9 @@ angular.module('doxelApp')
           console.log('finally')
           $cookies.remove('pp-access_token',{path:'/'});
           $cookies.remove('pp-userId',{path:'/'});
+          /*
         });
+        */
 
         return;
       }
@@ -142,10 +149,11 @@ angular.module('doxelApp')
     });
 
     $rootScope.$on('$routeChangeSuccess', function (event, next) {
+      $rootScope.path=$location.path();
       if (next.$$route) {
         $scope.view=next.$$route.controllerAs;
         $scope.$broadcast('rebuild:scrollbar');
-        
+
       } else {
         $scope.view=null;
       }

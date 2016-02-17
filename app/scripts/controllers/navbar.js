@@ -51,7 +51,7 @@ angular.module('doxelApp')
     ];
 
     $scope.getClass = function (path) {
-      if ($location.path() === path) {
+      if ($scope.path === path) {
           return 'active';
       } else {
           return '';
@@ -59,7 +59,16 @@ angular.module('doxelApp')
     };
 
     $scope.goto=function(dest){
-      $location.path(dest);
+
+      switch(dest) {
+        case 'github':
+          $scope.githubHref="https://www.github.com/doxel/doxel-loopback";
+          break;
+
+        default:
+          $location.path(dest);
+          break;
+      }
     };
 
   });
