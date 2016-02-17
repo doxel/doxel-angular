@@ -12,9 +12,15 @@ angular.module('doxelApp')
     // AngularJS will instantiate a singleton by calling "new" on this function
 
     this.show=function(options){
-      var scope=options.scope;
-      var err=options.err;
-      if (!err) {
+      if (typeof(options)=="string") {
+        err=options;
+
+      } else {
+        var scope=options.scope;
+        var err=options.err;
+      }
+
+      if (!err && scope) {
         for(var err in scope.error) {
           if (!scope.error.hasOwnProperty(err) || !scope.error[err].field) {
             continue;
@@ -24,7 +30,7 @@ angular.module('doxelApp')
         return;
       }
 
-      if (scope.error[err] && scope.error[err].field) {
+      if (scope && scope.error[err] && scope.error[err].field) {
         var field=scope.error[err].field;
         options.form[field].$setValidity(err,false);
         scope.hideMessages=false;
@@ -34,8 +40,8 @@ angular.module('doxelApp')
         },3000);
 
       } else {
-        var title=scope.error[err] && scope.error[err].title || err;
-        var message=scope.error[err] && scope.error[err].msg || 'Unexpected error.';
+        var title=scope && (scope.error[err] && scope.error[err].title || err) || "Something did not work";
+        var message=scope && (scope.error[err] && scope.error[err].msg || 'Unexpected error.') || err;
         BootstrapDialog.show({
           title: title,
           size: BootstrapDialog.SIZE_SMALL,
