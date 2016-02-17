@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="bower_components/bootstrap3-dialog/dist/css/bootstrap-dialog.min.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-social/bootstrap-social.css" />
     <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.css" />
+    <link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -40,7 +41,7 @@
                     <span class="icon-bar"></span>
                   </button>
 
-                  <a class="navbar-brand">DOXEL</a>
+                  <!--a class="navbar-brand">DOXEL</a-->
                 </div>
 
                 <div class="collapse navbar-collapse" id="js-navbar-collapse">
@@ -49,7 +50,10 @@
                     <li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
                     <li ng-class="getClass('/viewer')"><a ng-click="goto('/viewer')" class="viewer fa fa-eye"><span>Viewer</span></a></li>
                     <li ng-class="getClass('/upload')"><a ng-click="goto('/upload')" class="upload fa fa-upload"><span>Upload</span></a></li>
+                    <li ng-class="getClass('/segments')" ng-show="authenticated"><a ng-click="goto('/segments')" class="segments fa fa-database"><span>Segments</span></a></li>
                     <li ng-class="getClass('/profile')" ng-show="authenticated"><a class="profile fa fa-user" ng-click="goto('/profile')"><span>Profile</span></a></li>
+                    <li><a class="github fa fa-github" ng-href="{{githubHref}}" target="_blank" ng-click="goto('github')"><span>GitHub</span></a></li>
+                    <li ng-class="getClass('/login')" ng-show="!authenticated"><a class="login fa fa-sign-in" ng-click="goto('/login')"><span>Login</span></a></li>
                     <li ng-class="getClass('/logout')" ng-show="authenticated"><a class="logout fa fa-sign-out" ng-click="goto('/logout')"><span>Logout</span></a></li>
                   </ul>
                 </div>
@@ -69,7 +73,7 @@
 
         <div class="footer">
           <div class="container">
-            <p>&copy; 2015<a href="https://doxel.org/wordpress/" title="DOXEL.org – Dynamic Volumetric Pixel">
+            <p>&copy; 2015-2016<a href="https://doxel.org/wordpress/" title="DOXEL.org – Dynamic Volumetric Pixel">
               DOXEL.org – Dynamic Volumetric Pixel      </a></p>
           </div>
         </div>
@@ -110,6 +114,9 @@
           <script src="bower_components/ng-scrollbar/dist/ng-scrollbar.js"></script>
           <script src="bower_components/ui-router-extras/release/ct-ui-router-extras.js"></script>
           <script src="bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
+          <script src="bower_components/html5-sortable-angularjs/lib/html5-sortable.js"></script>
+          <script src="bower_components/ng-table/dist/ng-table.min.js"></script>
+          <script src="bower_components/bLazy/blazy.js"></script>
           <!-- endbower -->
           <!-- endbuild -->
 
@@ -125,6 +132,9 @@
           <script src="scripts/controllers/navbar.js"></script>
           <script src="scripts/services/error-message.js"></script>
           <script src="scripts/controllers/reset-password.js"></script>
+          <script src="scripts/controllers/segments.js"></script>
+          <script src="scripts/filters/format-timestamp.js"></script>
+          <script src="scripts/directives/imgonload.js"></script>
           <!-- endbuild -->
 
     </div>
