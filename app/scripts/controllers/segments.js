@@ -35,6 +35,58 @@
 
 'use strict';
 
+function getThumbnailAndExif($q,$http,picture) {
+  var q=$q.defer();
+
+  // load thumbnail as blob
+  $http({
+    method: 'GET',
+    cache: true,
+    responseType: 'blob',
+    url: picture.url+'?what=thumb'
+
+  }).then(function successCallback(response) {
+    if (response.status==200) {
+
+      // show thumbnail
+      picture.blob=window.URL.createObjectURL(response.data);
+
+      // extract exif
+      var reader=new FileReader();
+      reader.addEventListener('loadend',function(){
+        if (reader.error) {
+          console.log(reader.error);
+          q.reject(new Error('Could not read image'));
+
+        } else {
+          try {
+            picture.exif=piexif.load(reader.result);
+
+          } catch(e) {
+            console.log(e);
+            q.reject(new Error('Could not parse EXIF'));
+          }
+
+          q.resolve(picture);
+        }
+
+      });
+      reader.readAsBinaryString(response.data);
+
+    } else {
+      q.reject(new Error('Could not load image'));
+    }
+
+  }, function errorCallback(response) {
+    console.log(response);
+    q.reject(new Error('Internal server error'));
+  });
+
+  return q.promise;
+
+} // getThumbnailAndExif
+
+
 /**
  * @ngdoc function
  * @name doxelApp.controller:SegmentsCtrl
@@ -43,23 +95,13 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('SegmentsCtrl', function ($scope, ngTableParams, errorMessage, Segment, Picture, $filter, User) {
+  .controller('SegmentsCtrl', function ($scope, $q, $http, ngTableParams, errorMessage, Segment, Picture, $filter, User) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
 
-    $scope.dataFilter={
-      filter: {
-        where: {
-          userId: User.getCurrentId()
-        }
-      }
-    };
-
-    $scope.data=[];
-    window.Picture=Picture;
     window.alert=errorMessage.show;
 
     $scope.getClass=function(what,y,m,d,t,s){
@@ -90,7 +132,20 @@ angular.module('doxelApp')
       $scope.expanded={};
     }
 
-    $scope.viewMode='tree';
+    $scope.data=[];
+    $scope.dataFilter={
+      filter: {
+        where: {
+          userId: User.getCurrentId()
+        }
+      }
+    };
+
+    $scope.viewMode='list';
+
+    if ($scope.viewMode=='list') {
+      $scope.dataFilter.filter.include=['preview'];
+    }
 
     $scope.refresh=function(){
       $scope.loading=true;
@@ -109,10 +164,19 @@ angular.module('doxelApp')
               var yyyy=date.getFullYear();
               var mm=date.getMonth()+1;
               var dd=date.getDate();
+              var formatter={
+                month: new Intl.DateTimeFormat(navigator.language, {
+                  month: 'long'
+                }),
+                day:  new Intl.DateTimeFormat(navigator.language, {
+                  weekday: 'long'
+                })
+              }
 
               if (mm<10) mm='0'+mm;
-              if (dd<10) dd='0'+dd;
-
+      //        if (dd<10) dd='0'+dd;
+var mm=formatter.month.format(date);
+var dd=formatter.day.format(date) +' '+ dd;
               if (!$scope.tree[yyyy]) {
                 $scope.tree[yyyy]={};
               }
@@ -137,7 +201,7 @@ angular.module('doxelApp')
               break;
 
             case 'list':
-              _segment._timestamp=formatTimestamp(_segment.timestamp);
+              _segment._timestamp=formatTimestamp(_segment.timestamp, 'locale');
               _segment._pictures={};
               $scope.list.push(_segment);
               //$scope.list[yyyy+mm+dd+_segment.timestamp+_segment.id]=_segment;
@@ -179,20 +243,19 @@ angular.module('doxelApp')
 
       // check whether picture list is already loaded
       if ($scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId]) {
-        $scope.expanded[path]=true;
+        $scope.expanded[path.replace(/\./g,'')]=true;
         $scope.select($event);
 
       } else {
         // else load segment pictures list first
         var span=$('span',$($event.target).closest('li'));
         span.html('Loading... <i class="fa fa-cog fa-spin"></i>');
-        $scope.expanded[path]=true;
+        $scope.expanded[path.replace(/\./g,'')]=true;
         $scope.loading=true;
-        var segmentId
         Picture.find({
           filter: {
             where: {
-              segmentId: segmentId
+              segmentId: p.segmentId
             }
           }
 
@@ -202,12 +265,13 @@ angular.module('doxelApp')
         }, function(err) {
           errorMessage.show('Could not load the segment picture list');
           $scope.loading=false;
-          $scope.expanded[path]=false;
+          $scope.expanded[path.replace(/\./g,'')]=false;
           span.text(p.segmentId);
 
         }).$promise.then(function(){
           $scope.loading=false;
           span.text(p.segmentId);
+          $scope.view='segment';
           $scope.saveTreeState();
           $scope.select($event);
 
@@ -230,9 +294,12 @@ angular.module('doxelApp')
       // check whether picture details are already loaded
       if (picture.loaded) {
         $scope.picture=picture;
+        $scope.blob=picture.blob;
+        $scope.view='picture';
+        $scope.select($event);
+        $scope.saveTreeState();
 
       } else {
-
         // already loading something
         if (imgloading.picture) {
           // not this picture, restore tree leaf
@@ -250,34 +317,56 @@ angular.module('doxelApp')
         imgloading.span=span;
         imgloading.picture=picture;
         $scope.loading=true;
-        picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg?thumb=1';
-        $scope.picture=picture;
 
+        picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
+        getThumbnailAndExif($q,$http,picture).then(function(picture){
+            $scope.blob=picture.blob;
+            $scope.picture=picture;
+            $scope.view='picture';
+            $scope.select($event);
+            $scope.saveTreeState();
+
+        }, function(err) {
+            console.log(err);
+            errorMessage.show(err);
+            span.text($filter('formatTimestamp')(picture.timestamp, 'hms'));
+        });
+
+        return;
       }
-      $scope.view='picture';
-      $scope.select($event);
-      $scope.saveTreeState();
+
 
     } // clickOnPictureTimestamp
 
+    // restore tree leaf text
     $scope.imgloaded=function($event) {
-      $scope.loading=false;
+      var picture=imgloading.picture;
+      if (!picture) {
+        return;
+      }
+      console.log(picture)
+      var blob=picture.blob;
       var src=$event.target.src;
-      if (document.location.origin+imgloading.picture.url==src) {
-        imgloading.span.text($filter('formatTimestamp')(imgloading.picture.timestamp, 'hms'));
+
+      $scope.loading=false;
+
+      if (blob==src) {
+        imgloading.span.text($filter('formatTimestamp')(picture.timestamp, 'hms'));
+        picture.loaded=true;
         imgloading.picture=null;
       }
     }
 
     // toggle tree node state
     function splitPath(path) {
+      var s=path.split('.');
       return {
-        yyyy: path.substr(0,4),
-        mm: path.substr(4,2),
-        dd: path.substr(6,2),
-        segmentTimestamp: path.substr(8,17),
-        segmentId: path.substr(25,24),
-        pictureTimestamp: path.substr(49)
+        yyyy: s[0], //path.substr(0,4),
+        mm: s[1], //path.substr(4,2),
+        dd: s[2], //path.substr(6,2),
+        segmentTimestamp: s[3], //path.substr(8,17),
+        segmentId: s[4], // path.substr(25,24),
+        pictureTimestamp: s[5] // path.substr(49)
       }
     }
 
@@ -285,14 +374,14 @@ angular.module('doxelApp')
     $scope.toggle=function($event, path, index) {
 
       // toggle tree node state
-      if ($scope.expanded[path]) {
-        delete $scope.expanded[path];
+      if ($scope.expanded[path.replace(/\./g,'')]) {
+        delete $scope.expanded[path.replace(/\./g,'')];
 
       } else {
         var p=splitPath(path);
         if (!p.segmentId) {
           // usr clicked on a level below segmentId, nothing to load
-          $scope.expanded[path]=true;
+          $scope.expanded[path.replace(/\./g,'')]=true;
           $scope.select($event);
 
         } else {
@@ -313,8 +402,7 @@ angular.module('doxelApp')
     $scope.refresh().$promise.then(function(){
       $scope.tableParams=new ngTableParams({
         sorting:  {
-          _timestamp: 'asc',
-          timestamp: 'asc'
+          timestamp: 'desc'
         },
         page: 1,
         count: 5
@@ -338,4 +426,28 @@ angular.module('doxelApp')
       });
   });
 
+  })
+
+  .directive('preview', function () {
+    return {
+      restrict: 'AE',
+      replace: false,
+      transclude: true,
+      scope: {
+        preview: '='
+      },
+      controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
+        $scope.blob='';
+        Picture.findById({id: $scope.preview},function(picture){
+          picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
+          getThumbnailAndExif($q,$http,picture).then(function(picture){
+            $scope.blob=picture.blob;
+          }, function(err) {
+            errorMessage.show(err);
+          });
+
+        });
+      }],
+      template: '<img ng-src="{{blob}}"></img>'
+    };
   });
