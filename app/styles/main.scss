@@ -192,6 +192,41 @@ ng-message {
   border-style: dashed;
 }
 
+
+@media screen and (min-width: 384px) {
+
+.nav span {
+  display: none;
+
+}
+/*
+.navbar-inner {
+  margin: auto;
+}
+*/
+.navbar .collapse {
+  width: 320px;
+  margin: auto;
+}
+.navbar .container {
+  width: 100%;
+}
+}
+
+@media screen and (min-width: 768px) {
+  .navbar .collapse {
+    width: auto;
+  }
+  .nav span {
+    display: inline;
+  }
+  .navbar-inner: {
+    margin: auto;
+    width: auto;
+  }
+}
+
+
 @import "../styles/rotate.scss";
 @import "../styles/login.scss";
 @import "../styles/upload.scss";
