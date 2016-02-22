@@ -35,58 +35,6 @@
 
 'use strict';
 
-function getThumbnailAndExif($q,$http,picture) {
-  var q=$q.defer();
-
-  // load thumbnail as blob
-  $http({
-    method: 'GET',
-    cache: true,
-    responseType: 'blob',
-    url: picture.url+'?what=thumb'
-
-  }).then(function successCallback(response) {
-    if (response.status==200) {
-
-      // show thumbnail
-      picture.blob=window.URL.createObjectURL(response.data);
-
-      // extract exif
-      var reader=new FileReader();
-      reader.addEventListener('loadend',function(){
-        if (reader.error) {
-          console.log(reader.error);
-          q.reject(new Error('Could not read image'));
-
-        } else {
-          try {
-            picture.exif=piexif.load(reader.result);
-
-          } catch(e) {
-            console.log(e);
-            q.reject(new Error('Could not parse EXIF'));
-          }
-
-          q.resolve(picture);
-        }
-
-      });
-      reader.readAsBinaryString(response.data);
-
-    } else {
-      q.reject(new Error('Could not load image'));
-    }
-
-  }, function errorCallback(response) {
-    console.log(response);
-    q.reject(new Error('Internal server error'));
-  });
-
-  return q.promise;
-
-} // getThumbnailAndExif
-
-
 /**
  * @ngdoc function
  * @name doxelApp.controller:SegmentsCtrl
@@ -95,7 +43,7 @@ function getThumbnailAndExif($q,$http,picture) {
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('SegmentsCtrl', function ($scope, $q, $http, ngTableParams, errorMessage, Segment, Picture, $filter, User) {
+  .controller('SegmentsCtrl', function ($scope, ngTableParams, errorMessage, getPictureBlobAndExif, Segment, Picture, $filter, User) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -141,7 +89,7 @@ angular.module('doxelApp')
       }
     };
 
-    $scope.viewMode='list';
+    $scope.viewMode='tree';
 
     if ($scope.viewMode=='list') {
       $scope.dataFilter.filter.include=['preview'];
@@ -211,7 +159,6 @@ var dd=formatter.day.format(date) +' '+ dd;
 
         });
 
-        console.log($scope.list,$scope.tree);
         $scope.loading=false;
 
       }, function(err) {
@@ -319,7 +266,7 @@ var dd=formatter.day.format(date) +' '+ dd;
         $scope.loading=true;
 
         picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
-        getThumbnailAndExif($q,$http,picture).then(function(picture){
+        getPictureBlobAndExif(picture,'thumb').then(function(picture){
             $scope.blob=picture.blob;
             $scope.picture=picture;
             $scope.view='picture';
@@ -408,6 +355,7 @@ var dd=formatter.day.format(date) +' '+ dd;
         count: 5
 
       },{
+        groupBy: '_timestamp',
         getData: function($defer,params){
           console.log('params',params);
           console.log('parameters',params.parameters());
@@ -424,30 +372,6 @@ var dd=formatter.day.format(date) +' '+ dd;
         },
         total: $scope.list.length
       });
-  });
+    });
 
   })
-
-  .directive('preview', function () {
-    return {
-      restrict: 'AE',
-      replace: false,
-      transclude: true,
-      scope: {
-        preview: '='
-      },
-      controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
-        $scope.blob='';
-        Picture.findById({id: $scope.preview},function(picture){
-          picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
-          getThumbnailAndExif($q,$http,picture).then(function(picture){
-            $scope.blob=picture.blob;
-          }, function(err) {
-            errorMessage.show(err);
-          });
-
-        });
-      }],
-      template: '<img ng-src="{{blob}}"></img>'
-    };
-  });

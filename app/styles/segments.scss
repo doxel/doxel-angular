@@ -30,3 +30,10 @@
 #segments div.details > div {
   position: fixed;
 }
+
+#segments .thumb {
+  background-size: cover;
+  background-position: center;
+  width: 192px;
+  height: 120px;
+}

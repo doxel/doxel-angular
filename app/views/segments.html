@@ -2,42 +2,42 @@
 <div class="view" id="segments">
 
   <div class="tree">
-    <ul class="year" ng-show="viewMode=='tree'">
+    <ul class="year" ng-if="viewMode=='tree'">
       <li ng-repeat="(year, month) in tree">
         <a ng-click="toggle($event,year)">
           <i ng-class="expanded[year] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
           <i ng-class="expanded[year] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
           <span>{{year}}</span>
         </a>
-        <ul class="month" ng-show="expanded[year]">
+        <ul class="month" ng-if="expanded[year]">
           <li ng-repeat="(month, day) in tree[year]" ng-init="ym=year+month; ym2=year+'.'+month">
             <a ng-click="toggle($event,ym2)">
               <i ng-class="expanded[ym] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
               <i ng-class="expanded[ym] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
               <span>{{month}}</span>
             </a>
-            <ul class="day" ng-show="expanded[ym]">
+            <ul class="day" ng-if="expanded[ym]">
               <li ng-repeat="(day, timestamp) in tree[year][month]" ng-init="ymd=ym+day; ymd2=ym2+'.'+day">
                 <a ng-click="toggle($event,ymd2)">
                   <i ng-class="expanded[ymd] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
                   <i ng-class="expanded[ymd] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
                   <span>{{day}}<span>
                 </a>
-                <ul class="timestamp" ng-show="expanded[ymd]">
+                <ul class="timestamp" ng-if="expanded[ymd]">
                   <li ng-repeat="(timestamp, segmentId) in tree[year][month][day]" ng-init="ymdt=ymd+timestamp; ymdt2=ymd2+'.'+timestamp">
                     <a ng-click="toggle($event,ymdt2)">
                       <i ng-class="expanded[ymdt] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
                       <i ng-class="expanded[ymdt] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
                       <span>{{timestamp | formatTimestamp : 'hms'}}</span>
                     </a>
-                    <ul class="segmentId" ng-show="expanded[ymdt]">
+                    <ul class="segmentId" ng-if="expanded[ymdt]">
                       <li ng-repeat="(segmentId, segment) in tree[year][month][day][timestamp]" ng-init="ymdts=ymdt+segmentId; ymdts2=ymdt2+'.'+segmentId">
                         <a ng-click="toggle($event,ymdts2)">
                           <i ng-class="expanded[ymdts] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
                           <i ng-class="expanded[ymdts] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
                         <span>{{segmentId}}</span>
                         </a>
-                        <ul class="picture" ng-show="expanded[ymdts]">
+                        <ul class="picture" ng-if="expanded[ymdts]">
                           <li ng-repeat="(index, picture) in tree[year][month][day][timestamp][segmentId]" ng-init="ymdtsp=ymdts+picture.id; ymdtsp2=ymdts2+'.'+picture.id">
                             <a ng-click="toggle($event,ymdtsp2,index)">
                               <!--i ng-class="expanded[year+month+day+timestamp+segmentId+picture.id] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i-->
@@ -62,28 +62,38 @@
     </ul>
   </div>
 
-  <div ng-show="viewMode=='list'">
-    <table ng-show="viewMode=='list'" ng-table="tableParams" show-filter="true" class="table table-condensed table-bordered table-striped">
-      <tr ng-repeat="row in data">
-        <td data-title="'Preview'" preview="row.previewId"></td>
-        <td data-title="'Date'" filter="{ '_timestamp': 'text' }" sortable="'timestamp'">{{row._timestamp}}</td>
+  <div ng-if="viewMode=='list'">
+    <table ng-table="tableParams" show-filter="true" class="table table-condensed table-bordered table-striped">
+      <col width="auto" />
+      <col width="100%" />
+      <tr class="ng-table-group" ng-repeat-start="group in $groups" ng-init="group.$show=false">
+        <td colspan="3">
+          <a ng-click="group.$show = !group.$show">
+            <span class="glyphicon" ng-class="{ 'glyphicon-chevron-right': !group.$show, 'glyphicon-chevron-down': group.$show }"></span>
+            <strong>{{ group.value + (group.data.length>1?' (' + group.data.length + ')':'') }}</strong>
+          </a>
+        </td>
+      </tr>
+      <tr ng-if="group.$show" ng-repeat="segment in group.data" ng-repeat-end>
+        <td data-title="'Preview'" segment-preview="segment" segment-preview-class="thumb"></td>
+        <td data-title="'Date'" groupable="'_timestamp'" filter="{ '_timestamp': 'text' }" sortable="'timestamp'" segment-details="segment"></td>
       </tr>
     </table>
   </div>
 
-  <div ng-show="viewMode=='tree'" class="details">
-    <div ng-show="view=='year'" class="year">
+  <div ng-if="viewMode=='tree'" class="details">
+    <div ng-if="view=='year'" class="year">
     </div>
-    <div ng-show="view=='month'" class="month">
+    <div ng-if="view=='month'" class="month">
     </div>
-    <div ng-show="view=='day'" class="day">
+    <div ng-if="view=='day'" class="day">
     </div>
-    <div ng-show="view=='timestamp'" class="timestamp">
+    <div ng-if="view=='timestamp'" class="timestamp">
     </div>
-    <div ng-show="view=='segment'" class="segment">
+    <div ng-if="view=='segment'" class="segment">
     </div>
-    <div ng-show="view=='picture'" class="picture">
-      <img ng-src="{{blob}}" imgonload="imgloaded($event)">
+    <div ng-if="view=='picture'" class="picture">
+      <img ng-src="{{blob}}" dom-onload="imgloaded($event)">
     </div>
   </div>
 
