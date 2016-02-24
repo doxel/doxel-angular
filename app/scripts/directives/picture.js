@@ -14,9 +14,9 @@ angular.module('doxelApp')
       scope: {
         picture: '=',
         pictureClass: '@',
-        pictureOnLoad: '&'
+        pictureOnload: '&'
       },
-      controller: function($scope, errorMessage, getPictureBlobAndExif, $parse) {
+      controller: function($scope, errorMessage, getPictureBlobAndExif) {
         $scope.updatePicture=function() {
           var picture=$scope.picture;
           if (picture.blob) {
@@ -27,11 +27,12 @@ angular.module('doxelApp')
           picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
           getPictureBlobAndExif(picture,(($scope.pictureClass=='thumb')?'thumb':undefined)).then(function(picture){
             $scope.blob=picture.blob;
-            if ($scope.pictureOnLoad) {
-              picture.src=picture.blob;
-              $parse($scope.pictureOnload)($scope,{$event: {
-                target: picture
-              }});
+            if (typeof($scope.pictureOnload)=='function') {
+              $scope.pictureOnload({
+                $event: {
+                  target: picture
+                }
+              });
             }
 
           }, function(err) {

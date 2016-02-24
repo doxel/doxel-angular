@@ -37,3 +37,11 @@
   width: 192px;
   height: 120px;
 }
+
+#segments .dragover {
+  background-color: #bad;
+}
+
+#segments .dragging {
+  opacity: 0.5;
+}

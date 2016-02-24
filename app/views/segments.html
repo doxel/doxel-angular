@@ -97,7 +97,7 @@
       <div segment-details="segment"></div>
     </div>
     <div ng-if="view=='picture'" class="picture">
-      <img ng-src="{{blob}}" dom-onload="imgloaded($event)">
+      <div picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></div>
     </div>
   </div>
 

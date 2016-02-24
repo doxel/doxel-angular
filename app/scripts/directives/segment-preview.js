@@ -31,7 +31,6 @@ angular.module('doxelApp')
         }; // updateSegment
       },
       link: function(scope, element, attrs) {
-        console.log('segmentPreview-link', scope);
         scope.$watch('segmentPreview', function(newValue, oldValue) {
           if (newValue) {
             scope.updateSegment();

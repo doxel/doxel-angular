@@ -207,6 +207,7 @@ var dd=formatter.day.format(date) +' '+ dd;
       console.log(segment);
       $scope.view='segment';
 
+
     }
 
     $scope.expandSegment=function(path,$event) {
@@ -247,20 +248,21 @@ var dd=formatter.day.format(date) +' '+ dd;
 
     var imgloading={};
     // load and show picture details
-    $scope.togglePictureDetails=function(expand,$event, path, index) {
+    $scope.showPictureDetails=function(expand,$event, path, index) {
       var p=splitPath(path);
 
       var pictures=$scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId];
       var picture=pictures[index];
 
+      $scope.select($event);
+//      $scope.saveTreeState();
 
       // check whether picture details are already loaded
       if (picture.loaded) {
+        // show picture
         $scope.picture=picture;
-        $scope.blob=picture.blob;
+        // show picture view
         $scope.view='picture';
-        $scope.select($event);
-        $scope.saveTreeState();
 
       } else {
         // already loading something
@@ -275,11 +277,17 @@ var dd=formatter.day.format(date) +' '+ dd;
           }
         }
 
-        var span=$('span',$($event.target).closest('li'));
-        span.html('Loading... <i class="fa fa-cog fa-spin"></i>');
+        var span=$scope.showSpinner($event);
         imgloading.span=span;
         imgloading.picture=picture;
-        $scope.loading=true;
+
+        // load and show picture
+        $scope.picture=picture;
+
+        // show picture view
+        $scope.view='picture';
+
+    /*
 
         picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
         getPictureBlobAndExif(picture,'thumb').then(function(picture){
@@ -294,21 +302,22 @@ var dd=formatter.day.format(date) +' '+ dd;
             errorMessage.show(err);
             span.text($filter('formatTimestamp')(picture.timestamp, 'hms'));
         });
-
-        return;
+*/
       }
 
-    } // togglePictureDetails
+
+    } // showPictureDetails
 
     // restore tree leaf text
     $scope.imgloaded=function($event) {
+      console.log('loaded')
       var picture=imgloading.picture;
       if (!picture) {
         return;
       }
       console.log(picture)
       var blob=picture.blob;
-      var src=$event.target.src;
+      var src=$event.target.src||$event.target.blob;
 
       $scope.loading=false;
 
@@ -365,7 +374,7 @@ var dd=formatter.day.format(date) +' '+ dd;
 
           } else {
             // user clicked on picture timestamp
-            $scope.togglePictureDetails(expand,$event,path,index);
+            $scope.showPictureDetails(expand,$event,path,index);
 
           }
         }
