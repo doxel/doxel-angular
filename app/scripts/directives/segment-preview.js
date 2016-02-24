@@ -7,26 +7,38 @@
  * # segment-preview
  */
 angular.module('doxelApp')
-  .directive('segmentPreview', function () {
+  .directive('segmentPreview', function (Picture, errorMessage) {
     return {
       restrict: 'A',
       replace: false,
-      transclude: true,
+
       scope: {
         segmentPreview: '=',
         segmentPreviewClass: '@'
       },
-      controller: ['$scope', 'errorMessage', 'Picture', function($scope, errorMessage, Picture) {
-        var segment=$scope.segmentPreview;
-        if (segment.picture) {
-          $scope.picture=segment.picture;
-          return;
-        }
-        Picture.findById({id: segment.previewId},function(picture){
-          segment.picture=picture;
-          $scope.picture=picture;
-        }, errorMessage.show);
-      }],
+      controller: function($scope){
+        $scope.updateSegment=function(){
+          var segment=$scope.segmentPreview;
+          if (segment.picture) {
+            $scope.picture=segment.picture;
+            return;
+          }
+          Picture.findById({id: segment.previewId},function(picture){
+            segment.picture=picture;
+            $scope.picture=picture;
+          }, errorMessage.show);
+
+        }; // updateSegment
+      },
+      link: function(scope, element, attrs) {
+        console.log('segmentPreview-link', scope);
+        scope.$watch('segmentPreview', function(newValue, oldValue) {
+          if (newValue) {
+            scope.updateSegment();
+          }
+        }, false);
+      },
+
       template: '<div ng-if="picture" picture="picture" picture-class="{{segmentPreviewClass}}"></div>'
     };
   });

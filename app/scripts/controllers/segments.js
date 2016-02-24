@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('SegmentsCtrl', function ($scope, ngTableParams, errorMessage, getPictureBlobAndExif, Segment, Picture, $filter, User) {
+  .controller('SegmentsCtrl', function ($q, $rootScope, $scope, ngTableParams, errorMessage, getPictureBlobAndExif, Segment, Picture, $filter, User) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -184,21 +184,43 @@ var dd=formatter.day.format(date) +' '+ dd;
       $('#segments span.selected').not(elem).removeClass('selected');
     }
 
-    // load and show the list of picture timestamps
-    $scope.clickOnSegmentId=function($event, path) {
+    $scope.showSpinner=function($event,text){
+      $scope.loading=true;
+      return $('span',$($event.target).closest('li')).
+      html(((text)?text:'Loading...')+' <i class="fa fa-cog fa-spin"></i>');
+    }
+
+    $scope.hideSpinner=function(span,text){
+      $scope.loading=false;
+      span.html(text);
+    }
+
+    $scope.showSegmentDetails=function(segmentId) {
+      var segment;
+      $scope.segments.some(function(_segment){
+        if (_segment.id==segmentId) {
+          segment=_segment;
+          return true;
+        }
+      });
+      $scope.segment=segment;
+      console.log(segment);
+      $scope.view='segment';
+
+    }
+
+    $scope.expandSegment=function(path,$event) {
       var p=splitPath(path);
 
       // check whether picture list is already loaded
       if ($scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId]) {
-        $scope.expanded[path.replace(/\./g,'')]=true;
+        $scope.showSegmentDetails(p.segmentId);
         $scope.select($event);
 
       } else {
-        // else load segment pictures list first
-        var span=$('span',$($event.target).closest('li'));
-        span.html('Loading... <i class="fa fa-cog fa-spin"></i>');
-        $scope.expanded[path.replace(/\./g,'')]=true;
-        $scope.loading=true;
+        var span=$scope.showSpinner($event);
+
+        // load segment pictures data
         Picture.find({
           filter: {
             where: {
@@ -206,32 +228,26 @@ var dd=formatter.day.format(date) +' '+ dd;
             }
           }
 
-        }, function(pictures){
+        }).$promise.then(function(pictures){
           $scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId]=pictures;
+          $scope.hideSpinner(span,p.segmentId);
+          $scope.showSegmentDetails(p.segmentId);
+          $scope.select($event);
+
 
         }, function(err) {
           errorMessage.show('Could not load the segment picture list');
-          $scope.loading=false;
+          $scope.hideSpinner(span,p.segmentId);
           $scope.expanded[path.replace(/\./g,'')]=false;
-          span.text(p.segmentId);
-
-        }).$promise.then(function(){
-          $scope.loading=false;
-          span.text(p.segmentId);
-          $scope.view='segment';
           $scope.saveTreeState();
-          $scope.select($event);
 
         });
-
-        return;
       }
-
-    } // clickOnSegmentId
+    }
 
     var imgloading={};
     // load and show picture details
-    $scope.clickOnPictureTimestamp=function($event, path, index) {
+    $scope.togglePictureDetails=function(expand,$event, path, index) {
       var p=splitPath(path);
 
       var pictures=$scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId];
@@ -282,8 +298,7 @@ var dd=formatter.day.format(date) +' '+ dd;
         return;
       }
 
-
-    } // clickOnPictureTimestamp
+    } // togglePictureDetails
 
     // restore tree leaf text
     $scope.imgloaded=function($event) {
@@ -319,30 +334,43 @@ var dd=formatter.day.format(date) +' '+ dd;
 
     // toggle tree node state
     $scope.toggle=function($event, path, index) {
+      var p=splitPath(path);
 
-      // toggle tree node state
-      if ($scope.expanded[path.replace(/\./g,'')]) {
+      // get toggled node state
+      var expand=!$scope.expanded[path.replace(/\./g,'')];
+
+      // dont shrink unselected node when clicking on name
+      var target=$($event.target);
+      expand|=!target.hasClass('selected') && target[0].tagName.toLowerCase()=='span';
+
+      if (!expand) {
+        // shrink node
         delete $scope.expanded[path.replace(/\./g,'')];
+        $scope.saveTreeState();
 
       } else {
-        var p=splitPath(path);
-        if (!p.segmentId) {
-          // usr clicked on a level below segmentId, nothing to load
-          $scope.expanded[path.replace(/\./g,'')]=true;
-          $scope.select($event);
 
-        } else {
+        if (!p.pictureTimestamp) {
+          // expand everything but leaf
+          $scope.expanded[path.replace(/\./g,'')]=true;
+          $scope.saveTreeState();
+          $scope.select($event);
+        }
+
+        if (p.segmentId) {
+
           if (!p.pictureTimestamp) {
-            $scope.clickOnSegmentId($event,path);
+            // user clicked on segmentId
+            $scope.expandSegment(path,$event);
 
           } else {
-            $scope.clickOnPictureTimestamp($event,path,index);
+            // user clicked on picture timestamp
+            $scope.togglePictureDetails(expand,$event,path,index);
 
           }
         }
       }
 
-      $scope.saveTreeState();
 
     } // toggle
 
@@ -373,5 +401,51 @@ var dd=formatter.day.format(date) +' '+ dd;
         total: $scope.list.length
       });
     });
+
+/*
+    // expose this scope for ng-repeat (the ugly way)
+    window.segmentsCtrl=$scope;
+    $scope._dragstart=function(e) {
+      $scope.dragentercount=0;
+      $('.dragover').removeClass('dragover');
+      $('.dragging').removeClass('dragging');
+      $(e.target).closest('tr').addClass('dragging');
+    };
+
+    $scope._dragover=function(e) {
+      if (e.preventDefault) e.preventDefault();
+      return false;
+    }
+
+    $scope.dragenter=function(e) {
+      if (e.preventDefault) e.preventDefault();
+        var tr=$(e.toElement).closest('tr');
+        if (!tr.hasClass('dragging')) {
+          if (!$scope.dragentercount) {
+            tr.addClass('dragover');
+          }
+          ++$scope.dragentercount;
+        }
+    }
+
+    $scope.dragleave=function(e) {
+      var tr=$(e.toElement).closest('tr');
+      if (!tr.hasClass('dragging')) {
+        --$scope.dragentercount;
+        if (!$scope.dragentercount) {
+          tr.removeClass('dragover');
+        }
+      }
+    }
+
+    $rootScope.ondrop=function(e) {
+      console.log('drop',e);
+    }
+
+    $rootScope.dragend=function(e) {
+      $('.dragover').removeClass('dragover');
+      $('.dragging').removeClass('dragging');
+    }
+*/
 
   })

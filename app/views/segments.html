@@ -41,7 +41,7 @@
                           <li ng-repeat="(index, picture) in tree[year][month][day][timestamp][segmentId]" ng-init="ymdtsp=ymdts+picture.id; ymdtsp2=ymdts2+'.'+picture.id">
                             <a ng-click="toggle($event,ymdtsp2,index)">
                               <!--i ng-class="expanded[year+month+day+timestamp+segmentId+picture.id] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i-->
-                              <i class="fa""></i>
+                              <i class="fa"></i>
                               <i class="fa fa-file-image-o"></i>
                               <span>{{picture.timestamp | formatTimestamp : 'hms'}}</span>
                             </a>
@@ -64,19 +64,21 @@
 
   <div ng-if="viewMode=='list'">
     <table ng-table="tableParams" show-filter="true" class="table table-condensed table-bordered table-striped">
-      <col width="auto" />
-      <col width="100%" />
+      <col width="30%"></col>
+      <col width="70%"></col>
       <tr class="ng-table-group" ng-repeat-start="group in $groups" ng-init="group.$show=false">
-        <td colspan="3">
+        <td colspan="2">
           <a ng-click="group.$show = !group.$show">
             <span class="glyphicon" ng-class="{ 'glyphicon-chevron-right': !group.$show, 'glyphicon-chevron-down': group.$show }"></span>
             <strong>{{ group.value + (group.data.length>1?' (' + group.data.length + ')':'') }}</strong>
           </a>
         </td>
       </tr>
-      <tr ng-if="group.$show" ng-repeat="segment in group.data" ng-repeat-end>
-        <td data-title="'Preview'" segment-preview="segment" segment-preview-class="thumb"></td>
-        <td data-title="'Date'" groupable="'_timestamp'" filter="{ '_timestamp': 'text' }" sortable="'timestamp'" segment-details="segment"></td>
+
+      <!--tr ng-controller="SegmentsCtrl" ng-if="group.$show" ng-repeat="segment in group.data" ng-repeat-end ondragstart="segmentsCtrl._dragstart(event)" ondragend="segmentsCtrl.dragend(event)" ondragover="segmentsCtrl._dragover(event)" ondragenter="segmentsCtrl.dragenter(event)" ondragLeave="segmentsCtrl.dragleave(event)" ondrop="segmentsCtrl.ondrop(event)" draggable="true"-->
+      <tr ng-if="group.$show" ng-repeat="segment in group.data" ng-repeat-end dnd="true">
+      <td data-title="'Date'" groupable="'_timestamp'" filter="{ '_timestamp': 'text' }" sortable="'timestamp'"  segment-preview="segment" segment-preview-class="thumb"></td>
+        <td data-title="'Details'" segment-details="segment"></td>
       </tr>
     </table>
   </div>
@@ -91,6 +93,8 @@
     <div ng-if="view=='timestamp'" class="timestamp">
     </div>
     <div ng-if="view=='segment'" class="segment">
+      <div class="segment_preview" segment-preview="segment" segment-preview-class="thumb"></div>
+      <div segment-details="segment"></div>
     </div>
     <div ng-if="view=='picture'" class="picture">
       <img ng-src="{{blob}}" dom-onload="imgloaded($event)">
