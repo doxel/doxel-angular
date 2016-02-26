@@ -55,12 +55,21 @@ angular
     'lbServices',
     'ui.router',
     'ui.bootstrap',
+    'ui-leaflet',
     'ngScrollbar',
     'ngTable'
 
   ])
-  .config(function ($httpProvider, $routeProvider, $stateProvider) {
+  .config(function ($httpProvider, $routeProvider, $stateProvider,$locationProvider) {
 
+    // enable getting query string object with $location.search()
+    // (base href must be set in index.html)
+/*    $locationProvider.html5Mode({
+      enabled: true,
+      // TODO: in production requireBase must be set to true and base href must be set in index.html
+      requireBase: true
+    });
+*/
     var bLazy = new Blazy({
         src: 'data-blazy' // Default is data-src
     });

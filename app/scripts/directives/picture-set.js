@@ -1,5 +1,5 @@
 /*
- * segment-details.js
+ * picture-set.js
  *
  * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
@@ -33,43 +33,37 @@
  *      Attribution" section of <http://doxel.org/license>.
  */
 
- 'use strict';
+'use strict';
 
 /**
  * @ngdoc directive
- * @name doxelApp.directive:segmentDetails
+ * @name doxelApp.directive:pictureSet
  * @description
- * # segment-details
+ * # pictureSet
  */
 angular.module('doxelApp')
-  .directive('segmentDetails', function () {
+  .directive('pictureSet', function ($window) {
     return {
+      templateUrl: 'views/picture-set.html',
       restrict: 'E',
       replace: false,
       scope: {
-        segment: '<',
-        segmentDetailsClass: '@'
+        pictures: '='
       },
-      controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
-        $scope.updateSegmentDetails=function(){
-          var segment=$scope.segment=$scope.segment;
-          Picture.count({
-              where: {
-                segmentId: segment.id
-              }
-          },function(result){
-            $scope.count=result && result.count;
-          },function(err){
-            errorMessage.show(err);
-          });
-        }; // updateSegmentDetails
-
-      }],
-      link: function(scope,element,attrs) {
-        scope.$watch('segment',function(newValue, oldValue){
-          scope.updateSegmentDetails();
-        });
+      controller: function($scope){
+        $scope.resize=function(){
+          console.log('resize');
+          var window=$scope.window
+          $scope.element.height(window.height()-$scope.element.offset().top-64);
+          $scope.element.width(window.width()-$scope.element.offset().left);
+        }
       },
-      templateUrl: 'views/segment-details.html'
+      link: function postLink(scope, element, attrs) {
+        element.css('overflow-y','scroll');
+        scope.window=angular.element($window);
+        scope.window.bind('resize',scope.resize);
+        scope.element=element;
+        scope.resize();
+      }
     };
   });

@@ -37,8 +37,8 @@
                           <i ng-class="expanded[ymdts] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
                         <span>{{segmentId}}</span>
                         </a>
-                        <ul class="picture" ng-if="expanded[ymdts]">
-                          <li ng-repeat="(index, picture) in tree[year][month][day][timestamp][segmentId]" ng-init="ymdtsp=ymdts+picture.id; ymdtsp2=ymdts2+'.'+picture.id">
+                        <ul class="picture" ng-if="expanded[ymdts]" ng-init="segment=tree[year][month][day][timestamp][segmentId]";>
+                          <li ng-repeat="(index, picture) in segment.pictures" ng-init="ymdtsp=ymdts+picture.id; ymdtsp2=ymdts2+'.'+picture.id">
                             <a ng-click="toggle($event,ymdtsp2,index)">
                               <!--i ng-class="expanded[year+month+day+timestamp+segmentId+picture.id] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i-->
                               <i class="fa"></i>
@@ -92,12 +92,19 @@
     </div>
     <div ng-if="view=='timestamp'" class="timestamp">
     </div>
+
     <div ng-if="view=='segment'" class="segment">
-      <div class="segment_preview" segment-preview="segment" segment-preview-class="thumb"></div>
-      <div segment-details="segment"></div>
+      <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
+      <segment-details segment="segment"></segment-details>
+      <picture-set pictures="segment.pictures"></picture-set>
     </div>
+
     <div ng-if="view=='picture'" class="picture">
-      <div picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></div>
+      <picture picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
+    </div>
+
+    <div ng-if="view=='relatedSegments'">
+      <segment-set segments="relatedSegments"></segment-set >
     </div>
   </div>
 

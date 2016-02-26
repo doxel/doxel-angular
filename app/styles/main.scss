@@ -19,6 +19,7 @@ html, body {
 
 .view {
   margin-top: 64px;
+  margin-bottom: 64px;
 }
 /* Everything but the jumbotron gets side spacing for mobile first views */
 div.header,
@@ -235,3 +236,4 @@ ng-message {
 @import "../styles/reset-password.scss";
 @import "../styles/segments.scss";
 @import "../styles/useful.scss";
+@import "../styles/picture-set.scss";

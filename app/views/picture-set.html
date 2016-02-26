@@ -1,0 +1,8 @@
+<div class="picture-set">
+  <span ng-repeat="(index, picture) in pictures">
+    <a ng-click="click($event,index)">
+      <picture picture="picture" picture-class="thumb" />
+      <div>{{picture.timestamp | formatTimestamp }}</div>
+    </a>
+  </span>
+</div>

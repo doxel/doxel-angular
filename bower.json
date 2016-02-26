@@ -15,7 +15,7 @@
     "angular-ui-router": "ui-router#~0.2.15",
     "angular-bootstrap": "~0.14.3",
     "ui.bootstrap": "~0.14.3",
-    "ui-leaflet": "~1.0.0",
+    "ui-leaflet": "^1.0.0",
     "bootstrap3-dialog": "bootstrap-dialog#~1.34.7",
     "font-awesome": "~4.5.0",
     "bootstrap-social": "~4.11.0",
