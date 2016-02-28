@@ -63,6 +63,8 @@ angular.module('doxelApp')
 
     }
 
+    $scope.selected={};
+
     // restore tree state
     if (localStorage) {
       if (localStorage.expanded) {
@@ -166,6 +168,9 @@ angular.module('doxelApp')
               var segment=timestamp[_segment.timestamp];
 
               segment[_segment.id]=_segment;
+
+              // TODO: getSegmentPath() & getPicturePath() instead
+              _segment.path=[yyyy,mm,dd,_segment.timestamp,_segment.id].join('.');
               break;
 
             case 'list':
@@ -196,21 +201,27 @@ angular.module('doxelApp')
 
     } // saveTreeState
 
-    $scope.select=function($event, path) {
-      if ($event.target.tagName.toLowerCase()!='span') {
+    $scope.select=function(path,$event) {
+      if ($event && $event.target.tagName.toLowerCase()!='span') {
         return;
       }
-      var elem=$($event.target).addClass('selected');
-      $('#segments span.selected').not(elem).removeClass('selected');
+      $scope.selected[path]=true;
+      for(var key in $scope.selected) {
+        if ($scope.selected.hasOwnProperty(key) && key!=path) {
+          delete $scope.selected[key];
+        }
+      }
     }
 
     $scope.showSpinner=function($event,text){
+      if (!$event) return; // TODO: remove workaround for relatedSegment expandAllFromPath
       $scope.loading=true;
       return $('span',$($event.target).closest('li')).
       html(((text)?text:'Loading...')+' <i class="fa fa-cog fa-spin"></i>');
     }
 
     $scope.hideSpinner=function(span,text){
+      if (!span) return; // TODO: remove workaround for relatedSegment expandAllFromPath
       $scope.loading=false;
       span.html(text);
     }
@@ -253,10 +264,44 @@ angular.module('doxelApp')
 
       return loop(level,p.length);
     }
+/*
+    $scope.expandAllFromPath=function expandAllFromPath(path,expand) {
+      function loop(level,depth,path){
+        if (depth<$scope.treeDepth-2) {
+          for(var elem in level) {
+            if (level.hasOwnProperty(elem)) {
+              $scope.expanded[path+'.'+elem]=expand;
+              loop(level[elem],depth+1,path);
+            }
+          }
 
+        } else {
+          for (var segment in level) {
+            $scope.expanded[path+'.'+segment.id]=expand;
+          }
+
+        }
+      }
+
+      var p=path.split('.');
+      var level=$scope.tree;
+      for(var i=0; i<p.length; ++i) {
+        level=level[p[i]];
+      }
+
+      return loop(level,p.length,path);
+    }
+*/
     $scope.showRelatedSegments=function(path) {
-      $scope.relatedSegments=getSegments(path);
-      $scope.view='relatedSegments';
+      var relatedSegments=getSegments(path);
+      //if (relatedSegments.length>1) {
+        $scope.relatedSegments=getSegments(path);
+        $scope.view='relatedSegments';
+/*      } else {
+        var leafPath=$scope.expandAllFromPath(path,true);
+        $scope.expandSegment(relatedSegments[0].path);
+      }
+*/
     }
 
     $scope.showSegmentDetails=function(segment) {
@@ -273,7 +318,7 @@ angular.module('doxelApp')
       // check whether picture list is already loaded
       if (segment.pictures) {
         $scope.showSegmentDetails(segment);
-        $scope.select($event);
+        $scope.select(path,$event);
 
       } else {
         var span=$scope.showSpinner($event);
@@ -291,7 +336,7 @@ angular.module('doxelApp')
 
           $scope.hideSpinner(span,p.segmentId);
           $scope.showSegmentDetails(segment);
-          $scope.select($event);
+          $scope.select(path,$event);
 
         }, function(err) {
           errorMessage.show('Could not load the segment picture list');
@@ -310,7 +355,7 @@ angular.module('doxelApp')
       var pictures=$scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId].pictures;
       var picture=pictures[index];
 
-      $scope.select($event);
+      $scope.select(path,$event);
 
       // check whether picture details are already loaded
       if (picture.loaded) {
@@ -387,7 +432,7 @@ angular.module('doxelApp')
 
       // dont shrink unselected node when clicking on name
       var target=$($event.target);
-      expand|=!target.hasClass('selected') && target[0].tagName.toLowerCase()=='span';
+      expand|=!$scope.selected[path] && target[0].tagName.toLowerCase()=='span';
 
       if (!expand) {
         // shrink node
@@ -397,7 +442,7 @@ angular.module('doxelApp')
         if (!p.pictureTimestamp) {
           // expand everything but leaf
           $scope.expand(path,true);
-          $scope.select($event);
+          $scope.select(path,$event);
         }
 
         if (p.segmentId) {

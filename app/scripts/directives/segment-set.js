@@ -42,7 +42,7 @@
  * # segmentSet
  */
 angular.module('doxelApp')
-  .directive('segmentSet', function ($window) {
+  .directive('segmentSet', function () {
     return {
       templateUrl: 'views/segment-set.html',
       restrict: 'E',
@@ -50,17 +50,14 @@ angular.module('doxelApp')
       scope: {
         segments: '='
       },
-      controller: function($scope){
-        $scope.resize=function(){
-          console.log('resize');
-          var window=$scope.window
-          $scope.element.height(window.height()-$scope.element.offset().top-64);
-          $scope.element.width(window.width()-$scope.element.offset().left);
+      controller: function($scope,$window,layout){
+        $scope.window=angular.element($window);
+        $scope.resize=function(e){
+          layout.fitToContainer($scope.window,$scope.element,{v:64,h:0});
         }
       },
+
       link: function postLink(scope, element, attrs) {
-        element.css('overflow-y','scroll');
-        scope.window=angular.element($window);
         scope.window.bind('resize',scope.resize);
         scope.element=element;
         scope.resize();

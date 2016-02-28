@@ -53,10 +53,8 @@ angular.module('doxelApp')
         segmentPreviewClass: '@'
       },
       controller: function($scope){
-        console.log('burp');
         $scope.updateSegment=function(){
           var segment=$scope.segment;
-          console.log(segment);
           if (segment.picture) {
             $scope.picture=segment.picture;
             return;
@@ -69,7 +67,6 @@ angular.module('doxelApp')
         }; // updateSegment
       },
       link: function(scope, element, attrs) {
-        console.log('burp2');
         scope.$watch('segment', function(newValue, oldValue) {
           if (newValue) {
             scope.updateSegment();

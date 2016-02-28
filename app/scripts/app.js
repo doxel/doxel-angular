@@ -57,7 +57,9 @@ angular
     'ui.bootstrap',
     'ui-leaflet',
     'ngScrollbar',
-    'ngTable'
+    'ngTable',
+    'angular-nicescroll',
+    'btford.socket-io'
 
   ])
   .config(function ($httpProvider, $routeProvider, $stateProvider,$locationProvider) {

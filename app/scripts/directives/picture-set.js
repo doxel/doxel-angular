@@ -52,14 +52,12 @@ angular.module('doxelApp')
       },
       controller: function($scope){
         $scope.resize=function(){
-          console.log('resize');
           var window=$scope.window
-          $scope.element.height(window.height()-$scope.element.offset().top-64);
-          $scope.element.width(window.width()-$scope.element.offset().left);
+          $scope.element.height(window.height()-$scope.element.offset().top+window.scrollTop()-64);
+          $scope.element.width(window.width()-$scope.element.offset().left+window.scrollLeft());
         }
       },
       link: function postLink(scope, element, attrs) {
-        element.css('overflow-y','scroll');
         scope.window=angular.element($window);
         scope.window.bind('resize',scope.resize);
         scope.element=element;

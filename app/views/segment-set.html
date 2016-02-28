@@ -1,4 +1,4 @@
-<span ng-repeat="(index, segment) in segments">
+  <span ng-repeat="(index, segment) in segments">
   <a ng-click="click($event,index)">
     <segment-preview segment="segment" segment-preview-class="thumb" />
     <div>{{segment.timestamp | formatTimestamp }}</div>

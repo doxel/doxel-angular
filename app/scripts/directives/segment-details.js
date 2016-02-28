@@ -53,15 +53,26 @@ angular.module('doxelApp')
       controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
         $scope.updateSegmentDetails=function(){
           var segment=$scope.segment=$scope.segment;
-          Picture.count({
-              where: {
-                segmentId: segment.id
-              }
-          },function(result){
-            $scope.count=result && result.count;
-          },function(err){
-            errorMessage.show(err);
-          });
+          if (segment.pictures) {
+            $scope.count=segment.pictures.length;
+
+          } else {
+            if (segment.picturesCount) {
+              $scope.count=segment.picturesCount;
+
+            } else {
+              Picture.count({
+                  where: {
+                    segmentId: segment.id
+                  }
+              },function(result){
+                $scope.count=segment.picturesCount=result && result.count;
+              },function(err){
+                errorMessage.show(err);
+              });
+            }
+          }
+
         }; // updateSegmentDetails
 
       }],

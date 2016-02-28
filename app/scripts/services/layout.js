@@ -1,5 +1,5 @@
 /*
- * logout.js
+ * layout.js
  *
  * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
@@ -36,45 +36,23 @@
  'use strict';
 
 /**
- * @ngdoc function
- * @name doxelApp.controller:LogoutCtrl
+ * @ngdoc service
+ * @name doxelApp.layout
  * @description
- * # LogoutCtrl
- * Controller of the doxelApp
+ * # layout
+ * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .controller('LogoutCtrl', function ($scope, $rootScope, $location, User, LoopBackAuth, $cookies, socketService) {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-
-    User.signout({all: true},function(err,result){
-      if (err) {
-        return console.log(err);
+  .service('layout', function ($window) {
+    return {
+      fitToContainer: function(container,element,offset){
+        var elementOffset=element.offset();
+        offset=offset||{h:0,v:0};
+        element.height(container.height()-elementOffset.top+container.scrollTop()-offset.v);
+        element.width(container.width()-elementOffset.left+container.scrollLeft()-offset.h);
+      },
+      fitToWindow: function(element,offset) {
+        fitToContainer(angular.element($window),element,offset);
       }
-      if (result && result.error) {
-        console.log(result.error);
-      }
-
-    });
-
-    User.logout({
-      accessToken: LoopBackAuth.accessTokenId
-
-    }, function(resource){
-      $rootScope.authenticated=false;
-      $cookies.remove('access_token',{path:'/'});
-      $location.path('/');
-
-    }, function(err){
-      console.log('logout failed',err)
-      $location.path('/');
-    });
-
-    if (socketService.ioSocket.connected) {
-      socketService.ioSocket.close();
     }
-
-});
+  });

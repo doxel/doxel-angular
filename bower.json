@@ -27,7 +27,12 @@
     "html5-sortable-angularjs": "*",
     "ng-table": "^0.8.3",
     "bLazy": "blazy#^1.5.2",
-    "piexifjs": "*"
+    "piexifjs": "*",
+    "angular-nicescroll": "^0.0.9",
+    "angular-material": "^1.0.5",
+    "angular-live-set": "*",
+    "angular-socket-io": "^0.7.0",
+    "socket-io-client": "^1.4.5"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"

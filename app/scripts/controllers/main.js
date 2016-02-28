@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('MainCtrl', function ($scope, $location, $q, User, $rootScope, $cookies, LoopBackAuth, errorMessage) {
+  .controller('MainCtrl', function ($scope, $location, $q, User, $rootScope, $cookies, LoopBackAuth, errorMessage,socketService) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',

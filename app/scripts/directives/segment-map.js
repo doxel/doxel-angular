@@ -1,5 +1,5 @@
 /*
- * logout.js
+ * segment-map.js
  *
  * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
@@ -36,45 +36,46 @@
  'use strict';
 
 /**
- * @ngdoc function
- * @name doxelApp.controller:LogoutCtrl
+ * @ngdoc directive
+ * @name doxelApp.directive:segmentMap
  * @description
- * # LogoutCtrl
- * Controller of the doxelApp
+ * # segmentMap
  */
 angular.module('doxelApp')
-  .controller('LogoutCtrl', function ($scope, $rootScope, $location, User, LoopBackAuth, $cookies, socketService) {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-
-    User.signout({all: true},function(err,result){
-      if (err) {
-        return console.log(err);
+  .directive('segmentMap', function (leafletData) {
+    return {
+      scope: {
+        segment: '=',
+        options: '=?'
+      },
+      template: '<leaflet ng-if="defaults" id="{{mapId}}" defaults="defaults" lf-center="center" height="{{height}}" width="{{width}}"></leaflet>',
+      restrict: 'E',
+      controller: function($scope){
+        $scope.mapId=String(Date.now())+Math.random();
+      },
+      link: function postLink(scope, element, attrs) {
+        var $scope=scope;
+        $scope.options=$scope.options||{};
+        $scope.center=$scope.options.center||angular.extend({
+          lat: 51.505,
+          lng: 4.6,
+          zoom:  8
+        },$scope.segment);
+        $scope.height=$scope.options.height||'192px';
+        $scope.width=$scope.options.width||'256px';
+        $scope.defaults=angular.extend({
+          tileLayer: '//{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
+          maxZoom: 14,
+          path: {
+              weight: 10,
+              color: '#800000',
+              opacity: 1
+          }
+        }, $scope.options.defaults);
+        scope.$watch('segment',function(newValue, oldValue){
+          leafletData.getMap($scope.mapId).then(function(map){
+          });
+        });
       }
-      if (result && result.error) {
-        console.log(result.error);
-      }
-
-    });
-
-    User.logout({
-      accessToken: LoopBackAuth.accessTokenId
-
-    }, function(resource){
-      $rootScope.authenticated=false;
-      $cookies.remove('access_token',{path:'/'});
-      $location.path('/');
-
-    }, function(err){
-      console.log('logout failed',err)
-      $location.path('/');
-    });
-
-    if (socketService.ioSocket.connected) {
-      socketService.ioSocket.close();
-    }
-
-});
+    };
+  });
