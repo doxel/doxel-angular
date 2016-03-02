@@ -1,6 +1,6 @@
 <div ng-if="segment" class="segment-details {{segmentDetailsClass}}">
+  <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
   <div id="timestamp">{{segment.timestamp | formatTimestamp}}</div>
   <div id="count">{{count}} pictures.</div>
   <segment-map ng-if="segment.lat" segment="segment"></segment-map>
-  <--div segment-status="segment"></div-->
 </div>

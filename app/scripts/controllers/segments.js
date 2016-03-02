@@ -307,6 +307,7 @@ angular.module('doxelApp')
     $scope.showSegmentDetails=function(segment) {
       // trigger segment-details directive
       $scope.segment=segment;
+      console.log(segment.pictures);
       // show segment view
       $scope.view='segment';
     }
@@ -461,6 +462,19 @@ angular.module('doxelApp')
       }
 
     } // toggle
+
+    $scope.$on('ui.layout.resize', function(e, beforeContainer, afterContainer) {
+      var container=beforeContainer.element;
+      container.find('.ui-layout-resize')
+        .height(container.height())
+        .width(container.width());
+
+      container=afterContainer.element;
+      container.find('.ui-layout-resize')
+        .height(container.height())
+        .width(container.width());
+
+    });
 
     $scope.refresh().$promise.then(function(){
       $scope.tableParams=new ngTableParams({

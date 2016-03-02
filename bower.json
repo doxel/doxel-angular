@@ -32,7 +32,9 @@
     "angular-material": "^1.0.5",
     "angular-live-set": "*",
     "angular-socket-io": "^0.7.0",
-    "socket-io-client": "^1.4.5"
+    "socket-io-client": "^1.4.5",
+    "angular-ui-layout": "^1.4.2",
+    "ng-tags-input": "^3.0.0"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"

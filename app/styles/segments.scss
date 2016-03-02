@@ -1,7 +1,28 @@
+
+#segments {
+  .search-results-container {
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  ui-layout-container {
+    margin-bottom: 64px;
+    margin-top: 64px;
+  }
+
+
+}
+
+
 #segments ul {
     list-style: none;
+    padding-left: 10px;
+}
+
+#segments ul ul {
     padding-left: 20px;
 }
+
 #segments span.selected {
   background: cyan;
 }
@@ -18,17 +39,18 @@
   width: 15px;
 }
 
-#segments div.tree,
 #segments div.details {
   float: left;
 }
 
 #segments div.details {
-  margin-left: 64px;
+  margin-left: 10px;
 }
 
-#segments div.details > div {
-  position: fixed;
+#segments div.details > div,
+#segments .segment-pictures,
+#segments .segment-details {
+  text-align: center;
 }
 
 #segments .thumb {
@@ -36,6 +58,12 @@
   background-position: center;
   width: 192px;
   height: 120px;
+  border: 1px solid transparent;
+
+
+}
+#segments .segment-details .thumb {
+  margin: auto;
 }
 
 #segments picture {
@@ -55,4 +83,18 @@
 segment-map {
   width: 256px;
   height: 192px;
+}
+
+
+segment-preview {
+  height: 192px;
+}
+
+#segments .tree ul {
+  white-space: nowrap;
+}
+
+#segments .tags-input-container {
+  margin-left: 10px;
+  margin-right: 10px;
 }

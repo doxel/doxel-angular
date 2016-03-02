@@ -59,9 +59,9 @@ angular.module('doxelApp')
       },
       link: function postLink(scope, element, attrs) {
         scope.window=angular.element($window);
-        scope.window.bind('resize',scope.resize);
+//        scope.window.bind('resize',scope.resize);
         scope.element=element;
-        scope.resize();
+  //      scope.resize();
       }
     };
   });

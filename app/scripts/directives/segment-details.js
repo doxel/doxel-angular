@@ -47,7 +47,7 @@ angular.module('doxelApp')
       restrict: 'E',
       replace: false,
       scope: {
-        segment: '<',
+        segment: '=',
         segmentDetailsClass: '@'
       },
       controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {

@@ -50,17 +50,21 @@ angular.module('doxelApp')
       scope: {
         segments: '='
       },
-      controller: function($scope,$window,layout){
+      controller: function($scope,$window,layout,$timeout){
         $scope.window=angular.element($window);
         $scope.resize=function(e){
-          layout.fitToContainer($scope.window,$scope.element,{v:64,h:0});
+          $timeout(function(){
+            layout.fitToContainer($scope.window,$scope.element,{v:64,h:0});
+          },1000);
         }
+
       },
 
       link: function postLink(scope, element, attrs) {
-        scope.window.bind('resize',scope.resize);
+    //    scope.window.bind('resize',scope.resize);
         scope.element=element;
-        scope.resize();
+        scope.container=element.closest('ui-layout-container');
+    //    scope.resize();
       }
     };
   });

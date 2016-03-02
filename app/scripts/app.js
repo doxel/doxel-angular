@@ -59,7 +59,10 @@ angular
     'ngScrollbar',
     'ngTable',
     'angular-nicescroll',
-    'btford.socket-io'
+    'btford.socket-io',
+    'ui.layout',
+    'ngTagsInput'
+    
 
   ])
   .config(function ($httpProvider, $routeProvider, $stateProvider,$locationProvider) {
