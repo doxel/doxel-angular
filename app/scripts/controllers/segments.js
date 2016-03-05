@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('SegmentsCtrl', function ($location, $q, $rootScope, $scope, ngTableParams, errorMessage, getPictureBlobAndExif, Segment, Picture, $filter, User) {
+  .controller('SegmentsCtrl', function ($window, $location, $q, $rootScope, $scope, ngTableParams, errorMessage, getPictureBlobAndExif, Segment, Picture, $filter, User) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -463,17 +463,34 @@ angular.module('doxelApp')
 
     } // toggle
 
+    function resizeNiceScrollable(container) {
+        container.find('[ng-nicescroll]')
+        .height(container.height())
+        .width(container.width());
+    }
+
     $scope.$on('ui.layout.resize', function(e, beforeContainer, afterContainer) {
-      var container=beforeContainer.element;
-      container.find('.ui-layout-resize')
-        .height(container.height())
-        .width(container.width());
+      // use timeout for proper scrollbar placement
+      setTimeout(function(){
+        resizeNiceScrollable(beforeContainer.element);
+        resizeNiceScrollable(afterContainer.element);
+      },0);
+    });
 
-      container=afterContainer.element;
-      container.find('.ui-layout-resize')
-        .height(container.height())
-        .width(container.width());
+    $scope.$on('ui.layout.loaded', function(e,uiLayoutLoaded,element) {
+      element.find('[ng-nicescroll]').each(function(){
+        var nicescroll=$(this);
+        setTimeout(function(){
+          resizeNiceScrollable(nicescroll.closest('ui-layout-container'));
+        },0);
+      });
+    });
 
+    angular.element($window).on('resize', function(){
+      $('#segments [ng-nicescroll]').each(function(){
+        var nicescroll=$(this);
+        resizeNiceScrollable(nicescroll.closest('ui-layout-container'));
+      });
     });
 
     $scope.refresh().$promise.then(function(){

@@ -2,19 +2,21 @@
 <div class="view" id="segments" ng-cloak>
 
 
-  <div class="search-results-container" ui-layout="{flow: 'column', disableToggle: true}">
+  <div class="search-results-container" ui-layout="{flow: 'column', disableToggle: true}" ui-layout-loaded>
 
-    <ui-layout-container ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: false}">
+    <ui-layout-container size="256px">
+      <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
       <div class="tags-input-container">
           <tags-input ng-model="tags">
             <auto-complete source="loadTags($query)"></auto-complete>
           </tags-input>
       </div>
+    </div>
     </ui-layout-container>
 
-    <ui-layout-container size="128px" ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: false}">
+    <ui-layout-container>
 
-      <div ng-if="viewMode=='tree'">
+      <div ng-if="viewMode=='tree'" ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
         <div class="tree ui-layout-resize" >
           <ul class="year">
             <li ng-repeat="(year, month) in tree">
@@ -77,7 +79,7 @@
         </div>
       </div>
 
-      <div ng-if="viewMode=='list'">
+      <div ng-if="viewMode=='list'"  ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
         <table ng-table="tableParams" show-filter="true" class="table table-condensed table-bordered table-striped">
           <col width="30%"></col>
           <col width="70%"></col>
@@ -100,35 +102,39 @@
 
     </ui-layout-container>
 
-    <ui-layout-container ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: false}">
-      <div class="details">
-        <div ng-if="view=='year'" class="year">
-        </div>
-        <div ng-if="view=='month'" class="month">
-        </div>
-        <div ng-if="view=='day'" class="day">
-        </div>
-        <div ng-if="view=='timestamp'" class="timestamp">
-        </div>
+    <ui-layout-container>
+      <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+        <div class="details">
+          <div ng-if="view=='year'" class="year">
+          </div>
+          <div ng-if="view=='month'" class="month">
+          </div>
+          <div ng-if="view=='day'" class="day">
+          </div>
+          <div ng-if="view=='timestamp'" class="timestamp">
+          </div>
 
-        <div ng-if="view=='segment'" class="segment">
-        <!--leaflet id="segment.id"  height="256px" width="192px"></leaflet-->
-          <segment-details segment="segment"></segment-details>
-        </div>
+          <div ng-if="view=='segment'" class="segment">
+          <!--leaflet id="segment.id"  height="256px" width="192px"></leaflet-->
+            <segment-details segment="segment"></segment-details>
+          </div>
 
-        <div ng-if="view=='picture'" class="picture">
-          <picture picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
-        </div>
+          <div ng-if="view=='picture'" class="picture">
+            <picture picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
+          </div>
 
-        <div ng-if="view=='relatedSegments'">
-          <segment-set class="ui-layout-resize" segments="relatedSegments" ></segment-set >
-        </div>
+          <div ng-if="view=='relatedSegments'">
+            <segment-set class="ui-layout-resize" segments="relatedSegments" ></segment-set >
+          </div>
 
+        </div>
       </div>
     </ui-layout-container>
 
-    <ui-layout-container style="background: white" ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: false}">
-      <picture-set class="segment-pictures" ng-if="view=='segment'" pictures="segment.pictures"></picture-set>
+    <ui-layout-container style="background: white">
+      <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+        <picture-set class="segment-pictures" ng-if="view=='segment'" pictures="segment.pictures" ></picture-set>
+      </div>
     </ui-layout-container>
 
   </div>
