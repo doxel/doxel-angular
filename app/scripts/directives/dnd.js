@@ -57,7 +57,7 @@ angular.module('doxelApp')
 
         scope.dragOverClass=scope.dndDragoverClass||'dragover';
         scope.selector= (attrs.dndSelector)?attrs.dndSelector:$element[0].tagName.toLowerCase();
-        scope.dndChildren= (attrs.dndChildren)?attrs.dndChildren:$element[0].tagName.toLowerCase()+' div';
+        scope.targets= (attrs.dndTargets)?attrs.dndTargets:scope.selector;
 
     /*
         var $rootScope=(function(scope){
@@ -84,31 +84,10 @@ angular.module('doxelApp')
         function cleanup() {
           removeDragover();
           removeDragging();
-          disabled.forEach(function(elem){
-            elem.css('pointer-events','');
-          });
-          disabled=[];
         }
 
         function getDraggableElem(elem) {
           return $(elem).closest(scope.selector);
-        }
-
-        var disabled=[]
-        function disablePointerEvents(elem,disable){
-          var ok;
-          var index=disabled.indexOf(elem);
-          if (index>=0) {
-            if (disable) {
-              ok=true;
-            } else {
-              disabled.split(index,1);
-            }
-          }
-          if (!ok) {
-            disabled.push(elem);
-          }
-          $(scope.dndChildren).css('pointer-events',((disable)?'none':''));
         }
 
         // dragndrop event handlers
@@ -119,10 +98,10 @@ angular.module('doxelApp')
             return;
           }
           var elem=getDraggableElem(e.target).addClass('dragging');
-          disablePointerEvents(elem,true);
         }
 
         function ondragover(e) {
+          if (!$(e.toElement).is(scope.targets)) return;
           if (scope.onDragOver(scope,{$event: e})===false) {
             return false;
           }
@@ -131,6 +110,7 @@ angular.module('doxelApp')
         }
 
         function ondragenter(e) {
+          if (!$(e.toElement).is(scope.targets)) return;
           if (scope.onDragEnter(scope,{$event: e})===false) {
             return false;
           }
@@ -142,6 +122,7 @@ angular.module('doxelApp')
         }
 
         function ondragleave(e) {
+          if (!$(e.toElement).is(scope.targets)) return;
           if (scope.onDragLeave(scope,{$event: e})===false) {
             return false;
           }
@@ -150,6 +131,7 @@ angular.module('doxelApp')
         }
 
         function ondrop(e) {
+          if (!$(e.toElement).is(scope.targets)) return;
           if (e.preventDefault) e.preventDefault();
           var elem=getDraggableElem(e.originalEvent.toElement);
           if (elem.hasClass(scope.dragOverClass)) {
@@ -160,10 +142,10 @@ angular.module('doxelApp')
         }
 
         function ondragend(e) {
+          cleanup();
           if (scope.onDragEnd(scope,{$event: e})===false) {
             return;
           }
-          cleanup();
         }
 
         $element[0].draggable=scope.dnd?'true':'false';
