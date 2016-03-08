@@ -4,7 +4,8 @@
 
   <div class="search-results-container" ui-layout="{flow: 'column', disableToggle: true}" ui-layout-loaded>
 
-    <ui-layout-container size="256px">
+    <ui-layout-container class="primary" size="256px" collapsed="layout.tags.collapsed">
+      <toggle />
       <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
       <div class="tags-input-container">
           <tags-input ng-model="tags">
@@ -14,8 +15,8 @@
     </div>
     </ui-layout-container>
 
-    <ui-layout-container>
-
+    <ui-layout-container class="primary" collapsed="layout.tree.collapsed">
+      <toggle />
       <div ng-if="viewMode=='tree'" ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
         <div class="tree ui-layout-resize" >
           <ul class="year">
@@ -102,38 +103,39 @@
 
     </ui-layout-container>
 
-    <ui-layout-container>
-      <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
-        <div class="details">
-          <div ng-if="view=='year'" class="year">
+    <ui-layout-container class="primary" collapsed="layout.secondary.collapsed">
+      <div ui-layout="{flow: 'row', disableToggle: true}" ui-layout-loaded style="overflow: hidden">
+        <ui-layout-container collapsed="layout.segmentDetails.collapsed">
+          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+            <div>
+                <segment-details segment="segment"></segment-details>
+            </div>
           </div>
-          <div ng-if="view=='month'" class="month">
+        </ui-layout-container>
+        <ui-layout-container class="relatedSegments" collapsed="layout.relatedSegments.collapsed">
+          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+            <div>
+              <segment-set class="ui-layout-resize" segments="relatedSegments" ></segment-set >
+            </div>
           </div>
-          <div ng-if="view=='day'" class="day">
-          </div>
-          <div ng-if="view=='timestamp'" class="timestamp">
-          </div>
-
-          <div ng-if="view=='segment'" class="segment">
-          <!--leaflet id="segment.id"  height="256px" width="192px"></leaflet-->
-            <segment-details segment="segment"></segment-details>
-          </div>
-
-          <div ng-if="view=='picture'" class="picture">
-            <picture picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
-          </div>
-
-          <div ng-if="view=='relatedSegments'">
-            <segment-set class="ui-layout-resize" segments="relatedSegments" ></segment-set >
-          </div>
-
-        </div>
+        </ui-layout-container>
       </div>
     </ui-layout-container>
 
-    <ui-layout-container style="background: white">
-      <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
-        <picture-set class="segment-pictures" ng-if="view=='segment'" pictures="segment.pictures" ></picture-set>
+    <ui-layout-container class="primary" collapsed="layout.secondary.collapsed">
+      <div ui-layout="{flow: 'row', disableToggle: true}" ui-layout-loaded style="overflow: hidden">
+        <ui-layout-container collapsed="layout.pictureDetails.collapsed">
+          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+            <div>
+                <picture picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
+            </div>
+          </div>
+        </ui-layout-container>
+        <ui-layout-container collapsed="layout.pictures.collapsed">
+          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+            <picture-set class="segment-pictures" pictures="segment.pictures" ></picture-set>
+          </div>
+        </ui-layout-container>
       </div>
     </ui-layout-container>
 

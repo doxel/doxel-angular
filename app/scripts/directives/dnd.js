@@ -42,7 +42,7 @@
  * # dnd
  */
 angular.module('doxelApp')
-  .directive('dnd', function () {
+  .directive('dnd', function ($parse) {
     return {
       restrict: 'A',
       replace: false,
@@ -50,13 +50,14 @@ angular.module('doxelApp')
       link: function postLink(scope, $element, attrs) {
         scope.onDragStart=(attrs.onDragStart)?$parse(attrs.onDragStart):function(scope,e){console.log(e.$event)};
         scope.onDragEnter=(attrs.onDragEnter)?$parse(attrs.onDragEnter):function(scope,e){console.log(e.$event)};
-        scope.onDragOver=(attrs.onDragOver)?$parse(attrs.onDragOver):function(scope,e){console.log(e.$event)};
+        scope.onDragOver=(attrs.onDragOver)?$parse(attrs.onDragOver):function(scope,e){return;console.log(e.$event)};
         scope.onDragLeave=(attrs.onDragLeave)?$parse(attrs.onDragLeave):function(scope,e){console.log(e.$event)};
         scope.onDrop=(attrs.onDrop)?$parse(attrs.onDrop):function(scope,e){console.log(e.$event)};
         scope.onDragEnd=(attrs.onDragEnd)?$parse(attrs.onDragEnd):function(scope,e){console.log(e.$event)};
 
         scope.dragOverClass=scope.dndDragoverClass||'dragover';
-        scope.selector=scope.dndSelector||$element[0].tagName;
+        scope.selector= (attrs.dndSelector)?attrs.dndSelector:$element[0].tagName.toLowerCase();
+        scope.dndChildren= (attrs.dndChildren)?attrs.dndChildren:$element[0].tagName.toLowerCase()+' div';
 
     /*
         var $rootScope=(function(scope){
@@ -83,15 +84,31 @@ angular.module('doxelApp')
         function cleanup() {
           removeDragover();
           removeDragging();
-          disablePointerEvents(false);
+          disabled.forEach(function(elem){
+            elem.css('pointer-events','');
+          });
+          disabled=[];
         }
 
         function getDraggableElem(elem) {
           return $(elem).closest(scope.selector);
         }
 
-        function disablePointerEvents(disable){
-          $(scope.selector+ ' div').css('pointer-events',((disable)?'none':''));
+        var disabled=[]
+        function disablePointerEvents(elem,disable){
+          var ok;
+          var index=disabled.indexOf(elem);
+          if (index>=0) {
+            if (disable) {
+              ok=true;
+            } else {
+              disabled.split(index,1);
+            }
+          }
+          if (!ok) {
+            disabled.push(elem);
+          }
+          $(scope.dndChildren).css('pointer-events',((disable)?'none':''));
         }
 
         // dragndrop event handlers
@@ -101,8 +118,8 @@ angular.module('doxelApp')
           if (scope.onDragStart(scope,{$event: e})===false) {
             return;
           }
-          getDraggableElem(e.target).addClass('dragging');
-          disablePointerEvents(true);
+          var elem=getDraggableElem(e.target).addClass('dragging');
+          disablePointerEvents(elem,true);
         }
 
         function ondragover(e) {

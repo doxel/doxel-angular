@@ -1,6 +1,6 @@
   <span ng-repeat="(index, segment) in segments">
-  <a ng-click="click($event,index)">
-    <segment-preview segment="segment" segment-preview-class="thumb" />
-    <div>{{segment.timestamp | formatTimestamp }}</div>
+  <a data-sid="{{segment.id}}" ng-click="click($event,index)" dnd dnd-children=".thumb,.date" dnd-top="segment-set">
+    <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
+    <div class="date">{{segment.timestamp | formatTimestamp }}</div>
   </a>
 </span>

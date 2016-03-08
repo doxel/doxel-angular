@@ -1,5 +1,5 @@
 /*
- * segment-details.js
+ * element-selection.js
  *
  * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
@@ -36,54 +36,55 @@
  'use strict';
 
 /**
- * @ngdoc directive
- * @name doxelApp.directive:segmentDetails
+ * @ngdoc service
+ * @name doxelApp.elementSelection
  * @description
- * # segment-details
+ * # elementSelection
+ * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .directive('segmentDetails', function () {
-    return {
-      restrict: 'E',
-      replace: false,
-      scope: {
-        segment: '=',
-        segmentDetailsClass: '@'
-      },
-      controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
-        $scope.updateSegmentDetails=function(){
-          var segment=$scope.segment=$scope.segment;
-          if (segment.pictures) {
-            $scope.count=segment.pictures.length;
+  .service('elementSelection', function () {
+    // AngularJS will instantiate a singleton by calling "new" on this function
+    var self=this;
+    this.selection={};
+
+    this.replace=function(type,elem){
+      var alreadySelected;
+
+      if (self.selection[type]===undefined) {
+        self.selection[type]=[];
+
+      } else {
+        self.selection[type].forEach(function(el){
+          if (el==elem) {
+            alreadySelected=true;
 
           } else {
-            if (segment.picturesCount) {
-              $scope.count=segment.picturesCount;
-
-            } else {
-              Picture.count({
-                  where: {
-                    segmentId: segment.id
-                  }
-              },function(result){
-                $scope.count=segment.picturesCount=result && result.count;
-              },function(err){
-                errorMessage.show(err);
-              });
-            }
-          }
-
-        }; // updateSegmentDetails
-
-      }],
-      link: function(scope,element,attrs) {
-        scope.$watch('segment',function(newValue, oldValue){
-          if (newValue) {
-            scope.updateSegmentDetails();
+            el.removeClass('selected');
           }
         });
+      }
+      self.selection[type]=[elem];
+      elem.addClass('selected');
+    }
 
-      },
-      templateUrl: 'views/segment-details.html'
-    };
+    this.add=function(type,elem) {
+      if (self.selection[type]===undefined) {
+        self.selection[type]=[];
+      }
+      if (self.selection[type].indexOf(elem)<0) {
+        self.selection[type].push(elem);
+      }
+    }
+
+    this.remove=function(type,elem) {
+      if (self.selection[type]===undefined) {
+        return;
+      }
+      var index=self.selection[type].indexOf(elem);
+      if (index>=0) {
+        self.selection[type].splice(index,1);
+      }
+    }
+
   });

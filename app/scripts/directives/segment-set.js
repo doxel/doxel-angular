@@ -42,7 +42,7 @@
  * # segmentSet
  */
 angular.module('doxelApp')
-  .directive('segmentSet', function () {
+  .directive('segmentSet', function (elementSelection) {
     return {
       templateUrl: 'views/segment-set.html',
       restrict: 'E',
@@ -50,20 +50,40 @@ angular.module('doxelApp')
       scope: {
         segments: '='
       },
-      controller: function($scope,$window,layout,$timeout){
+      controller: function($scope,$window,layout,$timeout,errorMessage,Picture,elementSelection){
+
+        $scope.click=function($event,index){
+          var segment=$scope.segments[index]
+          console.log($event);
+          $scope.$parent.showSegmentDetails(segment);
+          if (!segment.pictures) {
+            Picture.find({
+              filter: {
+                where: {
+                  segmentId: segment.id
+                }
+              }
+            }, function(pictures){
+              segment.pictures=pictures;
+            }, errorMessage.show);
+          }
+
+        }
+/*
         $scope.window=angular.element($window);
         $scope.resize=function(e){
           $timeout(function(){
             layout.fitToContainer($scope.window,$scope.element,{v:64,h:0});
           },1000);
         }
-
+*/
       },
 
       link: function postLink(scope, element, attrs) {
     //    scope.window.bind('resize',scope.resize);
         scope.element=element;
         scope.container=element.closest('ui-layout-container');
+
     //    scope.resize();
       }
     };

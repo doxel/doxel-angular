@@ -6,11 +6,14 @@
   }
 
   ui-layout-container {
-    margin-bottom: 60px;
-    margin-top: 64px;
     overflow: hidden;
   }
 
+  ui-layout-container.primary {
+      margin-bottom: 60px;
+      margin-top: 64px;
+
+  }
 
 }
 
@@ -48,7 +51,7 @@
   padding: 10px;
 }
 
-#segments div.details > div,
+#segments .relatedSegments,
 #segments .segment-pictures,
 #segments .segment-details {
   text-align: center;
@@ -59,7 +62,6 @@
   background-position: center;
   width: 192px;
   height: 120px;
-  border: 1px solid transparent;
 
 
 }
@@ -70,7 +72,6 @@
 #segments picture {
   width: 192px;
   height: 120px;
-  border: 1px solid transparent;
 }
 
 #segments .dragover {
@@ -97,4 +98,18 @@ segment-preview {
 
 #segments .tags-input-container {
   padding: 10px;
+}
+
+.thumb.selected {
+  border: 4px dashed yellow;
+}
+
+.togsgle {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  margin: 4px;
+  width: 1.5em;
+  height: 1.5em;
+  text-align: center;
 }

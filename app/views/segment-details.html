@@ -2,5 +2,7 @@
   <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
   <div id="timestamp">{{segment.timestamp | formatTimestamp}}</div>
   <div id="count">{{count}} pictures.</div>
+  <label for='description'>Description</label>
+  <textarea id="description" ng-model="segment.description"></textarea>
   <segment-map ng-if="segment.lat" segment="segment"></segment-map>
 </div>

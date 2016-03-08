@@ -54,28 +54,47 @@ angular.module('doxelApp')
         $scope.mapId=String(Date.now())+Math.random();
       },
       link: function postLink(scope, element, attrs) {
-        var $scope=scope;
-        $scope.options=$scope.options||{};
-        $scope.center=$scope.options.center||angular.extend({
+        var segmentsCtrlScope=scope;
+        while(!segmentsCtrlScope.segmentsCtrl) {
+          segmentsCtrlScope=segmentsCtrlScope.$parent;
+        }
+        scope.options=scope.options||{};
+        scope.center=scope.options.center||angular.extend({
           lat: 51.505,
           lng: 4.6,
           zoom:  8
-        },$scope.segment);
-        $scope.height=$scope.options.height||'192px';
-        $scope.width=$scope.options.width||'256px';
-        $scope.defaults=angular.extend({
+        },scope.segment);
+        scope.height=scope.options.height||'192px';
+        scope.width=scope.options.width||'256px';
+        scope.defaults=angular.extend({
           tileLayer: '//{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
-          maxZoom: 14,
+          maxZoom: 19,
           path: {
               weight: 10,
               color: '#800000',
               opacity: 1
           }
-        }, $scope.options.defaults);
+        }, scope.options.defaults);
         scope.$watch('segment',function(newValue, oldValue){
-          leafletData.getMap($scope.mapId).then(function(map){
-          });
-        });
+          if (newValue) {
+            console.log('newvalue');
+            var segment=newValue;
+            leafletData.getMap(scope.mapId).then(function(map){
+              angular.forEach(segment.pictures,function(picture){
+                if (picture.lng!==undefined) {
+                  if (!picture.marker) {
+                    var marker=L.marker([picture.lat, picture.lng]).on('click',function(e){
+                      segmentsCtrlScope.picture=e.target.picture;
+                    })
+                    marker.picture=picture;
+//                    picture.marker.scope=scope.$id;
+                  }
+                  marker.addTo(map);
+                }
+              }); // angular.foreach
+            }); // lealetData
+          }
+        }); // scope.$watch
       }
     };
   });

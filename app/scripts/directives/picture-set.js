@@ -51,16 +51,23 @@ angular.module('doxelApp')
         pictures: '='
       },
       controller: function($scope){
-        $scope.resize=function(){
+
+        $scope.click=function($event,index){
+          var picture=$scope.pictures[index]
+          $scope.$parent.showPictureDetails(picture);
+
+        }
+/*        $scope.resize=function(){
           var window=$scope.window
           $scope.element.height(window.height()-$scope.element.offset().top+window.scrollTop()-64);
           $scope.element.width(window.width()-$scope.element.offset().left+window.scrollLeft());
         }
-      },
+  */
+    },
       link: function postLink(scope, element, attrs) {
-        scope.window=angular.element($window);
+//        scope.window=angular.element($window);
 //        scope.window.bind('resize',scope.resize);
-        scope.element=element;
+  //      scope.element=element;
   //      scope.resize();
       }
     };
