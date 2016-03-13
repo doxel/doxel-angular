@@ -48,15 +48,17 @@
                             <span ng-class="selected[ymdt2] ? 'selected' : ''">{{timestamp | formatTimestamp : 'hms'}}</span>
                           </a>
                           <ul class="segmentId" ng-if="expanded[ymdt]">
-                            <li ng-repeat="(segmentId, segment) in tree[year][month][day][timestamp]" ng-init="ymdts=ymdt+segmentId; ymdts2=ymdt2+'.'+segmentId">
+                            <li ng-repeat="(segmentId, segment) in tree[year][month][day][timestamp]" ng-init="ymdts=ymdt+segmentId; ymdts2=ymdt2+'.'+segmentId" class="dropsegment droppicture">
                               <a ng-click="toggle($event,ymdts2)">
                                 <i ng-class="expanded[ymdts] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i>
-                                <i ng-class="expanded[ymdts] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
-                              <span ng-class="selected[ymdts2] ? 'selected' : ''">{{segmentId}}</span>
+                                <span dnd dnd-debug="true" dnd-targets=".dropsegment">
+                                  <i ng-class="expanded[ymdts] ? 'fa fa-folder-open' : 'fa fa-folder'"></i>
+                                  <span ng-class="selected[ymdts2] ? 'selected' : ''">{{segmentId}}</span>
+                                </span>
                               </a>
                               <ul class="picture" ng-if="expanded[ymdts]" ng-init="segment=tree[year][month][day][timestamp][segmentId]";>
                                 <li ng-repeat="(index, picture) in segment.pictures" ng-init="ymdtsp=ymdts+picture.id; ymdtsp2=ymdts2+'.'+picture.id">
-                                  <a ng-click="toggle($event,ymdtsp2,index)">
+                                  <a ng-click="toggle($event,ymdtsp2,index)" dnd dnd-debug="true" dnd-targets=".droppicture">
                                     <!--i ng-class="expanded[year+month+day+timestamp+segmentId+picture.id] ? 'fa fa-caret-down' : 'fa fa-caret-right'"></i-->
                                     <i class="fa"></i>
                                     <i class="fa fa-file-image-o"></i>
@@ -96,7 +98,7 @@
           <!--tr ng-controller="SegmentsCtrl" ng-if="group.$show" ng-repeat="segment in group.data" ng-repeat-end ondragstart="segmentsCtrl._dragstart(event)" ondragend="segmentsCtrl.dragend(event)" ondragover="segmentsCtrl._dragover(event)" ondragenter="segmentsCtrl.dragenter(event)" ondragLeave="segmentsCtrl.dragleave(event)" ondrop="segmentsCtrl.ondrop(event)" draggable="true"-->
           <tr ng-if="group.$show" ng-repeat="segment in group.data" ng-repeat-end dnd="true">
           <td data-title="'Date'" groupable="'_timestamp'" filter="{ '_timestamp': 'text' }" sortable="'timestamp'"  segment-preview="segment" segment-preview-class="thumb"></td>
-            <td data-title="'Details'" segment-details="segment"></td>
+            <td data-title="'Details'"><segment-details segment="segment" /></td>
           </tr>
         </table>
       </div>
@@ -105,38 +107,30 @@
 
     <ui-layout-container class="primary" collapsed="layout.secondary.collapsed">
       <div ui-layout="{flow: 'row', disableToggle: true}" ui-layout-loaded style="overflow: hidden">
-        <ui-layout-container collapsed="layout.segmentDetails.collapsed">
-          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
-            <div>
-                <segment-details segment="segment"></segment-details>
-            </div>
-          </div>
-        </ui-layout-container>
-        <ui-layout-container class="relatedSegments" collapsed="layout.relatedSegments.collapsed">
-          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
-            <div>
-              <segment-set class="ui-layout-resize" segments="relatedSegments" ></segment-set >
-            </div>
-          </div>
-        </ui-layout-container>
+            <ui-layout-container size="192px" class="relatedSegments" collapsed="layout.relatedSegments.collapsed">
+              <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+                <div>
+                  <segment-set class="ui-layout-resize" segments="relatedSegments" ></segment-set >
+                </div>
+              </div>
+            </ui-layout-container>
+            <ui-layout-container size="192px" collapsed="layout.pictures.collapsed">
+              <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+                <div>
+                  <picture-set class="segment-pictures" pictures="segment.pictures" ></picture-set>
+                </div>
+              </div>
+            </ui-layout-container>
+            <ui-layout-container collapsed="layout.segmentDetails.collapsed">
+              <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
+                <div>
+                  <segment-details ng-if="view=='segment'" segment="segment"></segment-details>
+                  <picture ng-if="view=='picture'" picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
+                </div>
+              </div>
+            </ui-layout-container>
       </div>
-    </ui-layout-container>
 
-    <ui-layout-container class="primary" collapsed="layout.secondary.collapsed">
-      <div ui-layout="{flow: 'row', disableToggle: true}" ui-layout-loaded style="overflow: hidden">
-        <ui-layout-container collapsed="layout.pictureDetails.collapsed">
-          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
-            <div>
-                <picture picture="picture" picture-class="thumb" picture-onload="imgloaded($event)"></picture>
-            </div>
-          </div>
-        </ui-layout-container>
-        <ui-layout-container collapsed="layout.pictures.collapsed">
-          <div ng-nicescroll nice-option="{nativeparentscrolling: false, autohidemode: true}">
-            <picture-set class="segment-pictures" pictures="segment.pictures" ></picture-set>
-          </div>
-        </ui-layout-container>
-      </div>
     </ui-layout-container>
 
   </div>

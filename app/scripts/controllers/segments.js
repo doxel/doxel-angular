@@ -229,7 +229,8 @@ angular.module('doxelApp')
 
     } // saveTreeState
 
-    function expandTo(path) {
+    // expand parent tree nodes
+    function expandParentNodes(path) {
       var _path=[];
       path.split('.').forEach(function(p){
         _path.push(p);
@@ -237,11 +238,16 @@ angular.module('doxelApp')
       });
     }
 
+    // select picture or segment in tree and in thumb list
     $scope.select=function(path,$event) {
       if ($event && $event.target.tagName.toLowerCase()!='span') {
         return;
       }
+
+      // mark tree path as selected
       $scope.selected[path]=true;
+
+      // unselect other tree paths
       for(var key in $scope.selected) {
         if ($scope.selected.hasOwnProperty(key) && key!=path) {
           delete $scope.selected[key];
@@ -255,9 +261,11 @@ angular.module('doxelApp')
 
         var thumb;
         if (p.pictureId) {
+          // path refers to a picture
           thumb=$('picture-set a[data-pid='+p.pictureId+'] .thumb');
 
         } else if (p.segmentId) {
+          // path refers to a segment
           thumb=$('segment-set a[data-sid='+p.segmentId+'] .thumb');
 
         }
@@ -271,12 +279,13 @@ angular.module('doxelApp')
 
       } else {
         // clicked on thumb
-        // expand path and select tree node
+        // expand parent tree nodes and select the given one
         $timeout(function(){
           var nicescroll=$('.tree').parent();
           if (!$('.tree .selected').length) {
-            expandTo(path);
+            expandParentNodes(path);
           }
+          // scroll to selected node
           $timeout(function(){
             var itemTop=$('.tree .selected').position().top;
             nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-nicescroll.height()/3);
@@ -285,6 +294,7 @@ angular.module('doxelApp')
       }
     }
 
+    // show "Loading..." and spinner in tree
     $scope.showSpinner=function($event,text){
       if (!$event) return; // TODO: remove workaround for relatedSegment expandAllFromPath
       $scope.loading=true;
@@ -292,12 +302,14 @@ angular.module('doxelApp')
       html(((text)?text:'Loading...')+' <i class="fa fa-cog fa-spin"></i>');
     }
 
+    // restore tree element onload
     $scope.hideSpinner=function(span,text){
       if (!span) return; // TODO: remove workaround for relatedSegment expandAllFromPath
       $scope.loading=false;
       span.html(text);
     }
 
+    // returns a segment given its id
     $scope.segmentById=function(segmentId) {
       var segment;
       $scope.segments.some(function(_segment){
@@ -309,6 +321,7 @@ angular.module('doxelApp')
       return segment;
     }
 
+    // get segment list for the given path and its children
     function getSegments(path) {
       function loop(level,depth){
         var result=[];
@@ -430,6 +443,7 @@ angular.module('doxelApp')
     $scope.showPictureDetails=function($event, path, index) {
       var picture;
 
+      // if first parameter is a picture, discard other parameters
       if (arguments[0].constructor.modelName=='Picture') {
         picture=arguments[0];
         path=$scope.segmentById(picture.segmentId).path+'.'+picture.id;
@@ -442,16 +456,19 @@ angular.module('doxelApp')
         index=null;
 
       } else {
+        // retrieve picture from path name
         var p=splitPath(path);
         var pictures=$scope.tree[p.yyyy][p.mm][p.dd][p.segmentTimestamp][p.segmentId].pictures;
         picture=pictures[index];
       }
 
+      // set current segment to picture's segment
       if (!$scope.segment || $scope.segment.id!=picture.segmentId) {
         $scope.segment=$scope.segmentById(picture.segmentId);
       }
-      $scope.select(path,$event);
 
+      // select picture
+      $scope.select(path,$event);
 
       // check whether picture details are already loaded
       if (picture.loaded) {
@@ -473,6 +490,7 @@ angular.module('doxelApp')
           }
         }
 
+        // Loading...
         var span=$scope.showSpinner($event);
         imgloading.span=span;
         imgloading.picture=picture;

@@ -82,6 +82,9 @@ angular.module('doxelApp')
             scope.updatePicture();
           }
         });
+        if (picture.selected) {
+          pictureClass+=' selected';
+        }
 
       },
       template: '<div class="{{pictureClass}}" style="background-image: url({{blob}});">{{picture.legend}}</div>'

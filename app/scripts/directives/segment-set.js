@@ -48,13 +48,36 @@ angular.module('doxelApp')
       restrict: 'E',
       replace: false,
       scope: {
-        segments: '='
+        segments: '=',
+        onClick: '&'
       },
-      controller: function($scope,$window,layout,$timeout,errorMessage,Picture,elementSelection){
+      controller: function($scope,$window,layout,$timeout,errorMessage,Picture,elementSelection,dndService){
+        $scope.dragStart=function(scope,options) {
+          var $event=options.$event;
+          var index=dndService.fromElement.data('index');
+          var e=$event.originalEvent;
+          e.effectAllowed="move";
+          dndService.data={segments:[$scope.segments[index]]};
+        }
 
-        $scope.click=function($event,index){
+        $scope.dragEnter=function(scope,options) {
+          var $event=options.$event;
+          var e=$event.originalEvent;
+          var data=dndService.data;
+          if (!data || (!data.segments && !data.pictures)) {
+            return false;
+          }
+        }
+
+        $scope.click=function($event){
+          var index=$($event.target).closest('a').data('index');
           var segment=$scope.segments[index]
-          console.log($event);
+          if (typeof($scope.onClick)=='function') {
+            if ($scope.onClick(segment)===false) {
+              return;
+            }
+          }
+
           $scope.$parent.showSegmentDetails(segment);
           if (!segment.pictures) {
             Picture.find({

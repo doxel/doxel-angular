@@ -74,12 +74,20 @@
   height: 120px;
 }
 
-#segments .dragover {
+#segments .dndDragover {
   background-color: #bad;
 }
 
-#segments .dragging {
+#segments .dndDragging {
   opacity: 0.5;
+}
+
+#segments .dndValidTarget {
+  box-shadow: 1px 0px 1px 1px rosybrown;
+}
+
+#segment .dndDragover .dndValidTarget {
+  background-color: #bad;
 }
 
 segment-map {
