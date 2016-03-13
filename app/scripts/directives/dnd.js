@@ -72,20 +72,36 @@ angular.module('doxelApp')
         function cleanup() {
           $('.dndDragover').removeClass('dndDragover');
           $('.dndDragging').removeClass('dndDragging');
-          $('.dndValidTarget').removeClass('dndValidTarget');
+          if (dndService.targets) {
+            dndService.targets.removeClass('dndValidTarget')
+            setupEventHandlers('off');
+            dndService.targets=null;
+          }
         }
 
         function ondragstart(e) {
           cleanup();
-          dndService.fromElement=$(e.currentTarget).addClass('dndDragging');
+          dndService.fromElement=$(e.currentTarget)
           dndService.toElement=null;
+          dndService.targets=$(scope.targets);
           if (scope.onDragStart(scope,{$event: e})===false) {
             return;
           }
-          $(scope.targets).addClass('dndValidTarget');
+          dndService.fromElement.addClass('dndDragging');
+          dndService.targets.addClass('dndValidTarget');
+          setupEventHandlers('on');
         }
 
         function ondragover(e) {
+          var elem=$(e.currentTarget);
+          // prevent default to allow drop
+          if (e.preventDefault) {
+            e.preventDefault();
+          }
+          // ignore invalid targets
+          if (!elem.hasClass(scope.dragOverClass)) {
+            return false;
+          }
           if (scope.onDragOver(scope,{$event: e})===false) {
             return false;
           }
@@ -94,8 +110,9 @@ angular.module('doxelApp')
 
         function ondragenter(e) {
           var elem=$(e.currentTarget);
-          if (!elem.hasClass('dndValidTarget')) {
-            return;
+          // ignore source element or invalid targets
+          if (elem.hasClass('dndDragging') || !elem.hasClass('dndValidTarget')) {
+            return false;
           }
           // dragleave event being triggered after dragenter,
           // when the currentTarget is already the drop target
@@ -119,7 +136,7 @@ angular.module('doxelApp')
           // if we we already entered another drop target or
           // the dragenterCount for the current target is non-null.
           if (!elem.hasClass(scope.dragOverClass) || --dndService.dragenterCount) {
-            return;
+            return false;
           }
           if (scope.onDragLeave(scope,{$event: e})===false) {
             return false;
@@ -130,12 +147,12 @@ angular.module('doxelApp')
 
         function ondrop(e) {
           var elem=$(e.currentTarget);
-          // no drop on source element or invalid targets
-          if (elem.hasClass('dndDragging') || !elem.hasClass('dndValidTarget')) {
-            return;
-          }
           if (e.preventDefault) {
             e.preventDefault();
+          }
+          // ignore on source element or invalid targets
+          if (elem.hasClass('dndDragging') || !elem.hasClass('dndValidTarget')) {
+            return false;
           }
           if (scope.onDrop(scope,{$event: e})===false) {
             return;
@@ -149,12 +166,16 @@ angular.module('doxelApp')
           }
         }
 
+        function setupEventHandlers(methodName) {
+          var method=dndService.targets[methodName];
+          method.apply(dndService.targets,['dragover',ondragover]);
+          method.apply(dndService.targets,['dragenter',ondragenter]);
+          method.apply(dndService.targets,['dragleave',ondragleave]);
+          method.apply(dndService.targets,['drop',ondrop]);
+        }
+
         $element[0].draggable=true;
         $element.on('dragstart',ondragstart);
-        $element.on('dragover',ondragover);
-        $element.on('dragenter',ondragenter);
-        $element.on('dragleave',ondragleave);
-        $element.on('drop',ondrop);
         $element.on('dragend',ondragend);
       }
     };
