@@ -51,13 +51,23 @@ angular.module('doxelApp')
         var log=function(scope,options){console.log(options.$event)};
         log=scope.$parent.dndDebug ? scope.$parent.dndLog||log : function(){};
 
-        // dragevent handlers can be specified as attributes or defined in the parent scope
-        scope.onDragStart=(attrs.onDragStart) ? $parse(attrs.onDragStart) : scope.$parent.dragStart||log;
-        scope.onDragEnter=(attrs.onDragEnter) ? $parse(attrs.onDragEnter) : scope.$parent.dragEnter||log;
-        scope.onDragOver=(attrs.onDragOver) ? $parse(attrs.onDragOver) : scope.$parent.dragOver||log;
-        scope.onDragLeave=(attrs.onDragLeave) ? $parse(attrs.onDragLeave) : scope.$parent.dragLeave||log;
-        scope.onDrop=(attrs.onDrop) ? $parse(attrs.onDrop) : scope.$parent.drop||log;
-        scope.onDragEnd=(attrs.onDragEnd) ? $parse(attrs.onDragEnd) : scope.$parent.dragEnd||log;
+        function closest(property){
+          var parent=scope.$parent;
+          while(parent) {
+            if (parent[property]) {
+              return parent[property];
+            }
+            parent=parent.$parent;
+          }
+        }
+
+        // dragevent handlers can be specified as attributes or defined in a parent scope
+        scope.onDragStart=(attrs.onDragStart) ? $parse(attrs.onDragStart) : closest('dragStart')||log;
+        scope.onDragEnter=(attrs.onDragEnter) ? $parse(attrs.onDragEnter) : closest('dragEnter')||log;
+        scope.onDragOver=(attrs.onDragOver) ? $parse(attrs.onDragOver) : closest('dragOver')||log;
+        scope.onDragLeave=(attrs.onDragLeave) ? $parse(attrs.onDragLeave) : closest('dragLeave')||log;
+        scope.onDrop=(attrs.onDrop) ? $parse(attrs.onDrop) : closest('drop')||log;
+        scope.onDragEnd=(attrs.onDragEnd) ? $parse(attrs.onDragEnd) : closest('dragEnd')||log;
 
         // - valid targets selector(s) can be specified with attribute 'dndTargets'
         // - the default value is the draggable element tagName
@@ -72,24 +82,26 @@ angular.module('doxelApp')
         function cleanup() {
           $('.dndDragover').removeClass('dndDragover');
           $('.dndDragging').removeClass('dndDragging');
-          if (dndService.targets) {
-            dndService.targets.removeClass('dndValidTarget')
-            setupEventHandlers('off');
-            dndService.targets=null;
+          $('.dndValidTarget').removeClass('dndValidTarget');
+          if (dndService.sameWindowOnly) {
+            enableDragEvents(false);
           }
+          dndService.targets=null;
         }
 
         function ondragstart(e) {
           cleanup();
           dndService.fromElement=$(e.currentTarget)
           dndService.toElement=null;
-          dndService.targets=$(scope.targets);
+          dndService.targets=$(scope.targets).not(dndService.fromElement);
           if (scope.onDragStart(scope,{$event: e})===false) {
-            return;
+            return false;
           }
+          enableDragEvents(true);
+
           dndService.fromElement.addClass('dndDragging');
           dndService.targets.addClass('dndValidTarget');
-          setupEventHandlers('on');
+          dndService.fromElement.closest('.dndValidTarget').remove('dndValidTarget');
         }
 
         function ondragover(e) {
@@ -99,7 +111,7 @@ angular.module('doxelApp')
             e.preventDefault();
           }
           // ignore invalid targets
-          if (!elem.hasClass(scope.dragOverClass)) {
+          if (!elem.hasClass('dndDragover')) {
             return false;
           }
           if (scope.onDragOver(scope,{$event: e})===false) {
@@ -110,14 +122,19 @@ angular.module('doxelApp')
 
         function ondragenter(e) {
           var elem=$(e.currentTarget);
+
+          if (!elem.is('[dnd]')) {
+            elem=elem.find('[dnd]:first');
+          }
+
           // ignore source element or invalid targets
-          if (elem.hasClass('dndDragging') || !elem.hasClass('dndValidTarget')) {
+          if (elem.hasClass('dndDragging') || !elem.closest('.dndValidTarget').length || elem.find('.dndDragging').length) {
             return false;
           }
           // dragleave event being triggered after dragenter,
           // when the currentTarget is already the drop target
           // only increase the dragenterCount
-          if (elem.hasClass(scope.dragOverClass)) {
+          if (elem.hasClass('dndDragover')) {
             ++dndService.dragenterCount;
 
           } else {
@@ -132,10 +149,15 @@ angular.module('doxelApp')
 
         function ondragleave(e) {
           var elem=$(e.currentTarget);
+
+          if (!elem.is('[dnd]')) {
+            elem=elem.find('[dnd]:first');
+          }
+
           // dragleave event being triggered after dragenter, do nothing
           // if we we already entered another drop target or
           // the dragenterCount for the current target is non-null.
-          if (!elem.hasClass(scope.dragOverClass) || --dndService.dragenterCount) {
+          if (!elem.hasClass('dndDragover') || --dndService.dragenterCount) {
             return false;
           }
           if (scope.onDragLeave(scope,{$event: e})===false) {
@@ -150,8 +172,13 @@ angular.module('doxelApp')
           if (e.preventDefault) {
             e.preventDefault();
           }
+
+          if (!elem.is('[dnd]')) {
+            elem=elem.find('[dnd]:first');
+          }
+
           // ignore on source element or invalid targets
-          if (elem.hasClass('dndDragging') || !elem.hasClass('dndValidTarget')) {
+          if (elem.hasClass('dndDragging') || !elem.closest('.dndValidTarget').length || elem.find('.dndDragging').length) {
             return false;
           }
           if (scope.onDrop(scope,{$event: e})===false) {
@@ -166,17 +193,28 @@ angular.module('doxelApp')
           }
         }
 
-        function setupEventHandlers(methodName) {
-          var method=dndService.targets[methodName];
-          method.apply(dndService.targets,['dragover',ondragover]);
-          method.apply(dndService.targets,['dragenter',ondragenter]);
-          method.apply(dndService.targets,['dragleave',ondragleave]);
-          method.apply(dndService.targets,['drop',ondrop]);
+        function enableDragEvents(enable) {
+          if (enable) {
+            $('.dnd-target')
+            .not('.dnd-events')
+            .on('dragover.dnd',ondragover)
+            .on('dragenter.dnd',ondragenter)
+            .on('dragleave.dnd',ondragleave)
+            .on('drop.dnd',ondrop)
+            .addClass('dnd-events');
+
+          } else {
+            $('.dnd-events').off('.dnd');
+          }
+
         }
 
         $element[0].draggable=true;
         $element.on('dragstart',ondragstart);
         $element.on('dragend',ondragend);
+        if (!dndService.sameWindowOnly) {
+          enableDragEvents(true);
+        }
       }
     };
   });

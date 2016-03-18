@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('SegmentsCtrl', function ($timeout, $window, $location, $q, $rootScope, $scope, ngTableParams, errorMessage, getPictureBlobAndExif, Segment, Picture, $filter, User, elementSelection) {
+  .controller('SegmentsCtrl', function ($timeout, $window, $location, $q, $rootScope, $scope, ngTableParams, errorMessage, dndService, getPictureBlobAndExif, Segment, Picture, $filter, User, elementSelection) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -605,14 +605,29 @@ angular.module('doxelApp')
 
     $scope.$on('ui.layout.loaded', function(e,uiLayoutLoaded,element) {
       $timeout(function(){
-      element.find('[ng-nicescroll]').each(function(){
-        var nicescroll=$(this);
-        setTimeout(function(){
-          resizeNiceScrollable(nicescroll.closest('ui-layout-container'));
-        },0);
+        element.find('[ng-nicescroll]').each(function(){
+          var nicescroll=$(this);
+          setTimeout(function(){
+            resizeNiceScrollable(nicescroll.closest('ui-layout-container'));
+          },0);
+        });
       });
     });
-    });
+
+
+    $scope.dragStart=function(e){
+      console.log(arguments);
+    };
+    $scope.dragEnter=function(scope,options) {
+      var $event=options.$event;
+      var e=$event.originalEvent;
+      console.log(e.dataTransfer.getData('text/json'));
+      var data=dndService.data;
+      if (!data || (!data.segments && !data.pictures)) {
+        return false;
+      }
+    }
+
 
     angular.element($window).on('resize', function(){
       $('#segments [ng-nicescroll]').each(function(){

@@ -49,7 +49,8 @@ angular.module('doxelApp')
       scope: {
         picture: '=',
         pictureClass: '@',
-        pictureOnload: '&'
+        pictureOnload: '&',
+        label: '@'
       },
       controller: function($scope, errorMessage, getPictureBlobAndExif) {
         $scope.updatePicture=function() {
@@ -87,6 +88,6 @@ angular.module('doxelApp')
         }
 
       },
-      template: '<div class="{{pictureClass}}" style="background-image: url({{blob}});">{{picture.legend}}</div>'
+      template: '<div class="{{pictureClass}}" style="background-image: url({{blob}});"><div class="label">{{label}}</div></div>'
     };
   });

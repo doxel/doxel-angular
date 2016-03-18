@@ -74,6 +74,6 @@ angular.module('doxelApp')
         }, false);
       },
 
-      template: '<picture ng-if="picture" picture="picture" picture-class="{{segmentPreviewClass}}"></picture>'
+      template: '<picture ng-if="picture" picture="picture" picture-class="{{segmentPreviewClass}}" />'
     };
   });

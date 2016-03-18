@@ -54,15 +54,23 @@ angular.module('doxelApp')
       controller: function($scope,$window,layout,$timeout,errorMessage,Picture,elementSelection,dndService){
         $scope.dragStart=function(scope,options) {
           var $event=options.$event;
+  /*        if (!$($event.target).find('.selected').length) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            return false;
+          }
+          */
           var index=dndService.fromElement.data('index');
           var e=$event.originalEvent;
           e.effectAllowed="move";
-          dndService.data={segments:[$scope.segments[index]]};
+          dndService.data={segments:[$scope.segments[index].id]};
+          e.dataTransfer.setData('text/json', JSON.stringify(dndService.data));
         }
 
         $scope.dragEnter=function(scope,options) {
           var $event=options.$event;
           var e=$event.originalEvent;
+          console.log(e.dataTransfer.getData('text/json'));
           var data=dndService.data;
           if (!data || (!data.segments && !data.pictures)) {
             return false;

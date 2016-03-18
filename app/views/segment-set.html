@@ -1,5 +1,5 @@
 <span ng-repeat="(index, segment) in segments">
-  <a class="dropsegment droppicture" data-sid="{{segment.id}}" data-index="{{index}}" ng-click="click($event)" dnd dnd-targets=".dropsegment">
+  <a class="dnd-target dropsegment droppicture" data-sid="{{segment.id}}" data-index="{{index}}" ng-click="click($event)" dnd dnd-targets=".dropsegment">
     <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
     <div class="date">{{segment.timestamp | formatTimestamp}}</div>
   </a>

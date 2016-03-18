@@ -2,7 +2,7 @@
   <span ng-repeat="(index, picture) in pictures">
     <a data-pid="{{picture.id}}" ng-click="click($event,index)" dnd dnd-targets=".droppicture">
       <picture picture="picture" picture-class="thumb" />
-      <div>{{picture.timestamp | formatTimestamp }}</div>
+      <div class="date">{{picture.timestamp | formatTimestamp }}</div>
     </a>
   </span>
 </div>
