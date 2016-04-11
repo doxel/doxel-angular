@@ -50,7 +50,7 @@ angular.module('doxelApp')
       'Karma'
     ];
 
-    User.signout({all: true},function(err,result){
+    User.signout({removeAllAccessTokens: true},function(err,result){
       if (err) {
         return console.log(err);
       }
@@ -66,10 +66,17 @@ angular.module('doxelApp')
     }, function(resource){
       $rootScope.authenticated=false;
       $cookies.remove('access_token',{path:'/'});
+      $cookies.remove('userId',{path:'/'});
+      $cookies.remove('pp-access_token',{path:'/'});
+      $cookies.remove('pp-userId',{path:'/'});
       $location.path('/');
 
     }, function(err){
       console.log('logout failed',err)
+      $cookies.remove('access_token',{path:'/'});
+      $cookies.remove('userId',{path:'/'});
+      $cookies.remove('pp-access_token',{path:'/'});
+      $cookies.remove('pp-userId',{path:'/'});
       $location.path('/');
     });
 
