@@ -62,7 +62,7 @@ angular
     'btford.socket-io',
     'ui.layout',
     'ngTagsInput'
-    
+
 
   ])
   .config(function ($httpProvider, $routeProvider, $stateProvider,$locationProvider) {
@@ -87,8 +87,10 @@ angular
             //Now clearing the loopback values from client browser for safe logout...
             LoopBackAuth.clearUser();
             LoopBackAuth.clearStorage();
-            $location.pathAfterSignin = $location.path();
-            $location.path('/login');
+            if ($location.path()!='/logout') {
+               $location.pathAfterSignin = $location.path();
+            }
+            $location.path('/login');
           }
           return $q.reject(rejection);
         }
