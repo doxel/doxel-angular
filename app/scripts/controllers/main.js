@@ -60,70 +60,25 @@ angular.module('doxelApp')
       // When the user just logged in with passport,
       // bind and switch to parent user if any
       var cookies=$cookies.getAll();
+
       if (cookies && cookies['pp-access_token']) {
-/*
-        var q=$q.defer();
+        $cookies.remove('pp-access_token',{path:'/'});
+        $cookies.remove('pp-userId',{path:'/'});
 
-        if (User.isAuthenticated()) {
-          User.addThirdPartyAccount({
-            access_token: cookies['pp-access_token']
+        if ($rootScope.authenticated && cookies['pp-userId']=='undefined') {
+          $location.path('/profile');
+          // user linked a third-party account
+          return;
 
-          }, function(result){
-            if (result.error) {
-              q.reject(error);
-
-            } else {
-              q.resolve();
-            }
-
-          }, function(error) {
-            q.reject(error);
-
-          });
-
-        } else {
-*/
+        }
+        if (cookies['pp-userId']!='undefined') {
+          // user logged in with third-party account (returned credentials may be for main account)
           LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
           LoopBackAuth.save();
-/*
-          // if parent account is known, switch to it
-          User.getParent(function(result){
-            if (result.error) {
-              q.reject(error);
-
-            } else {
-              if (result.accessToken) {
-                LoopBackAuth.setUser(result.accessToken.id, result.accessToken.userId, null);
-                LoopBackAuth.save();
-              }
-              q.resolve();
-            }
-
-          },function(error){
-            q.reject(error);
-
-          });
-        }
-
-        q.promise.then(function(){
-        */
-          $cookies.remove('pp-access_token',{path:'/'});
-          $cookies.remove('pp-userId',{path:'/'});
           $location.path($location.pathAfterSignin||'/upload');
-          /*
+          return;
 
-        }).catch(function(error){
-            errorMessage.show(error);
-
-        }).finally(function(){
-          console.log('finally')
-          $cookies.remove('pp-access_token',{path:'/'});
-          $cookies.remove('pp-userId',{path:'/'});
-          /*
-        });
-        */
-
-        return;
+        }
       }
 
       if (User.isAuthenticated()) {
