@@ -52,7 +52,7 @@ angular.module('doxelApp')
 
     // to find this scope from child scopes
     $scope.segmentsCtrl=true;
-
+window.scop=$scope;
     $scope.layout={
       tags: {
         collapsed: false
@@ -239,27 +239,50 @@ angular.module('doxelApp')
     }
 
     // select picture or segment in tree and in thumb list
-    $scope.select=function(path,$event) {
+    $scope.select=function(path,$event,options) {
       if ($event && $event.target.tagName.toLowerCase()!='span') {
         return;
       }
 
-      // mark tree path as selected
-      $scope.selected[path]=true;
-
-      // unselect other tree paths
-      for(var key in $scope.selected) {
-        if ($scope.selected.hasOwnProperty(key) && key!=path) {
-          delete $scope.selected[key];
+      if (!path) {
+        // unselect all
+        for(var key in $scope.selected) {
+          if ($scope.selected.hasOwnProperty(key)) {
+            delete $scope.selected[key];
+          }
         }
+        $('#segments .selected').removeClass('selected'); // somewhere else ?
+        return;
+      }
+
+      if (!options) {
+        options={
+          selected: true,
+          unique: true
+        };
+      }
+
+      if (options.selected) {
+        $scope.selected[path]=true;
+        if (options.unique) {
+          // unselect other tree paths
+          for(var key in $scope.selected) {
+            if ($scope.selected.hasOwnProperty(key) && key!=path) {
+              delete $scope.selected[key];
+            }
+          }
+        }
+
+      } else {
+        delete $scope.selected[path];
       }
 
       if ($event) {
         // clicked in tree
-        // show thumb
-        var p=splitPath(path);
 
+        // get thumbnail
         var thumb;
+        var p=splitPath(path);
         if (p.pictureId) {
           // path refers to a picture
           thumb=$('picture-set a[data-pid='+p.pictureId+'] .thumb');
@@ -270,27 +293,32 @@ angular.module('doxelApp')
 
         }
 
-        if (thumb && thumb.length) {
-          var itemTop=thumb.position().top;
-          var nicescroll=thumb.closest('[ng-nicescroll]');
-          var offset=(nicescroll.height()-thumb.height())/2;
-          nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-(offset>0?offset:0));
+        if (options.selected) {
+          // scroll to selected item
+          if (thumb && thumb.length) {
+            var itemTop=thumb.position().top;
+            var nicescroll=thumb.closest('[ng-nicescroll]');
+            var offset=(nicescroll.height()-thumb.height())/2;
+            nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-(offset>0?offset:0));
+          }
         }
 
       } else {
         // clicked on thumb
-        // expand parent tree nodes and select the given one
-        $timeout(function(){
-          var nicescroll=$('.tree').parent();
-          if (!$('.tree .selected').length) {
-            expandParentNodes(path);
-          }
-          // scroll to selected node
+        if (options.selected) {
+          // expand parent tree nodes and select the given one
           $timeout(function(){
-            var itemTop=$('.tree .selected').position().top;
-            nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-nicescroll.height()/3);
+            var nicescroll=$('.tree').parent();
+            if (!$('.tree .selected').length) {
+              expandParentNodes(path);
+            }
+            // scroll to selected node
+            $timeout(function(){
+              var itemTop=$('.tree .selected').position().top;
+              nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-nicescroll.height()/3);
+            });
           });
-        });
+        }
       }
     }
 
@@ -383,6 +411,10 @@ angular.module('doxelApp')
         $scope.relatedSegments=getSegments(path);
         $scope.view='relatedSegments';
         $scope.layout.relatedSegments.collapsed=false;
+        $scope.segment=null;
+        $scope.picture=null;
+        // unselect all
+        $scope.select();
 /*      } else {
         var leafPath=$scope.expandAllFromPath(path,true);
         $scope.expandSegment(relatedSegments[0].path);
@@ -396,11 +428,31 @@ angular.module('doxelApp')
         $scope.select(segment.path);
       }
 
+      // load segment pictures
+      if (!segment.pictures) {
+        Picture.find({
+          filter: {
+            where: {
+              segmentId: segment.id
+            }
+          }
+        }, function(pictures){
+          segment.pictures=pictures;
+        }, errorMessage.show);
+      }
+
       // trigger segment-details directive
       $scope.segment=segment;
+      $scope.picture=null;
+
       // show segment view
       $scope.view='segment';
+
     }
+
+    $scope.$on('segment.click',function($event,segment){
+      $scope.showSegmentDetails(segment);
+    });
 
     $scope.expandSegment=function(path,$event) {
       var p=splitPath(path);

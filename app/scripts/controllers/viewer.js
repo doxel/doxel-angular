@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('ViewerCtrl', function ($scope) {
+  .controller('ViewerCtrl', function ($scope,errorMessage,Segment) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -62,8 +62,28 @@ angular.module('doxelApp')
       }
       iframe.show().height($('body').height()-102);
         $(window).off('resize.viewer').on('resize.viewer',function(){
-          $('iframe.viewer').height($('body').height()-102);
+          iframe.height($('body').height()-102);
         });
+    });
+
+    $scope.$on('segment.click',function($event,segment){
+      $scope.segmentClick(segment);
+    });
+
+    $scope.visible=true;
+    Segment.find({
+      filter: {
+        where: {
+          lat: {exists: true}
+        },
+        include: {
+          relation: 'preview'
+        }
+      }
+    }, function(segments){
+      $scope.segments=segments;
+    }, function(err){
+      errorMessage.show('Could not load segments');
     });
 
   });

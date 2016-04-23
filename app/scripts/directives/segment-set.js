@@ -37,7 +37,7 @@
 
 /**
  * @ngdoc directive
- * @name doxelApp.directive:segmentSet
+ * @name doxelApp.directive:segment-set
  * @description
  * # segmentSet
  */
@@ -51,7 +51,7 @@ angular.module('doxelApp')
         segments: '=',
         onClick: '&'
       },
-      controller: function($scope,$window,layout,$timeout,errorMessage,Picture,elementSelection,dndService){
+      controller: function($scope,$window,layout,$timeout,errorMessage,elementSelection,dndService){
         $scope.dragStart=function(scope,options) {
           var $event=options.$event;
   /*        if (!$($event.target).find('.selected').length) {
@@ -86,18 +86,7 @@ angular.module('doxelApp')
             }
           }
 
-          $scope.$parent.showSegmentDetails(segment);
-          if (!segment.pictures) {
-            Picture.find({
-              filter: {
-                where: {
-                  segmentId: segment.id
-                }
-              }
-            }, function(pictures){
-              segment.pictures=pictures;
-            }, errorMessage.show);
-          }
+          $scope.$emit('segment.click',segment);
 
         }
 /*

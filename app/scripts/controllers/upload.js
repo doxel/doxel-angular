@@ -75,9 +75,13 @@ angular.module('doxelApp')
     });
 
     $scope.$on('$routeChangeSuccess',function(e, next, current){
-        $('iframe.upload').show().height($('body').height()-102);
+        var iframe=$('iframe.upload');
+        if (!iframe.attr('src')) {
+          iframe.attr('src','/upload/index.php');
+        }
+        iframe.show().height($('body').height()-102);
         $(window).off('resize.upload').on('resize.upload',function(){
-          $('iframe.upload').height($('body').height()-102);
+          iframe.height($('body').height()-102);
         });
     });
   });
