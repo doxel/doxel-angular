@@ -193,12 +193,19 @@ angular.module('doxelApp')
     document.location.assign('/auth/google');
   }
 
-  $scope.resetPassword=function(email){
+  $scope.resetPassword=function(){
     //send an email with instructions to reset an existing user's password
-    User.resetPassword({
-      email: email
+    if ($scope.mailSent) {
+      errorMessage.show("An email has already been sent.");
+      return;
+    }
 
-    }, function() {
+    User.resetPassword({
+      email: $scope.email
+
+    }, function(res) {
+      console.log(res);
+
       $scope.emailSent=true;
       errorMessage.show("Check your email and follow the instructions.");
 
