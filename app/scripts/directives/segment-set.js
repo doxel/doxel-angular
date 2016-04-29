@@ -103,6 +103,7 @@ angular.module('doxelApp')
     //    scope.window.bind('resize',scope.resize);
         scope.element=element;
         scope.container=element.closest('ui-layout-container');
+        scope.dndEnable=attrs.dndEnable
 
     //    scope.resize();
       }
