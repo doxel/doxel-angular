@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('ViewerCtrl', function ($scope,errorMessage,Segment) {
+  .controller('ViewerCtrl', function ($scope,errorMessage,Segment,$q) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -58,13 +58,50 @@ angular.module('doxelApp')
     $scope.$on('$routeChangeSuccess',function(e, next, current){
       var iframe=$('iframe.viewer');
       if (!iframe.attr('src')) {
-        iframe.attr('src','/viewer/deploy/index1.html');
+        iframe.attr('src','/earth/deploy/index1.html');
+        iframe[0].contentWindow.parentScope=$scope;
+        setTimeout(function(){
+          iframe[0].contentWindow.parentScope=$scope;
+        },1000);
       }
       iframe.show().height($('body').height()-102);
         $(window).off('resize.viewer').on('resize.viewer',function(){
           iframe.height($('body').height()-102);
         });
     });
+
+    $scope.q=$q.defer();
+    $scope.iframe=$('iframe.viewer')[0];
+    // when switching back to the view, 'webglearth2.loaded' is not fired and contentWindow.earth is already set
+    $scope.earth=$scope.iframe.contentWindow.earth;
+    if ($scope.earth) {
+      $scope.q.resolve();
+
+    } else {
+      $scope.$on('webglearth2.loaded',function($event){
+        $scope.webglearth2_loaded=true;
+        $scope.earth=$scope.iframe.contentWindow.earth;
+        $scope.q.resolve();
+      });
+    }
+
+    $scope.segmentClick=function(segment) {
+      var center=$scope.earth.getCenter();
+      var zoom=$scope.earth.getZoom();
+      var options={
+        to: {
+          lon: segment.lng,
+          lat: segment.lat
+        },
+        steps: 25
+      };
+      if (zoom<18 && Math.abs(center[1]-segment.lng)<1e-6 && Math.abs(center[0]-segment.lat)<1e-6) {
+        options.to.zoom=Math.min(18,zoom+1);
+      }
+
+      $scope.iframe.contentWindow.zoomandpan(options);
+
+    };
 
     $scope.$on('segment.click',function($event,segment){
       $scope.segmentClick(segment);
@@ -75,13 +112,26 @@ angular.module('doxelApp')
       filter: {
         where: {
           lat: {exists: true}
-        },
-        include: {
-          relation: 'preview'
         }
       }
     }, function(segments){
       $scope.segments=segments;
+      var place_list={};
+      segments.forEach(function(segment){
+        place_list[segment.id]={
+          segmentId: segment.id,
+          lon: segment.lng,
+          lat: segment.lat,
+          timestamp: segment.timestamp,
+          thumb: '/api/segments/preview/'+segment.id+'/'+segment.timestamp+'/'+segment.previewId
+        };
+      });
+
+      $scope.q.promise.then(function(){
+        $scope.iframe.contentWindow.setMarkers(place_list);
+      });
+
+
     }, function(err){
       errorMessage.show('Could not load segments');
     });
