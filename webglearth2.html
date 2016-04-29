@@ -1,0 +1,268 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+        html {
+            background-color: black;
+            visibility: hidden;
+        }
+
+        .we-pp-content {
+            text-align: center;
+        }
+
+        a.thumb {
+            display: block;
+            width: 300px;
+            height:168px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            margin: 16px 0px;
+            box-shadow: 4px 4px 4px rgba(0,0,0,0.3);
+        }
+
+        a.thumb:hover {
+            transform: scale(0.995);
+            box-shadow: 3.5px 3.5px 4px rgba(0,0,0,0.4);
+        }
+
+        a.thumb:active {
+            transform: scale(0.98);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+        }
+
+    </style>
+    <script src="api.js"></script>
+    <script src="jquery.js"></script>
+    <script src="jquery.mousewheel.js"></script>
+    <script>
+
+      var place_list=[];
+      var earth;
+
+      function WE_init() {
+        var options = {
+          sky: true,
+          atmosphere: true,
+          dragging: true,
+          tilting: true,
+          zooming: true,
+          center: [8, 47],
+          zoom: 3
+        };
+        earth = new WE.map('earth_div', options);
+
+var natural=WE.tileLayer('https://{s}.tiles.mapbox.com/v3/dennisl.map-6g3jtnzm/{z}/{x}/{y}.png', {
+                  attribution: '<a href="https://www.mapbox.com/about/maps">Mapbox</a>, <a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+ });
+
+   /*     var natural = WE.tileLayer('http://data.webglearth.com/natural-earth-color/{z}/{x}/{y}.jpg', {
+          tileSize: 256,
+          tms: true
+        });*/
+        natural.addTo(earth);
+
+/*        var toner = WE.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+          attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.',
+          opacity: 0.2
+        });
+        toner.addTo(earth);
+*/
+
+      } // WE_init
+
+      function loadMarkers() {
+          $.ajax({
+              url: "../../markers.json",
+              dataType: 'json',
+              success: function(json){
+                  if (json.error) {
+                      console.log(error);
+                      alert(error.message);
+                      return;
+                  }
+                  addMarkers(json);
+              },
+              error: function(){
+                  console.log(arguments);
+                  alert("Internal server error");
+              }
+          });
+
+      } // loadMarkers
+
+     function addMarkers(json) {
+         place_list=json;
+         for(var uri in place_list) {
+             if (place_list[uri].error) {
+                 console.log(uri,place_list[uri].error);
+                 delete place_list[uri];
+                 continue;
+             }
+             var place=place_list[uri];
+             var timestamp=new String(uri).substring(uri.lastIndexOf('/') + 1);
+             var thumb='/doxel-viewer/thumbs/'+timestamp+'.jpeg'; 
+             var marker=WE.marker([place.lat, place.lon], 'logo_doxel_24.png',24,24);
+             marker.bindPopup('<div data-thumb="'+thumb+'"><a></a>'+place.display_name+'</div>');
+             place_list[uri].marker=marker;
+             marker.addTo(earth);
+             (function(uri,thumb,timestamp,place){
+                 marker.on('click',function(e){
+                     var popup=$(e.target.element).find('.we-pp');
+                     $('.we-pp').not(popup).css('visibility','hidden');
+                     if (!$('.thumb',popup).length) {
+                        var div=$('[data-thumb]',popup);
+                        var thumb=div.data('thumb');
+                        getLocalTime(Number(timestamp.split('_')[0]),place.lat,place.lon,function(date){
+                            var div=$('[data-thumb="'+thumb+'"]');
+                            $(div).prepend(date);
+                        });
+                        $('a',div).replaceWith('<a class="thumb" href="/doxel-viewer/viewer.html?src='+uri+'" target="_viewer" style="background-image: url('+thumb+');"></a>');
+                     }
+                 });
+             })(uri,thumb,timestamp,place);
+         }
+         
+     } // addMarkers
+
+     function zoomandpan(options) {
+         var from=options.from;
+         var to=options.to;
+
+         Math.easeOutCubic = function (time, base, delta, duration) {
+             time /= duration;
+             --time;
+             return base+delta*(time*time*time+1);
+         };
+
+         var cur={
+             lat: from.lat,
+             lon: from.lon,
+             zoom: from.zoom
+         }
+
+         var delta={
+             lat: (to.lat-from.lat),
+             lon: (to.lon-from.lon),
+             zoom: (to.zoom-from.zoom)
+         }
+
+         var i=0;
+         function loop() {
+             earth.setView([cur.lat,cur.lon],cur.zoom);
+             if (++i>=options.steps) return options.callback();
+             requestAnimationFrame(loop);
+             cur.lon=Math.easeOutCubic(i,from.lon,delta.lon,options.steps);
+             cur.lat=Math.easeOutCubic(i,from.lat,delta.lat,options.steps);
+             cur.zoom=Math.easeOutCubic(i,from.zoom,delta.zoom,options.steps);
+         }
+         loop();
+     }
+
+     var getLocalTime_prev_request=0;
+     var getLocalTime_q=[];
+     function getLocalTime(timestamp,lat,lng,callback){
+
+       getLocalTime_q.push({
+           timestamp: timestamp,
+           lat: lat,
+           lng: lng,
+           callback: callback
+       });
+
+       if (getLocalTime_q.length>1) {
+           return;
+       }
+
+       function loop() {
+           var timestamp=getLocalTime_q[0].timestamp;
+           var lat=getLocalTime_q[0].lat;
+           var lng=getLocalTime_q[0].lng;
+           var callback=getLocalTime_q[0].callback;
+
+           var now = new Date().getTime();
+           var delay=now-getLocalTime_prev_request;
+
+           delay=(delay<1000)?1100-delay:1;
+           getLocalTime_prev_request=now;
+
+           setTimeout(function(){
+
+               $.ajax({
+                 url:"https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lng + "&timestamp=" + timestamp,
+                 cache: false,
+                 type: "POST",
+               }).done(function(response){
+                   console.log(response);
+
+                 getLocalTime_q.shift();
+                 if (getLocalTime_q.length) {
+                     setTimeout(loop,1);
+                 }
+
+                 if(response.timeZoneId != null){
+                   var diff=(response.rawOffset+response.dstOffset)/3600;
+                   var d = new Date(1000*(timestamp+new Date().getTimezoneOffset()*60+diff*3600));
+                   var mm=d.getMonth()+1;
+                   if (mm<10) mm='0'+mm;
+                   var dd=d.getDate();
+                   if (dd<10) dd='0'+dd;
+                   callback(d.getFullYear()+'-'+mm+'-'+dd+' @ '+d.toLocaleTimeString()+' UTC'+(diff>0?'+':'')+diff);
+
+                 } else {
+                     callback('Could not compute local date');
+                 }
+
+               });
+
+           },delay);
+       }
+
+       loop();
+
+     }
+
+     $(document).on('ready',function(){
+
+         WE_init();
+
+         $(window).on('mousewheel','.we-pm-icon', function(e){
+             $('#earth_div canvas').trigger(e);
+
+         });
+
+         setTimeout(function(){
+
+             earth.setZoom(-4);
+             $('html').css('visibility','visible');
+
+             zoomandpan({
+                 from: {
+                     lon: -172,
+                     lat: -47,
+                     zoom: -4
+                 },
+                 to: {
+                     lon: 8,
+                     lat: 47,
+                     zoom: 3 
+                 },
+                 steps: 90,
+                 callback: loadMarkers
+             });
+
+         }, 2000);
+
+      });
+    </script>
+    <style>
+      html, body{padding: 0; margin: 0;}
+      #earth_div{top: 0; right: 0; bottom: 0; left: 0; position: absolute !important;}
+    </style>
+    <title>WebGL Earth API: Overlays</title>
+  </head>
+  <body>
+    <div id="earth_div"></div>
+  </body>
+</html>
