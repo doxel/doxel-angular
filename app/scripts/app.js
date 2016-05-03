@@ -138,6 +138,11 @@ angular
         controller: 'SegmentsCtrl',
         controllerAs: 'segments'
       })
+      .when('/tos', {
+        templateUrl: 'views/tos.html',
+        controller: 'TosCtrl',
+        controllerAs: 'tos'
+      })
       .otherwise({
         redirectTo: '/'
       });

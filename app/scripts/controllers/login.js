@@ -43,7 +43,7 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService) {
+.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
@@ -107,9 +107,65 @@ angular.module('doxelApp')
     });
   }
 
-  $scope.signup=function(e){
-    e.preventDefault();
-    $scope.errorMessage(null);
+  var loginMessage={
+    nopassword: '<p>&bullet; If you do not provide a password, you will not be able to reconnect to your account with another device or if your browser cookies are cleared.</p>',
+    nomail: '<p>&bullet; If you do not provide an email address, you will not be able to recover your account if you forget your password.</p>',
+    nocredentials: '<p>&bullet; If you do not provide an username and a password, you will not be able to reconnect to your account with another device or once your browser cookies are cleared.</p>',
+    conditions: '<p><input type="checkbox">By checking this box and clicking "I Agree" below, you confirm that you have read, fully understand, will observe and further agree to be bound by the TERMS AND CONDITIONS above, from time to time updated.</p>'
+  }
+
+  $scope.disclaimer=function(){
+    var q=$q.defer();
+
+    BootstrapDialog.show({
+        title: '<span class="glyphicon glyphicon-info-sign" style="margin-right: 10px;"></span>DISCLAIMER',
+        message: function(dialog) {
+          var $content=$(loginMessage.conditions);
+
+          // disable button "I Agree"
+          var button_agree=dialog.$modalFooter.find('button:last');
+          button_agree[0].disabled=true;
+
+          // disable checkbox
+          var checkbox=$content.find('input');
+          checkbox[0].disabled=true;
+          checkbox.bind('change',function(e){
+            button_agree[0].disabled=!e.target.checked;
+          });
+
+          // load Terms of Services
+          $('<div></div>').load('views/tos.html',function(html){
+            if (html.search('--marker--')) {
+              // enable checkbox
+              checkbox[0].disabled=false;
+            }
+          }).prependTo($content);
+
+          return $content;
+        },
+
+        buttons: [{
+            label: 'Cancel',
+            action: function(dialog) {
+                dialog.close();
+                q.resolve(false);
+            }
+          }, {
+              label: 'I Agree',
+              action: function(dialog) {
+                dialog.close();
+                q.resolve(true);
+              }
+        }]
+    });
+    return q.promise;
+
+  };
+
+  $scope.doSignup=function(really){
+    if (!really) {
+      return;
+    }
     $scope.getBrowserFingerprint(function(fingerprint){
       $scope.fingerprint=fingerprint;
       User.signup({
@@ -134,6 +190,49 @@ angular.module('doxelApp')
 
       });
     });
+
+  };
+
+  $scope.warned={};
+
+  $scope.signup=function(e){
+    e.preventDefault();
+    $scope.errorMessage(null);
+
+    var message='';
+    if ((!$scope.username || !$scope.username.trim().length) && (!$scope.password || !$scope.password.trim().length)) {
+      message+=loginMessage.nocredentials;
+
+    } else if (!$scope.password || !$scope.password.trim().length) {
+      message+=loginMessage.nopassword;
+    }
+
+    if (!$scope.email || !$scope.email.trim().length) {
+      message+=loginMessage.nomail;
+    }
+
+    if (message.length) {
+      BootstrapDialog.show({
+          title: '<span class="glyphicon glyphicon-info-sign" style="margin-right: 10px;"></span><span>WARNING</span>',
+          message: message,
+          buttons: [{
+              label: 'Cancel',
+              action: function(dialog) {
+                  dialog.close();
+              }
+          }, {
+              label: 'Continue',
+              action: function(dialog) {
+                dialog.close();
+                $scope.disclaimer().then($scope.doSignup);
+              }
+          }]
+      });
+
+    } else {
+      $scope.disclaimer().then($scope.doSignup);
+    }
+
   };
 
   $scope.signin=function($event){
@@ -215,5 +314,6 @@ angular.module('doxelApp')
 
     });
   };
+
 
 });

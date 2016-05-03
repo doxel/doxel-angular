@@ -227,6 +227,13 @@ ng-message {
   }
 }
 
+.modal-dialog {
+  p {
+    width: 90%;
+    text-align: justify;
+    margin-left: 5%;
+  }
+}
 
 @import "../styles/rotate.scss";
 @import "../styles/login.scss";
@@ -235,5 +242,6 @@ ng-message {
 @import "../styles/profile.scss";
 @import "../styles/reset-password.scss";
 @import "../styles/segments.scss";
+@import "../styles/tos.scss";
 @import "../styles/useful.scss";
 @import "../styles/picture-set.scss";

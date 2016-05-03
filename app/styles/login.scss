@@ -6,69 +6,88 @@ div#authentication {
     height: 100%;
     background-color: white;
     z-index: 0;
-}
 
-div#authentication form {
-  position: relative;
-  left: 50%;
-  top: 50%;
-  width: 280px;
-  height : 300px;
-  margin-left: -140px;
-  margin-top: 96px;
-  margin-bottom:64px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: aquamarine 6px 6px 6px;
-  padding: 13px;
-}
-
-div#authentication .field {
-  margin-bottom: 10px;
-}
-
-div#authentication input {
+  form {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    width: 280px;
+    margin-left: -140px;
+    margin-top: 84px;
+    margin-bottom:84px;
+    border: 1px solid #ccc;
     border-radius: 4px;
-}
-
-div#authentication .field input {
-  width: 100%;
-}
-
-div#authentication button {
-  box-shadow: aquamarine 2px 2px 4px;
-  margin: 3px 10px;
+    box-shadow: aquamarine 6px 6px 6px;
+    padding: 13px;
   }
 
-div#authentication button.login,
-div#authentication button.register {
+  .field {
+    margin-bottom: 10px;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  input {
+      border-radius: 4px;
+  }
+
+
+  button {
+    box-shadow: aquamarine 2px 2px 4px;
+    margin: 3px 10px;
+  }
+
+  button.login,
+  button.register {
     width: 40%;
-}
+  }
 
-div#authentication .btn-social-icon {
-  color: white;
-  margin-top: 10px;
+  div.anonymous {
+    width: 100%;
+    margin-top: 20px;
+    button {
+      width: 90%;
+    }
 
-}
+  }
 
-div#authentication span#or {
-  background-color: white;
-  width: 2em;
-  padding: 4px;
-}
+  .btn-social-icon {
+    color: white;
+    margin-top: 10px;
 
-div#authentication hr {
-  margin: 20px 26px 13px 26px;
-}
+  }
 
-div#authentication div.hr,
-div#authentication section.social {
-  position: relative;
-  top: -25px;
-  z-index: 0;
-}
+  span#or {
+    background-color: white;
+    width: 2em;
+    padding: 4px;
+  }
 
-div#authentication section.main {
-  padding-bottom: 10px;
+  hr {
+    margin: 20px 26px 13px 26px;
+  }
+
+  div.hr,
+  section.social {
+    position: relative;
+    top: -25px;
+    z-index: 0;
+  }
+
+  section.social {
+    margin-bottom: -20px;
+  }
+
+  section.main {
+    padding-bottom: 10px;
+
+  }
+
+  .reset-password {
+    float: right;
+    margin-top: 20px;
+  }
 
 }

@@ -23,7 +23,7 @@
       </div>
 
       <div class="field email">
-        <input name="email" class="form-control" placeholder="Email (optional)" id="email" type="email" ng-model="email">
+        <input name="email" class="form-control" placeholder="Email" id="email" type="email" ng-model="email">
         <ng-messages for="loginForm.email.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
           <ng-message when="emailExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailExists.msg"></div></ng-message>
           <ng-message when="emailInvalid" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailInvalid.msg"></div></ng-message>
@@ -31,9 +31,14 @@
       </div>
 
       <div style="text-align:center;">
-        <button class="btn btn-primary raise login" ng-click="signin($event)">Login</button>
-        <button class="btn btn-success raise register" ng-click="signup($event)">Register</button>
+        <button class="btn btn-primary raise login" title="Connect using the above credentials" ng-click="signin($event)" ng-disabled="!username.trim().length || !password.trim().length">Login</button>
+        <button class="btn btn-success raise register" title="Register a new account" ng-click="signup($event)" ng-disabled="!(username.trim().length) || !password.trim().length || !email.trim().length">Register</button>
       </div>
+      
+      <div class="anonymous" style="text-align:center;">
+        <button class="btn btn-success raise anonymous" title="Login as anonymous user" ng-click="signup($event)" ng-disabled="email.trim().length">Anonymous Login</button>
+      </div>
+
     </section>
 
     <hr>
@@ -55,8 +60,11 @@
       </button>
     </section>
 
-  </form>
 
-  <a ng-click="resetPassword()">reset password</a>
+  <div class="reset-password">
+    <a ng-click="resetPassword()">Forgot your password ?</a>
+  </div>
+</form>
+
 
 </div>
