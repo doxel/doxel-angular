@@ -34,6 +34,7 @@
 
 }
 
+iframe.earth,
 iframe.viewer {
   position: absolute;
   width: 100%;
@@ -43,4 +44,12 @@ iframe.viewer {
   border: 0px;
   margin-top: 52px;
   margin-bottom: -52px;
+}
+
+iframe.viewer {
+  visibility: hidden;
+}
+
+iframe.viewer.visible {
+  visibility: visible;
 }

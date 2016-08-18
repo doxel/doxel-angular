@@ -9,24 +9,24 @@
       <div class="field user">
         <input name="username" class="form-control" placeholder="Username" id="username" type="text" ng-model="username">
         <ng-messages for="loginForm.username.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
-            <ng-message when="usernameExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.usernameExists.msg"></div></ng-message>
-            <ng-message when="noUsername" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.noUsername.msg"></div></ng-message>
+            <ng-message when="usernameExists" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.usernameExists.msg"></div></ng-message>
+            <ng-message when="noUsername" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.noUsername.msg"></div></ng-message>
         </ng-messages>
       </div>
 
       <div class="field password">
         <input name="password" class="form-control" placeholder="Password" id="password" type="password" ng-model="password">
         <ng-messages for="loginForm.password.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
-          <ng-message when="noPassword" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noPassword.msg"></div></ng-message>
-          <ng-message when="loginFailed" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.loginFailed.msg"></div></ng-message>
+          <ng-message when="noPassword" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.noPassword.msg"></div></ng-message>
+          <ng-message when="loginFailed" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind-html="error.loginFailed.msg"></div></ng-message>
         </ng-messages>
       </div>
 
       <div class="field email">
         <input name="email" class="form-control" placeholder="Email" id="email" type="email" ng-model="email">
         <ng-messages for="loginForm.email.$error" role="alert" class="disable-selection" ng-hide="hideMessages">
-          <ng-message when="emailExists" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailExists.msg"></div></ng-message>
-          <ng-message when="emailInvalid" ng-show="loginForm.$submitted" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailInvalid.msg"></div></ng-message>
+          <ng-message when="emailExists"  ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailExists.msg"></div></ng-message>
+          <ng-message when="emailInvalid" ng-cloak><div class="bubble-arrow"></div><div class="bubble" ng-bind="error.emailInvalid.msg"></div></ng-message>
         </ng-messages>
       </div>
 
@@ -34,7 +34,7 @@
         <button class="btn btn-primary raise login" title="Connect using the above credentials" ng-click="signin($event)" ng-disabled="!username.trim().length || !password.trim().length">Login</button>
         <button class="btn btn-success raise register" title="Register a new account" ng-click="signup($event)" ng-disabled="!(username.trim().length) || !password.trim().length || !email.trim().length">Register</button>
       </div>
-      
+
       <div class="anonymous" style="text-align:center;">
         <button class="btn btn-success raise anonymous" title="Login as anonymous user" ng-click="signup($event)" ng-disabled="email.trim().length">Anonymous Login</button>
       </div>

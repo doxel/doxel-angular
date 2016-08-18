@@ -83,7 +83,7 @@ angular.module('doxelApp')
             scope.updatePicture();
           }
         });
-        if (picture.selected) {
+        if (scope.picture.selected) {
           pictureClass+=' selected';
         }
 

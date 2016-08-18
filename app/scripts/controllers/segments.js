@@ -680,7 +680,6 @@ window.scop=$scope;
       }
     }
 
-
     angular.element($window).on('resize', function(){
       $('#segments [ng-nicescroll]').each(function(){
         var nicescroll=$(this);

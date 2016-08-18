@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.min.css" />
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
     <link rel="stylesheet" href="bower_components/angular-ui-layout/src/ui-layout.css" />
-    <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css" />
+    <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -54,9 +54,9 @@
                   <ul class="nav navbar-nav">
                     <li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
                     <li ng-class="getClass('/viewer')"><a ng-click="goto('/viewer')" class="viewer fa fa-eye"><span>Viewer</span></a></li>
-                    <li ng-class="getClass('/upload')"><a ng-click="goto('/upload')" class="upload fa fa-upload"><span>Upload</span></a></li>
+                    <li ng-class="getClass('/upload')" ng-show="authenticated"><a ng-click="goto('/upload')" class="upload fa fa-upload"><span>Upload</span></a></li>
                     <li ng-class="getClass('/segments')" ng-show="authenticated"><a ng-click="goto('/segments')" class="segments fa fa-database"><span>Segments</span></a></li>
-                    <li ng-class="getClass('/profile')" ng-show="authenticated"><a class="profile fa fa-user" ng-click="goto('/profile')"><span>Profile</span></a></li>
+                    <li ng-class="getClass('/profile')" ng-if="false" ng-show="authenticated"><a class="profile fa fa-user" ng-click="goto('/profile')"><span>Profile</span></a></li>
                     <li><a class="github fa fa-github" ng-href="{{githubHref}}" target="_blank" ng-click="goto('github')"><span>GitHub</span></a></li>
                     <li ng-class="getClass('/login')" ng-show="!authenticated"><a class="login fa fa-sign-in" ng-click="goto('/login')"><span>Login</span></a></li>
                     <li ng-class="getClass('/logout')" ng-show="authenticated"><a class="logout fa fa-sign-out" ng-click="goto('/logout')"><span>Logout</span></a></li>
@@ -73,7 +73,9 @@
 
         <div class="views">
           <iframe class="upload" ng-show="view=='upload'"></iframe>
+          <iframe class="earth" ng-show="view=='viewer'" src="about:blank"></iframe>
           <iframe class="viewer" ng-show="view=='viewer'"></iframe>
+
         </div>
 
         <div class="footer">
@@ -123,7 +125,6 @@
           <script src="bower_components/ng-table/dist/ng-table.min.js"></script>
           <script src="bower_components/bLazy/blazy.js"></script>
           <script src="bower_components/piexifjs/piexif.js"></script>
-          <script src="bower_components/jquery.nicescroll/jquery.nicescroll.js"></script>
           <script src="bower_components/angular-nicescroll/angular-nicescroll.js"></script>
           <script src="bower_components/angular-aria/angular-aria.js"></script>
           <script src="bower_components/angular-material/angular-material.js"></script>
@@ -131,7 +132,7 @@
           <script src="bower_components/angular-socket-io/socket.js"></script>
           <script src="bower_components/socket-io-client/socket.io.js"></script>
           <script src="bower_components/angular-ui-layout/src/ui-layout.js"></script>
-          <script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>
+          <script src="bower_components/ng-tags-input/ng-tags-input.js"></script>
           <!-- endbower -->
           <!-- endbuild -->
 

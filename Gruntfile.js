@@ -487,7 +487,8 @@ module.exports = function (grunt) {
     'wiredep',
     'concurrent:test',
     'postcss',
-    'connect:test'//,
+    'connect:test',
+    'watch'//,
 //    'karma'
   ]);
 

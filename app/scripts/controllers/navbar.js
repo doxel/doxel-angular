@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('NavBarCtrl', function ($scope, $location) {
+  .controller('NavBarCtrl', function ($scope, $location, $rootScope) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -51,7 +51,7 @@ angular.module('doxelApp')
     ];
 
     $scope.getClass = function (path) {
-      if ($scope.path === path) {
+      if ($rootScope.path === path) {
           return 'active';
       } else {
           return '';

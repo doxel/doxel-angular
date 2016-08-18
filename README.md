@@ -41,7 +41,7 @@ version 0.15.1.
 
 ## Prerequisite
 
-sudo apt-get ruby-dev php5-cgi
+sudo apt-get ruby-dev ruby-full php5-cgi
 gem install compass
 
 ## installation

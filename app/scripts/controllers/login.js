@@ -43,7 +43,7 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q) {
+.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q, $timeout) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
@@ -57,7 +57,7 @@ angular.module('doxelApp')
 
   $scope.serverErrors={};
   $scope.error={
-    invalidEmail: {
+    emailInvalid: {
       field: 'email',
       msg: 'Enter a valid email address.'
     },
@@ -108,15 +108,13 @@ angular.module('doxelApp')
   }
 
   var loginMessage={
-    nopassword: '<p>&bullet; If you do not provide a password, you will not be able to reconnect to your account with another device or if your browser cookies are cleared.</p>',
-    nomail: '<p>&bullet; If you do not provide an email address, you will not be able to recover your account if you forget your password.</p>',
-    nocredentials: '<p>&bullet; If you do not provide an username and a password, you will not be able to reconnect to your account with another device or once your browser cookies are cleared.</p>',
-    conditions: '<p><input type="checkbox">By checking this box and clicking "I Agree" below, you confirm that you have read, fully understand, will observe and further agree to be bound by the TERMS AND CONDITIONS above, from time to time updated.</p>'
+    nopassword: '<p class="list">If you do not specify a password, you will not be able to reconnect to your account with another device or if your browser cookies are cleared.</p>',
+    nomail: '<p class="list">If you do not specify an email address, you will not be able to recover your account if you forget your password.</p>',
+    nocredentials: '<p class="list">If you do not specify a username and a password, you will not be able to reconnect to your account with another device or once your browser cookies are cleared.</p>',
+    conditions: '<div><p style="width: 80%; margin-left: 10%;"><input type="checkbox">By checking this box and clicking "I Agree" below, you confirm that you have read, fully understand, will observe and further agree to be bound by all the statements of the document above, from time to time updated.</p></div>'
   }
 
-  $scope.disclaimer=function(){
-    var q=$q.defer();
-
+  $scope.disclaimer=function(callback){
     BootstrapDialog.show({
         title: '<span class="glyphicon glyphicon-info-sign" style="margin-right: 10px;"></span>DISCLAIMER',
         message: function(dialog) {
@@ -148,18 +146,16 @@ angular.module('doxelApp')
             label: 'Cancel',
             action: function(dialog) {
                 dialog.close();
-                q.resolve(false);
+                callback(false);
             }
           }, {
               label: 'I Agree',
               action: function(dialog) {
                 dialog.close();
-                q.resolve(true);
+                callback(true);
               }
         }]
     });
-    return q.promise;
-
   };
 
   $scope.doSignup=function(really){
@@ -176,7 +172,9 @@ angular.module('doxelApp')
       },
       function(res) {
         if (res.result.error) {
-          $scope.errorMessage(res.result.error);
+          $timeout(function(){
+            $scope.errorMessage(res.result.error);
+          });
           return;
         }
         LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
@@ -185,7 +183,9 @@ angular.module('doxelApp')
         $location.path($location.pathAfterSignin||'/upload');
       },
       function(err){
-        alert('Signup failed !');
+        $timeout(function(){
+          $scope.errorMessage(err && err.data && err.data.error && err.data.error.message || 'Signup failed !');
+        });
         console.log(err);
 
       });
@@ -224,13 +224,13 @@ angular.module('doxelApp')
               label: 'Continue',
               action: function(dialog) {
                 dialog.close();
-                $scope.disclaimer().then($scope.doSignup);
+                $scope.disclaimer($scope.doSignup);
               }
           }]
       });
 
     } else {
-      $scope.disclaimer().then($scope.doSignup);
+      $scope.disclaimer($scope.doSignup);
     }
 
   };
@@ -257,7 +257,9 @@ angular.module('doxelApp')
     },
     function(res) {
       if (res.result.error) {
-        $scope.errorMessage(res.result.error);
+        $timeout(function(){
+          $scope.errorMessage(res.result.error);
+        });
         return;
       }
       console.log(res.result.session);
@@ -279,23 +281,38 @@ angular.module('doxelApp')
 
   $scope.facebook=function($event){
     $event.preventDefault();
-    document.location.assign('/auth/facebook');
+    $scope.disclaimer(function(agree){
+      if (agree) document.location.assign('/auth/facebook');
+    });
   }
 
   $scope.twitter=function($event){
     $event.preventDefault();
-    document.location.assign('/auth/twitter');
+    $scope.disclaimer(function(agree){
+      if (agree) {
+        document.location.assign('/auth/twitter');
+      }
+    });
   }
 
   $scope.google=function($event){
     $event.preventDefault();
-    document.location.assign('/auth/google');
+    $scope.disclaimer(function(agree){
+      if (agree) {
+        document.location.assign('/auth/google');
+      }
+    });
   }
 
   $scope.resetPassword=function(){
     //send an email with instructions to reset an existing user's password
     if ($scope.mailSent) {
       errorMessage.show("An email has already been sent.");
+      return;
+    }
+
+    if (!$scope.email || !$scope.email.trim().length) {
+      $scope.errorMessage('emailInvalid');
       return;
     }
 
@@ -310,7 +327,7 @@ angular.module('doxelApp')
 
     }, function(err) {
       console.log(err);
-      errorMessage.show(err);
+      errorMessage.show(err && err.data && err.data.error && err.data.error.message || 'Unable to reset password.');
 
     });
   };

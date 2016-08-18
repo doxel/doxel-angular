@@ -52,40 +52,48 @@ angular.module('doxelApp')
 
     // yeah its ugly but we dont want to reload everything
     $scope.$on('$routeChangeStart',function(e, next, current){
-        $('iframe.viewer').hide();
+        $('iframe.viewer, iframe.earth').hide(0);
     });
 
     $scope.$on('$routeChangeSuccess',function(e, next, current){
-      var iframe=$('iframe.viewer');
-      if (!iframe.attr('src')) {
+      var iframe=$('iframe.earth');
+      if (!$('iframe.viewer.visible').length && iframe.attr('src')=='about:blank') {
         iframe.attr('src','/earth/deploy/index1.html');
         iframe[0].contentWindow.parentScope=$scope;
         setTimeout(function(){
           iframe[0].contentWindow.parentScope=$scope;
         },1000);
       }
-      iframe.show().height($('body').height()-102);
+      var iframes=$('iframe.viewer, iframe.earth')
+      iframes.show().height($('body').height()-64);
         $(window).off('resize.viewer').on('resize.viewer',function(){
-          iframe.height($('body').height()-102);
+          iframes.height($('body').height()-64);
         });
     });
 
     $scope.q=$q.defer();
-    $scope.iframe=$('iframe.viewer')[0];
+    $scope.iframe_earth=$('iframe.earth')[0];
     // when switching back to the view, 'webglearth2.loaded' is not fired and contentWindow.earth is already set
-    $scope.earth=$scope.iframe.contentWindow.earth;
+    $scope.earth=$scope.iframe_earth.contentWindow.earth;
     if ($scope.earth) {
       $scope.q.resolve();
 
     } else {
       $scope.$on('webglearth2.loaded',function($event){
         $scope.webglearth2_loaded=true;
-        $scope.earth=$scope.iframe.contentWindow.earth;
+        $scope.earth=$scope.iframe_earth.contentWindow.earth;
         $scope.q.resolve();
       });
     }
 
     $scope.segmentClick=function(segment) {
+
+      if ($('iframe.viewer.visible').length) {
+        $('iframe.viewer').attr('src','/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html');
+        return;
+
+      }
+
       var center=$scope.earth.getCenter();
       var zoom=$scope.earth.getZoom();
       var options={
@@ -99,7 +107,7 @@ angular.module('doxelApp')
         options.to.zoom=Math.min(18,zoom+1);
       }
 
-      $scope.iframe.contentWindow.zoomandpan(options);
+      $scope.iframe_earth.contentWindow.zoomandpan(options);
 
     };
 
@@ -108,6 +116,7 @@ angular.module('doxelApp')
     });
 
     $scope.visible=true;
+
     Segment.find({
       filter: {
         where: {
@@ -128,12 +137,18 @@ angular.module('doxelApp')
       });
 
       $scope.q.promise.then(function(){
-        $scope.iframe.contentWindow.setMarkers(place_list);
+        $scope.iframe_earth.contentWindow.setMarkers(place_list);
       });
 
 
     }, function(err){
       errorMessage.show('Could not load segments');
+    });
+
+    $scope.$on('webglearth2.viewer',function($event,place){
+      $('iframe.earth').attr('src','about:blank');
+      $('iframe.viewer').attr('src','/api/segments/viewer/'+place.segmentId+'/'+place.timestamp+'/viewer.html')
+      .addClass('visible');
     });
 
   });

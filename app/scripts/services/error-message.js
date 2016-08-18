@@ -67,16 +67,20 @@ angular.module('doxelApp')
 
       if (scope && scope.error[err] && scope.error[err].field) {
         var field=scope.error[err].field;
+        setTimeout(function(){
         options.form[field].$setValidity(err,false);
         scope.hideMessages=false;
+        scope.$apply();
         setTimeout(function(){
+          options.form[field].$setValidity(err,false);
           scope.hideMessages=true;
           scope.$apply();
         },3000);
+      },100);
 
       } else {
-        var title=scope && (scope.error[err] && scope.error[err].title || err) || "Something did not work";
-        var message=scope && (scope.error[err] && scope.error[err].msg || 'Unexpected error.') || err;
+        var title=scope && (scope.error[err] && scope.error[err].title) || '';
+        var message=scope && (scope.error[err] && scope.error[err].msg || err) || err || 'Unexpected error.';
         BootstrapDialog.show({
           title: title,
           size: BootstrapDialog.SIZE_SMALL,
