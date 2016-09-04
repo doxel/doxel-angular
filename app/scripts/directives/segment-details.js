@@ -52,7 +52,7 @@ angular.module('doxelApp')
       },
       controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
         $scope.updateSegmentDetails=function(){
-          var segment=$scope.segment=$scope.segment;
+          var segment=$scope.segment;
           if (segment.pictures) {
             $scope.count=segment.pictures.length;
 

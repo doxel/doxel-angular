@@ -1,140 +1,40 @@
-
 #segments {
-  .search-results-container {
-    z-index: 1;
-    overflow: hidden;
-  }
-
-  ui-layout-container {
-    overflow: hidden;
-  }
-
-  ui-layout-container.primary {
-      margin-bottom: 60px;
-      margin-top: 64px;
-
-  }
-
-  user-select: none;
-
-  textarea {
-    user-select: none;
-    margin-bottom: 13px;
-
-  }
-
-}
-
-
-#segments ul {
-    list-style: none;
-    padding-left: 10px;
-}
-
-#segments ul ul {
-    padding-left: 20px;
-}
-
-#segments span.selected {
-  background: cyan;
-}
-
-#segments a * {
-  cursor: pointer;
-}
-
-#segments a .fa-caret-right {
-  width: 8px;
-}
-
-#segments a .fa-folder {
-  width: 15px;
-}
-
-#segments div.details {
-  float: left;
-}
-
-#segments div.details {
-  padding: 10px;
-}
-
-#segments .relatedSegments,
-#segments .segment-pictures,
-#segments .segment-details {
+  left: 0px;
+  position: absolute;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin-top: 64px;
+  margin-bottom: -64px;
   text-align: center;
-}
 
-#segments .thumb {
-  background-size: cover;
-  background-position: center;
-  width: 192px;
-  height: 120px;
+  .segments {
+    text-align: center;
+    width: 100%;
+    overflow-y: auto;
+    height: 100%;
+    padding-bottom: 104px;
+  }
 
-}
+  picture {
+    width: 192px;
+    height: 120px;
+  }
 
-#segments .segment-details .thumb {
-  margin: auto;
-}
+  .thumb {
+    background-size: cover;
+    background-position: center;
+    width: 192px;
+    height: 120px;
 
-#segments picture {
-  width: 192px;
-  height: 120px;
-}
+    .selected {
+      border: 4px solid yellow;
+    }
 
-#segments .dndDragging {
-  opacity: 0.5;
-}
+  }
 
-#segments .dndValidTarget .thumb {
-  border: 4px dashed rosybrown;
-}
+  .segment-details .thumb {
+    margin: auto;
+  }
 
-#segments .dndDragover.dndValidTarget .thumb {
-  border: 4px dashed yellow;
-}
-
-
-#segments li a div {
-  display: inline;
-}
-
-#segments .tree .dndValidTarget > a {
-  box-shadow: 1px 0px 1px 1px rosybrown;
-}
-
-#segments .tree .dndValidTarget > a .dndDragover {
-  background-color: #bad;
-}
-
-segment-map {
-  width: 256px;
-  height: 192px;
-}
-
-
-segment-preview {
-  height: 192px;
-}
-
-#segments .tree ul {
-  white-space: nowrap;
-}
-
-#segments .tags-input-container {
-  padding: 10px;
-}
-
-.thumb.selected {
-  border: 4px solid yellow;
-}
-
-.togsgle {
-  position: fixed;
-  top: 0px;
-  right: 0px;
-  margin: 4px;
-  width: 1.5em;
-  height: 1.5em;
-  text-align: center;
 }

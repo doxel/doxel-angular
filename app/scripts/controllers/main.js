@@ -43,17 +43,38 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('MainCtrl', function ($scope, $location, $q, User, $rootScope, $cookies, LoopBackAuth, errorMessage,socketService) {
+  .controller('MainCtrl', function ($timeout, $scope, $location, $q, User, $rootScope, $cookies, LoopBackAuth, errorMessage, socketService, appConfig, $window,$state) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
+/*
+    $rootScope.$state=$state;
+    $rootScope.params=$state.current.params;
+*/
+    $rootScope.$on('viewer.show',function(event,segment){
+      if (appConfig && appConfig.viewerInMainWindow) {
+        $location.path('/viewer').search({
+          sid: segment.id,
+          sts: segment.timestamp
+        });
+      } else {
+        segment.viewerWindow=$window.open('/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html');
+      }
+    });
+
+    $rootScope.$on('segment.show',function(event,segment){
+      $location.path('/segments').search({
+        sid: segment.id,
+        sts: segment.timestamp
+      });
+    });
 
     // Whenever the route changes we see if either the user is logged in or is
     // trying to access a public route. Otherwise she will be redirected to
     // login.
-    $rootScope.$on('$routeChangeStart', function (event, next) {
+    $rootScope.$on('$stateChangeStart', function (event, next) {
       $rootScope.authenticated=User.isAuthenticated();
       var path=$location.path();
 
@@ -103,10 +124,14 @@ angular.module('doxelApp')
       }
     });
 
-    $rootScope.$on('$routeChangeSuccess', function (event, next) {
+    $rootScope.$on('$stateChangeSuccess', function (event, toState) {
       $rootScope.path=$location.path();
-      if (next.$$route) {
-        $scope.view=next.$$route.controllerAs;
+      angular.extend($rootScope.params,$location.search());
+      $timeout(function(){
+        $location.search($rootScope.params);
+      },1);
+      if (toState.name) {
+        $scope.view=toState.name;
         $scope.$broadcast('rebuild:scrollbar');
 
       } else {

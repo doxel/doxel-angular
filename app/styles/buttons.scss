@@ -1,0 +1,58 @@
+
+a.button {
+  box-shadow: 6px 6px 12px rgba(0,0,0,0.4);
+  position: absolute;
+  top: 0;
+  /* left: 0; */
+  color: black;
+  /*margin: 1em;*/
+  border: 1px solid black;
+  border-radius: 0.5em;
+  background-color: rgba(200,200,255,0.6);
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.05s ease-in;
+
+  div {
+    position: relative;
+    font-size: 2em;
+    text-align: center;
+  /*  width: 1em;  let fa-fw take care of width */
+    height: 1em;
+  }
+
+  .fa-fw {
+    /* same height and lin-height than fa-fw width */
+    height: 1.2857142857em;
+    line-height: 1.2857142857em;
+    margin: 0.13em;
+  }
+
+
+
+}
+
+  a.button:hover {
+    background-color: rgba(255,255,255,0.7);
+  }
+
+  a.button:active {
+    box-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+    transform: scale(0.98);
+
+  }
+
+a.button.current {
+  background-color: rgba(160,160,200,0.6);
+  box-shadow: 3px 3px 6px rgba(0,0,0,0.65);
+  transform: scale(0.98);
+  transition: all 0s;
+
+}
+
+a.fa.disabled, a.fa.disabled:hover, a.fa.disabled:active, a.button.disabled, a.button.disabled:hover, a.button.disabled:active {
+  opacity: 0.4;
+  transform: none;
+  pointer-events: none;
+}

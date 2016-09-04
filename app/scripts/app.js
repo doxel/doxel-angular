@@ -43,29 +43,28 @@
  *
  * Main module of the application.
  */
-angular
+var app=angular
   .module('doxelApp', [
     'ngAnimate',
     'ngCookies',
     'ngMessages',
     'ngResource',
-    'ngRoute',
     'ngSanitize',
     'ngTouch',
     'lbServices',
     'ui.router',
+    'ct.ui.router.extras.core',
+    'ct.ui.router.extras.sticky',
     'ui.bootstrap',
     'ui-leaflet',
     'ngScrollbar',
     'ngTable',
     'angular-nicescroll',
     'btford.socket-io',
-    'ui.layout',
     'ngTagsInput'
 
-
   ])
-  .config(function ($httpProvider, $routeProvider, $stateProvider,$locationProvider) {
+  .config(function ($httpProvider, $urlRouterProvider, $stateProvider,$locationProvider) {
 
     // enable getting query string object with $location.search()
     // (base href must be set in index.html)
@@ -75,6 +74,10 @@ angular
       requireBase: true
     });
 */
+
+    var params={
+    }
+
     var bLazy = new Blazy({
         src: 'data-blazy' // Default is data-src
     });
@@ -97,53 +100,152 @@ angular
       };
     });
 
-    $routeProvider
-      .when('/', {
+    $urlRouterProvider.otherwise('home');
+    $stateProvider
+      .state('home', {
+        url: '/',
         templateUrl: 'views/main.html',
         controller: 'MainCtrl',
         controllerAs: 'main'
       })
-      .when('/login', {
+      .state('login', {
+        url: '/login',
         templateUrl: 'views/login.html',
         controller: 'LoginCtrl',
         controllerAs: 'login'
       })
-      .when('/logout', {
+      .state('logout', {
+        url: '/logout',
         templateUrl: 'views/logout.html',
         controller: 'LogoutCtrl',
         controllerAs: 'logout'
       })
-      .when('/profile', {
+      .state('profile', {
+        url: '/profile',
         templateUrl: 'views/profile.html',
         controller: 'ProfileCtrl',
         controllerAs: 'profile'
       })
-      .when('/reset-password', {
+      .state('reset-password', {
+        url: '/reset-password',
         templateUrl: 'views/reset-password.html',
         controller: 'ResetPasswordCtrl',
         controllerAs: 'resetPassword'
       })
-     .when('/viewer', {
-        templateUrl: 'views/viewer.html',
-        controller: 'ViewerCtrl',
-        controllerAs: 'viewer'
-      })
-      .when('/upload', {
+      .state('upload', {
+        url: '/upload',
         templateUrl: 'views/upload.html',
         controller: 'UploadCtrl',
         controllerAs: 'upload'
       })
-      .when('/segments', {
-        templateUrl: 'views/segments.html',
-        controller: 'SegmentsCtrl',
-        controllerAs: 'segments'
+      .state('gallery', {
+        url: '/gallery',
+        sticky: true,
+        DSR: true,
+        views: {
+          'gallery': {
+            templateUrl: 'views/gallery.html',
+            controller: 'GalleryCtrl',
+            controllerAs: 'gallery'
+          }
+        }
       })
-      .when('/tos', {
+      .state('gallery.view', {
+        abstract: true,
+        sticky: true,
+        DSR: true,
+        views: {
+          'gallery-toolbar': {
+            templateUrl: 'views/gallery-toolbar.html',
+            controller: 'GalleryToolbarCtrl',
+            controllerAs: 'toolbar'
+          },
+          'gallery-thumbs': {
+            templateUrl: 'views/gallery-thumbs.html',
+            controller: 'GalleryThumbsCtrl',
+            controllerAs: 'thumbs',
+          },
+          'gallery-map': {
+            templateUrl: 'views/gallery-map.html',
+            controller: 'GalleryMapCtrl',
+            controllerAs: 'map'
+          },
+          'gallery-earth': {
+            templateUrl: 'views/gallery-earth.html',
+            controller: 'GalleryEarthCtrl',
+            controllerAs: 'earth'
+          },
+          'gallery-info': {
+            templateUrl: 'views/gallery-info.html',
+            controller: 'GalleryInfoCtrl',
+            controllerAs: 'info'
+          },
+        }
+      })
+
+      .state('gallery.view.thumbs', {
+        url: '/thumbs',
+        controller: 'GalleryThumbsCtrl'
+      })
+
+      .state('gallery.view.info', {
+        url: '/info',
+        controller: 'GalleryInfoCtrl'
+      })
+
+      .state('gallery.view.map', {
+        url: '/map',
+        controller: 'GalleryMapCtrl'
+      })
+
+      .state('gallery.view.earth', {
+        url: '/earth',
+        controller: 'GalleryEarthCtrl'
+      })
+
+      .state('gallery.view.cloud', {
+        url: '/cloud',
+        controller: 'GalleryViewerCtrl'
+      })
+
+      .state('tos', {
+        url: '/tos',
         templateUrl: 'views/tos.html',
         controller: 'TosCtrl',
         controllerAs: 'tos'
       })
-      .otherwise({
-        redirectTo: '/'
-      });
+      .state('segments', {
+        url: '/segments',
+        templateUrl: 'views/segments.html',
+        controller: 'SegmentsCtrl',
+        controllerAs: 'segments',
+      })
+      .state('map', {
+        url: '/map',
+        templateUrl: 'views/map.html',
+        controller: 'MapCtrl',
+        controllerAs: 'map'
+      })
+      .state('earth', {
+        url: '/earth',
+        templateUrl: 'views/earth.html',
+        controller: 'EarthCtrl',
+        controllerAs: 'earth'
+      })
+      .state('browser', {
+        url: '/browser',
+        templateUrl: 'views/browser.html',
+        controller: 'BrowserCtrl',
+        controllerAs: 'browser'
+      })
+      .state('viewer', {
+        url: '/viewer',
+        templateUrl: 'views/viewer.html',
+        controller: 'ViewerCtrl',
+        controllerAs: 'viewer'
+      })
+  })
+  .run(function ($rootScope,$state) {
+    $rootScope.$state=$state;
+    $rootScope.params={};
   });

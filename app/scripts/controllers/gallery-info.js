@@ -1,12 +1,12 @@
 /*
- * viewer.js
+ * gallery-info.js
  *
  * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
  *
  * Author(s):
  *
- *      Luc Deschenaux <luc.deschenaux@freesurf.ch>
+ *      Rurik Bogdanov <rurik.bugdanov@alsenet.com>
  *
  * This file is part of the DOXEL project <http://doxel.org>.
  *
@@ -32,27 +32,21 @@
  *      You are required to attribute the work as explained in the "Usage and
  *      Attribution" section of <http://doxel.org/license>.
  */
-
- 'use strict';
+ 
+'use strict';
 
 /**
  * @ngdoc function
- * @name doxelApp.controller:ViewerCtrl
+ * @name doxelApp.controller:GalleryInfoCtrl
  * @description
- * # ViewerCtrl
+ * # GalleryInfoCtrl
  * Controller of the doxelApp
  */
-
 angular.module('doxelApp')
-  .controller('ViewerCtrl', function ($scope,errorMessage,Segment,$q,$location) {
+  .controller('GalleryInfoCtrl', function () {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-
-    var segmentId=$location.$$search.sid;
-    var segmentTimestamp=$location.$$search.sts;
-    $('iframe.viewer').attr('src','/api/segments/viewer/'+segmentId+'/'+segmentTimestamp+'/viewer.html');
-
   });

@@ -1,0 +1,24 @@
+#gallery-toolbar.ng-scope {
+  position: fixed;
+  z-index: 99999;
+  left: 0px;
+  top: 52px;
+  display: flex;
+  flex-flow: column wrap;
+
+
+  .relative {
+    position: relative;
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 3.3em;
+    height: 3.3em;
+
+    > div {
+      position: relative;
+      /* vertical space between buttons */
+      height: 4em;
+    }
+
+  }
+}

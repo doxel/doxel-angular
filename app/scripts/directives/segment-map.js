@@ -67,7 +67,6 @@ angular.module('doxelApp')
         scope.height=scope.options.height||'192px';
         scope.width=scope.options.width||'256px';
         scope.defaults=angular.extend({
-          tileLayer: '//{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',
           maxZoom: 19,
           path: {
               weight: 10,

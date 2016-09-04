@@ -71,6 +71,7 @@ div.footer {
   background: rgba(white,0);
   color: #777;
   pointer-events: none;
+  font-size: 9px;
 }
 
 .container-narrow > hr {
@@ -245,13 +246,29 @@ p.list {
   visiblity: hidden;
 }
 
+.alert {
+  /* as in bootstrap-sass-official/assets/stylesheets/bootstrap/_alerts.scss */
+  background-color: #d9ef7;
+}
+
+a * {
+  cursor: pointer;
+}
+
+@import "../styles/gallery.scss";
+@import "../styles/gallery-thumbs.scss";
+@import "../styles/gallery-toolbar.scss";
+@import "../styles/gallery-map.scss";
+@import "../styles/gallery-earth.scss";
 @import "../styles/rotate.scss";
 @import "../styles/login.scss";
 @import "../styles/upload.scss";
+@import "../styles/browser.scss";
+@import "../styles/segments.scss";
 @import "../styles/viewer.scss";
 @import "../styles/profile.scss";
 @import "../styles/reset-password.scss";
-@import "../styles/segments.scss";
 @import "../styles/tos.scss";
 @import "../styles/useful.scss";
 @import "../styles/picture-set.scss";
+@import "../styles/buttons.scss";

@@ -15,7 +15,7 @@
     "angular-ui-router": "ui-router#~0.2.15",
     "angular-bootstrap": "~0.14.3",
     "ui.bootstrap": "~0.14.3",
-    "ui-leaflet": "^1.0.0",
+    "ui-leaflet": "https://github.com/angular-ui/ui-leaflet.git",
     "bootstrap3-dialog": "bootstrap-dialog#~1.34.7",
     "font-awesome": "~4.5.0",
     "bootstrap-social": "~4.11.0",
@@ -35,7 +35,8 @@
     "socket-io-client": "^1.4.5",
     "angular-ui-layout": "^1.4.2",
     "ng-tags-input": "^3.0.0",
-    "jquery.nicescroll": "^3.6.8"
+    "jquery.nicescroll": "https://github.com/inuyaksa/jquery.nicescroll.git",
+    "angular-ui-router.stateHelper": "https://github.com/marklagendijk/ui-router.stateHelper.git"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
@@ -49,11 +50,35 @@
         "dist/css/bootstrap.css",
         "dist/js/bootstrap.js"
       ]
+    },
+    "jquery.nicescroll": {
+      "main": [
+        "dist/jquery.nicescroll.min.js"
+      ]
+    },
+    "ui-leaflet": {
+      "main": [
+        "dist/ui-leaflet_dev_mapped.js"
+       ]
     }
   },
   "resolutions": {
     "ng-table": "1.0.0-beta.9",
     "angular": "^1.4.0",
     "angular-messages": "^1.4.8"
-  }
+  },
+  "homepage": "https://github.com/doxel/doxel-angular",
+  "authors": [
+    "Rurik Bugdanov <rurik.bugdanov@alsenet.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "AGPL-3.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }
