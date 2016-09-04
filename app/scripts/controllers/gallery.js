@@ -72,7 +72,12 @@ angular.module('doxelApp')
       if (toState.name!='gallery') {
         params.v=toState.name.split('.').pop();
       }
-      $state.go('gallery.view.'+(params.v||'thumbs'));
+
+      // timeout is needed so that ui-leaflet display and behave properly,
+      // when returning to gallery from other tabs
+      $timeout(function(){
+        $state.go('gallery.view.'+(params.v||'thumbs'));
+      },1)
 
     });
 

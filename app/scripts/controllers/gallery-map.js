@@ -1,3 +1,38 @@
+/*
+ * gallery-map.js
+ *
+ * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
+ * Please read <http://doxel.org/license> for more information.
+ *
+ * Author(s):
+ *
+ *      Rurik Bogdanov <rurik.bugdanov@alsenet.com>
+ *
+ * This file is part of the DOXEL project <http://doxel.org>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Additional Terms:
+ *
+ *      You are required to preserve legal notices and author attributions in
+ *      that material or in the Appropriate Legal Notices displayed by works
+ *      containing it.
+ *
+ *      You are required to attribute the work as explained in the "Usage and
+ *      Attribution" section of <http://doxel.org/license>.
+ */
+
 'use strict';
 
 /**
@@ -14,29 +49,31 @@ angular.module('doxelApp')
       'AngularJS',
       'Karma'
     ];
-
     angular.extend($scope,{
+
+      getMap: function(){
+        // opbtain a reference for the leaflet map
+        var q=$q.defer();
+        $rootScope.map_promise=q.promise;
+        $rootScope.gotmap=true;
+        $timeout(function(){
+          q.resolve(leafletData.getMap('main'))
+        },500);
+      },
+
       init: function(){
 
-        $scope.map_visible=true;
+        $scope.map_visible=false;
+
+        if (!$rootScope.gotmap) $scope.getMap();
 
         $timeout(function(){
           $scope.map_visible=($state.current.name=='gallery.view.map');
         },1);
 
-
-        // opbtain a reference for the leaflet map
-        var q=$q.defer();
-        $scope.map_promise=q.promise;
-        $timeout(function(){
-          leafletData.getMap('main').then(function(map){
-            q.resolve(map);
-          });
-        },1000);
-
         // show location on segment.clicked
         $scope.$on('segment.clicked',function($event,args){
-          $scope.map_promise.then(function(map){
+          $rootScope.map_promise.then(function(map){
             var segment=args.segment;
             $scope.setView(segment);
             if ($scope.currentMarker) {
@@ -49,6 +86,17 @@ angular.module('doxelApp')
 
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
           $scope.map_visible=(toState.name=='gallery.view.map');
+
+          // needed so that ui-leflet behave properly,
+          // when switching views in gallery
+          if ($scope.map_visible) {
+            if (!$rootScope.gotmap) {
+              $scope.getMap();
+            }
+          } else {
+            $rootScope.gotmap=false;
+          }
+
         });
 
         $scope.$on('centerUrlHash',function(event,hash){
@@ -108,7 +156,7 @@ TODO: use geopoint and using the smallest map dimension
 */
       // pan and zoom
       setView: function(segment){
-        $scope.map_promise.then(function(map){
+        $rootScope.map_promise.then(function(map){
           map.setView({
             lat: segment.lat,
             lng: segment.lng

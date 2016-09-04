@@ -198,7 +198,7 @@ angular.module('doxelApp')
                   if (segments[i].id==params.s) {
                     $timeout(function(){
                       $scope.segmentClick(segments[i]);
-                    },100);
+                    },150);
                     return;
                   }
                 }
