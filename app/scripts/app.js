@@ -140,8 +140,6 @@ var app=angular
       })
       .state('gallery', {
         url: '/gallery',
-        sticky: true,
-        DSR: true,
         views: {
           'gallery': {
             templateUrl: 'views/gallery.html',
@@ -152,8 +150,6 @@ var app=angular
       })
       .state('gallery.view', {
         abstract: true,
-        sticky: true,
-        DSR: true,
         views: {
           'gallery-toolbar': {
             templateUrl: 'views/gallery-toolbar.html',
@@ -179,6 +175,11 @@ var app=angular
             templateUrl: 'views/gallery-info.html',
             controller: 'GalleryInfoCtrl',
             controllerAs: 'info'
+          },
+          'gallery-cloud': {
+            templateUrl: 'views/gallery-viewer.html',
+            controller: 'GalleryViewerCtrl',
+            controllerAs: 'viewer'
           },
         }
       })

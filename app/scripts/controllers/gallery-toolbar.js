@@ -8,46 +8,63 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryToolbarCtrl', function ($scope,$rootScope,$state) {
+  .controller('GalleryToolbarCtrl', function ($scope,$rootScope,$state,$location) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
 
-    if (!$scope.currentView) {
-      $scope.currentView='thumbs';
-    }
+    angular.extend($scope,{
+      rootState: 'gallery.view',
 
-/*
-    $scope.$on('segment.clicked',function(event,args){
-      console.log(event,args);
-    });
-*/
-    $scope.getClass=function(what) {
-      var name=$state.current.name.split('.');
-      if (name[0]=='gallery') {
-        if (!$scope.visible) $scope.visible=true;
-        if (name[2]==what) {
-          if ($scope.currentView!=what) $scope.currentView=what;
-          return "current";
+      buttons: {
+        info: {},
+        map: {},
+        earth: {},
+        thumbs: {},
+        cloud: {}
+      },
+
+      init: function() {
+        for (var state in $scope.buttons){
+          if (!$scope.buttons.hasOwnProperty(state)) {
+            return;
+          }
+          $scope[state]=(function(state,rootState){
+            return function() {
+              var stateName=$scope.buttons[state].toState||($scope.rootState+'.'+state);
+              if ($state.current.name!=stateName) {
+                $state.go(stateName,$rootScope.params);
+              }
+            }
+          })(state);
         }
-      } else {
-        if ($scope.visible) $scope.visible=false;
-        return (what==$scope.currentView)?'current':'';
-      }
-    }
+      },
 
-    var states=['info','map','earth','thumbs','eye'];
-    states.forEach(function(name){
-      $scope[name]=(function(name){
-        return function() {
-          var stateName='gallery.view.'+name;
-          if ($state.current.name!=stateName) {
-            $state.go(stateName,$rootScope.params);
+      getClass: function(what) {
+        var name=$state.current.name.split('.');
+        if (what=='viewer') {
+          if ($location.search().s) {
+            return '';
+          } else {
+            return 'disabled';
           }
         }
-      })(name);
+        if (name[0]=='gallery') {
+          if (!$scope.visible) $scope.visible=true;
+          if (name[2]==what) {
+            if ($scope.currentView!=what) $scope.currentView=what;
+            return "current";
+          }
+        } else {
+          if ($scope.visible) $scope.visible=false;
+          return (what==$scope.currentView)?'current':'';
+        }
+      }
+
     });
+
+    $scope.init();
 
   });
