@@ -102,7 +102,7 @@ angular.module('doxelApp')
         $scope.$on('centerUrlHash',function(event,hash){
           console.log(hash);
           $rootScope.params.c=hash;
-          $location.search($rootScope.params);
+          $location.search($rootScope.params).replace();
         });
 
         $scope.$on('leafletDirectiveMap.moveend',function(){

@@ -70,7 +70,7 @@ angular.module('doxelApp')
             return function() {
               var stateName=$scope.buttons[state].toState||($scope.rootState+'.'+state);
               if ($state.current.name!=stateName) {
-                $state.go(stateName,$rootScope.params);
+                $state.go(stateName);
               }
             }
           })(state);

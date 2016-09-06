@@ -49,10 +49,7 @@ angular.module('doxelApp')
       'AngularJS',
       'Karma'
     ];
-/*
-    $rootScope.$state=$state;
-    $rootScope.params=$state.current.params;
-*/
+
     $rootScope.$on('viewer.show',function(event,segment){
       if (appConfig && appConfig.viewerInMainWindow) {
         $location.path('/viewer').search({
@@ -126,10 +123,36 @@ angular.module('doxelApp')
 
     $rootScope.$on('$stateChangeSuccess', function (event, toState) {
       $rootScope.path=$location.path();
-      angular.extend($rootScope.params,$location.search());
-      $timeout(function(){
-        $location.search($rootScope.params);
-      },1);
+
+      var search=$location.search();
+      var params=$rootScope.params;
+      var changed=false;
+      for (var prop in params) {
+        if (params.hasOwnProperty(prop)) {
+          if (params[prop]!=search[prop]) {
+            changed=true;
+            break;
+          }
+        }
+      }
+      if (!changed) {
+        for (var prop in search) {
+          if (search.hasOwnProperty(prop)) {
+            if (params[prop]!=search[prop]) {
+              changed=true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (changed) {
+        angular.extend($rootScope.params,$location.search());
+        $timeout(function(){
+          $location.search($rootScope.params).replace();
+        },1);
+      }
+
       if (toState.name) {
         $scope.view=toState.name;
         $scope.$broadcast('rebuild:scrollbar');

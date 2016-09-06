@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryCtrl', function ($scope,$rootScope,$state,errorMessage,Segment,$timeout) {
+  .controller('GalleryCtrl', function ($scope,$rootScope,$state,errorMessage,Segment,$timeout,$location) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -71,13 +71,19 @@ angular.module('doxelApp')
       // if any, else switch to gallery.view.thumbs
       if (toState.name!='gallery') {
         params.v=toState.name.split('.').pop();
+      } else {
+        params.v=$location.search().v||'thumbs';
       }
 
-      // timeout is needed so that ui-leaflet display and behave properly,
-      // when returning to gallery from other tabs
-      $timeout(function(){
-        $state.go('gallery.view.'+(params.v||'thumbs'));
-      },1)
+        // timeout is needed so that ui-leaflet display and behave properly,
+        // when returning to gallery from other tabs
+        if (toState.name=='gallery')
+        $timeout(function(){
+          console.log('redir',$state.current.name,'gallery.view.'+(params.v||'thumbs'));
+          $state.go('gallery.view.'+(params.v||'thumbs'),{},{
+            location: 'replace'
+          });
+        },1)
 
     });
 
@@ -86,7 +92,10 @@ angular.module('doxelApp')
     $scope.visible=($state.current.name.substr(0,7)=='gallery');
     if ($state.current.name=='gallery') {
       // when state is literal "gallery", switch to gallery.view.thumbs
-      $state.go('gallery.view.thumbs');
+      var view=$location.search().v;
+      $state.go('gallery.view.'+(view||'thumbs'),{
+        location: 'replace'
+      });
     }
 
 
