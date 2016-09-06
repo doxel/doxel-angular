@@ -100,7 +100,7 @@ var app=angular
       };
     });
 
-    $urlRouterProvider.otherwise('home');
+    $urlRouterProvider.otherwise('/');
     $stateProvider
       .state('home', {
         url: '/',
@@ -246,7 +246,14 @@ var app=angular
         controllerAs: 'viewer'
       })
   })
-  .run(function ($rootScope,$state) {
+  .run(function ($rootScope,$state,$location) {
     $rootScope.$state=$state;
     $rootScope.params={};
+
+    $rootScope.$watch(function(){
+      return $location.search();
+    }, function(newValue,oldValue){
+      $rootScope.$broadcast('location.search',arguments);
+    });
+
   });

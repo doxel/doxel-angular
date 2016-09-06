@@ -63,13 +63,15 @@ angular.module('doxelApp')
         }
       }
 
-      $scope.segmentClick=function(segment) {
+      $scope.segmentClick=function(segment,dontUpdateQuery) {
 
   //      $scope.$root.$broadcast('segment.show',segment);
   //      $state.go('gallery',{segmentId: segment.id},{notify: false, reload:' gallery.details'});
           $scope.select(segment);
           $rootScope.params.s=segment.id;;
-          $location.search($rootScope.params);
+          if (!dontUpdateQuery) {
+            $location.search($rootScope.params);
+          }
           $rootScope.$broadcast('segment.clicked',{segment: segment});
           $scope.$emit('updateButtons');
 
@@ -167,7 +169,6 @@ angular.module('doxelApp')
             $scope.showThumb(thumb);
           }
         }
-
       }
 
       $scope.showThumb=function(thumb){
@@ -185,19 +186,29 @@ angular.module('doxelApp')
 
       $scope.updateVisibility=function(state){
         $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
+      }
 
+      $scope.updateThumbsStyle=function(state){
+        if (state.name=="gallery.view.thumbs") {
+          // full screen for thumbs view
+          $('#gallery-thumbs #segments').removeClass('_bottom');
+        } else {
+          // one row or column of thumbs for map and earth view
+          $('#gallery-thumbs #segments').addClass('_bottom');
+        }
+      }
+
+      $scope.updateSelection=function(segmentId,dontUpdateQuery){
         if ($scope.thumbs_visible) {
-
           // restore (single) thumb selection
-          var params=$rootScope.params;
-          if (params.s) {
-            var thumb=$('#gallery-thumbs a[data-sid='+params.s+']');
+          if (segmentId) {
+            var thumb=$('#gallery-thumbs a[data-sid='+segmentId+']');
             if (!thumb.hasClass('selected')) {
               $scope.$parent.segmentFind.$promise.then(function(segments){
                 for (var i in segments) {
-                  if (segments[i].id==params.s) {
+                  if (segments[i].id==segmentId) {
                     $timeout(function(){
-                      $scope.segmentClick(segments[i]);
+                      $scope.segmentClick(segments[i],dontUpdateQuery);
                     },150);
                     return;
                   }
@@ -205,23 +216,26 @@ angular.module('doxelApp')
               });
             }
           }
-
-          if (state.name=="gallery.view.thumbs") {
-            // full screen for thumbs view
-            $('#gallery-thumbs #segments').removeClass('_bottom');
-          } else {
-            // one row or column of thumbs for map and earth view
-            $('#gallery-thumbs #segments').addClass('_bottom');
-          }
         }
+      }
 
-      };
+      $scope.update=function(state){
+        $scope.updateVisibility(state);
+        $scope.updateThumbsStyle(state);
+        $scope.updateSelection($rootScope.params.s);
+      }
 
       $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-        $scope.updateVisibility(toState);
+        $scope.update(toState);
       });
 
-      $scope.updateVisibility($state.current);
+      $scope.update($state.current);
+
+      $scope.$on('location.search',function(event,value){
+        if (value[0].s!=value[1].s) {
+          $scope.updateSelection(value[0].s,true);
+        }
+      });
 
   /*
       $scope.$on('webglearth2.viewer',function($event,place){
