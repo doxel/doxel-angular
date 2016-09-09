@@ -72,7 +72,7 @@ angular.module('doxelApp')
       if (toState.name!='gallery') {
         params.v=toState.name.split('.').pop();
       } else {
-        params.v=$location.search().v||'thumbs';
+        params.v=$location.search().v||params.v||'thumbs';
       }
 
         // timeout is needed so that ui-leaflet display and behave properly,
@@ -92,8 +92,8 @@ angular.module('doxelApp')
     $scope.visible=($state.current.name.substr(0,7)=='gallery');
     if ($state.current.name=='gallery') {
       // when state is literal "gallery", switch to gallery.view.thumbs
-      var view=$location.search().v;
-      $state.go('gallery.view.'+(view||'thumbs'),{
+      var view=$location.search().v||$rootScope.params.v||'thumbs';
+      $state.go('gallery.view.'+view,{
         location: 'replace'
       });
     }
