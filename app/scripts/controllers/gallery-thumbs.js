@@ -63,11 +63,19 @@ angular.module('doxelApp')
         }
       }
 
-      $scope.segmentClick=function(segment,dontUpdateQuery) {
+      $scope.segmentClick=function(options) {
+         var segment=options.segment;
+         var dontUpdateQuery=options.dontUpdateQuery;
+         var show=options.show;
+
 
   //      $scope.$root.$broadcast('segment.show',segment);
   //      $state.go('gallery',{segmentId: segment.id},{notify: false, reload:' gallery.details'});
-          $scope.select(segment);
+          $scope.select(segment,{
+            selected: true,
+            unique: true,
+            show: show
+          });
           $rootScope.params.s=segment.id;;
           if (!dontUpdateQuery) {
             $location.search($rootScope.params);
@@ -122,7 +130,9 @@ angular.module('doxelApp')
       $scope.$on('segment.click',function($event,segment){
         $event.stopPropagation();
         $event.preventDefault();
-        $scope.segmentClick(segment);
+        $scope.segmentClick({
+          segment: segment
+        });
       });
 
       // select segment in thumb list
@@ -173,10 +183,16 @@ angular.module('doxelApp')
 
       $scope.showThumb=function(thumb){
         if (thumb && thumb.length) {
-          var itemTop=thumb.position().top;
           var nicescroll=thumb.closest('[ng-nicescroll]');
-          var offset=(nicescroll.height()-thumb.height())/2;
-          nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-(offset>0?offset:0));
+          if ($scope.isVertical) {
+            var itemTop=thumb.position().top;
+            var offset=(nicescroll.height()-thumb.height())/2;
+            nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-(offset>0?offset:0));
+          } else {
+            var itemLeft=thumb.position().left;
+            var offset=(nicescroll.width()-thumb.width())/2;
+            nicescroll.scrollLeft(nicescroll.scrollLeft()+itemLeft-(offset>0?offset:0));
+          }
         }
       }
 
@@ -191,9 +207,11 @@ angular.module('doxelApp')
       $scope.updateThumbsStyle=function(state){
         if (state.name=="gallery.view.thumbs") {
           // full screen for thumbs view
+          $scope.isVertical=true;
           $('#gallery-thumbs #segments').removeClass('_bottom');
         } else {
           // one row or column of thumbs for map and earth view
+          $scope.isVertical=false;
           $('#gallery-thumbs #segments').addClass('_bottom');
         }
       }
@@ -202,17 +220,21 @@ angular.module('doxelApp')
         if ($scope.thumbs_visible) {
           // restore (single) thumb selection
           if (segmentId) {
-            var thumb=$('#gallery-thumbs a[data-sid='+segmentId+']');
-            if (!thumb.hasClass('selected')) {
-              $scope.$parent.segmentFind.$promise.then(function(segments){
-                for (var i in segments) {
-                  if (segments[i].id==segmentId) {
-                    $timeout(function(){
-                      $scope.segmentClick(segments[i],dontUpdateQuery);
-                    },150);
-                    return;
-                  }
-                }
+            var thumb=$('#gallery-thumbs a[data-sid='+segmentId+'] .thumb');
+            if (thumb.hasClass('selected')) {
+              console.log('showthumb');
+              $timeout(function(){
+                $scope.showThumb(thumb);
+              },150);
+            } else {
+              $scope.getSegment(segmentId, function(segment){
+                $timeout(function(){
+                  $scope.segmentClick({
+                    segment: segment,
+                    dontUpdateQuery: true,
+                    show: true
+                  });
+                },150);
               });
             }
           }

@@ -130,4 +130,14 @@ angular.module('doxelApp')
       errorMessage.show('Could not load segments');
     });
 
+    $scope.getSegment=function(segmentId,callback){
+      $scope.segmentFind.$promise.then(function(segments){
+        for (var i in segments) {
+          if (segments[i].id==segmentId) {
+            return callback(segments[i]);
+          }
+        }
+      });
+    }
+
   });

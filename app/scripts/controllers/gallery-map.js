@@ -73,27 +73,34 @@ angular.module('doxelApp')
 
         // show location on segment.clicked
         $scope.$on('segment.clicked',function($event,args){
-          $rootScope.map_promise.then(function(map){
-            var segment=args.segment;
-            $scope.setView(segment);
-            if ($scope.currentMarker) {
-              map.removeLayer($scope.currentMarker);
-            }
-            $scope.currentMarker=L.marker([segment.lat,segment.lng]);
-            map.addLayer($scope.currentMarker);
-          });
+          if (!$scope.map_visible) {
+            return;
+          }
+          var segment=args.segment;
+          $scope.setView(segment);
         });
 
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-          $scope.map_visible=(toState.name=='gallery.view.map');
+          var visible=(toState.name=='gallery.view.map');
 
           // needed so that ui-leflet behave properly,
           // when switching views in gallery
-          if ($scope.map_visible) {
-            if (!$rootScope.gotmap) {
-              $scope.getMap();
+          if (visible) {
+            if (!$scope.map_visible) {
+              $scope.map_visible=true;
+              if (!$rootScope.gotmap) {
+                $scope.getMap();
+              }
+              $scope.map_promise.then(function(map){
+                if ($scope.params.s) {
+                  $scope.getSegment($scope.params.s,function(segment){
+                    $scope.setView(segment);
+                  });
+                }
+              });
             }
           } else {
+            $scope.map_visible=false;
             $rootScope.gotmap=false;
           }
 
@@ -156,7 +163,8 @@ TODO: use geopoint and using the smallest map dimension
 */
       // pan and zoom
       setView: function(segment){
-        $rootScope.map_promise.then(function(map){
+       console.log('setView');
+       $rootScope.map_promise.then(function(map){
           map.setView({
             lat: segment.lat,
             lng: segment.lng
@@ -164,6 +172,16 @@ TODO: use geopoint and using the smallest map dimension
           segment.zoom||map._zoom, {
             pan: {}
           });
+
+          if ($scope.currentMarker) {
+            var m=$scope.currentMarker._latlng;
+            if (m.lat==segment.lat && m.lng==segment.lng) {
+              return;
+            }
+            map.removeLayer($scope.currentMarker);
+          }
+          $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+          map.addLayer($scope.currentMarker);
         });
       }
     });
