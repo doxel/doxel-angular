@@ -119,7 +119,10 @@ angular.module('doxelApp')
     };
 
     $scope.$on('segment.click',function($event,segment){
-      $scope.segmentClick(segment);
+      $scope.segmentClick({
+        show: $event,
+        segment: segment
+      });
     });
 
     $scope.visible=true;
