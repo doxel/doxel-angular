@@ -175,13 +175,25 @@ TODO: use geopoint and using the smallest map dimension
 
           if ($scope.currentMarker) {
             var m=$scope.currentMarker._latlng;
-            if (m.lat==segment.lat && m.lng==segment.lng) {
-              return;
+            if (m.lat!=segment.lat || m.lng!=segment.lng) {
+              if (map.hasLayer($scope.currentMarker)) {
+                map.removeLayer($scope.currentMarker)
+              }
+              $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+              map.addLayer($scope.currentMarker);
+
+            } else {
+              if (!map.hasLayer($scope.currentMarker)) {
+                // it was on another map instance, we must reinstantiate it
+                $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+                map.addLayer($scope.currentMarker);
+              }
             }
-            map.removeLayer($scope.currentMarker);
+          } else {
+            $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+            map.addLayer($scope.currentMarker);
           }
-          $scope.currentMarker=L.marker([segment.lat,segment.lng]);
-          map.addLayer($scope.currentMarker);
+
         });
       }
     });
