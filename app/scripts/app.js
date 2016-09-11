@@ -90,7 +90,7 @@ var app=angular
             //Now clearing the loopback values from client browser for safe logout...
             LoopBackAuth.clearUser();
             LoopBackAuth.clearStorage();
-            if ($location.path()!='/logout') {
+            if ($location.path()!='/logout' && $location.path()!='/login') {
                $location.pathAfterSignin = $location.path();
             }
             $location.path('/login');
