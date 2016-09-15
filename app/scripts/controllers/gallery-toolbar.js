@@ -79,9 +79,14 @@ angular.module('doxelApp')
 
       getClass: function(what) {
         var name=$state.current.name.split('.');
-        if (what=='viewer') {
+        if (what=='cloud') {
           if ($location.search().s) {
-            return '';
+            var segment=$scope.selected[$location.search().s];
+            if (segment&&segment.status=='R') {
+              return '';
+            } else {
+              return 'disabled';
+            }
           } else {
             return 'disabled';
           }
