@@ -10,3 +10,58 @@ iframe.viewer {
   margin-top: 52px;
   margin-bottom: -52px;
 }
+
+
+#gallery-earth {
+
+  position: relative;
+  height: 100%;
+
+  background-color: black;
+
+  .we-pp-content {
+      text-align: center;
+  }
+
+  a.thumb {
+      display: block;
+      width: 300px;
+      height:168px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      margin: 16px 0px;
+      box-shadow: 4px 4px 4px rgba(0,0,0,0.3);
+  }
+
+  a.thumb:hover {
+      transform: scale(0.995);
+      box-shadow: 3.5px 3.5px 4px rgba(0,0,0,0.4);
+  }
+
+  a.thumb:active {
+      transform: scale(0.98);
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+  }
+
+  .we-pm-icon {
+      cursor: pointer;
+  }
+
+  .we-pp {
+      pointer-events: none;
+  }
+
+  .we-pp .we-pp-content, .we-pp a {
+      pointer-events: all;
+  }
+
+  #earth_div  {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
+}
