@@ -44,7 +44,7 @@
  */
 
 angular.module('doxelApp')
-  .controller('GalleryViewerCtrl', function ($scope,$rootScope,$location,$q,Segment,$state) {
+  .controller('GalleryViewerCtrl', function ($scope,$rootScope,$location,$q,Segment,$state,$http,LoopBackAuth,errorMessage) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -57,11 +57,15 @@ angular.module('doxelApp')
       updateViewerVisibility: function(state) {
          console.log(state)
         if (state==$scope.viewer_state) {
-          $scope.viewer_visible=true;
-          $scope.show();
+          if (!$scope.viewer_visible) {
+            $scope.viewer_visible=true;
+            $scope.show();
+          }
         } else {
-          $scope.viewer_visible=false;
-          $scope.hide();
+          if ($scope.viewer_visible) {
+            $scope.viewer_visible=false;
+            $scope.hide();
+          }
         }
       },
 
@@ -107,8 +111,23 @@ angular.module('doxelApp')
         q.promise.then(function(segment){
           var src=$('iframe.viewer').attr('src');
           var toSrc='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html';
+          var json='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer/viewer.json';
           if (src!=toSrc) {
-            $('iframe.viewer').attr('src',toSrc);
+            $http.head(toSrc,{
+              headers: {
+                authorization: LoopBackAuth.accessTokenId
+              }
+            }).then(function(res){
+              if (Math.floor(res.status/100)!=2) {
+                errorMessage.show('Could not open viewer: '+res.statusText);
+              } else {
+                $('iframe.viewer').attr('src',toSrc);
+              }
+            }, function(err){
+              console.log(err);
+              errorMessage.show('Could not open viewer: '+err.statusText);
+            });
+
           }
         });
 
