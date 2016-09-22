@@ -43,7 +43,7 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q, $timeout) {
+.controller('LoginCtrl', function ($window, $scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q, $timeout, $compile) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
@@ -111,14 +111,15 @@ angular.module('doxelApp')
     nopassword: '<p class="list">If you do not specify a password, you will not be able to reconnect to your account with another device or if your browser cookies are cleared.</p>',
     nomail: '<p class="list">If you do not specify an email address, you will not be able to recover your account if you forget your password.</p>',
     nocredentials: '<p class="list">If you do not specify a username and a password, you will not be able to reconnect to your account with another device or once your browser cookies are cleared.</p>',
-    conditions: '<div><p style="width: 80%; margin-left: 10%;"><input type="checkbox">By checking this box and clicking "I Agree" below, you confirm that you have read, fully understand, will observe and further agree to be bound by all the statements of the document above, from time to time updated.</p></div>'
+    conditions: '<div id="tos_body" ng-include="\'views/tos.html\'"></div><div><p><label for="cb_agree"><input type="checkbox" id="cb_agree" ng-model="disclaimerAgree">&nbsp;By checking this box and clicking "I Agree" below, you confirm that you have read, fully understand, will observe and further agree to be bound by all the statements of the document above, from time to time updated.</label></p></div>'
   }
 
   $scope.disclaimer=function(callback){
-    BootstrapDialog.show({
+    var dialog=BootstrapDialog.show({
         title: '<span class="glyphicon glyphicon-info-sign" style="margin-right: 10px;"></span>DISCLAIMER',
         message: function(dialog) {
-          var $content=$(loginMessage.conditions);
+          $scope.disclaimerAgree=false;
+          var $content=$($compile(loginMessage.conditions)($scope));
 
           // disable button "I Agree"
           var button_agree=dialog.$modalFooter.find('button:last');
@@ -126,18 +127,9 @@ angular.module('doxelApp')
 
           // disable checkbox
           var checkbox=$content.find('input');
-          checkbox[0].disabled=true;
           checkbox.bind('change',function(e){
             button_agree[0].disabled=!e.target.checked;
           });
-
-          // load Terms of Services
-          $('<div></div>').load('views/tos.html',function(html){
-            if (html.search('--marker--')) {
-              // enable checkbox
-              checkbox[0].disabled=false;
-            }
-          }).prependTo($content);
 
           return $content;
         },
@@ -156,6 +148,8 @@ angular.module('doxelApp')
               }
         }]
     });
+    console.log(dialog);
+    $window.dia=dialog;
   };
 
   $scope.doSignup=function(really){

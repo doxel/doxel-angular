@@ -90,3 +90,24 @@ div#authentication {
   }
 
 }
+
+#tos_body {
+  height: 12em;
+  overflow: hidden;
+  margin-bottom: 1em;
+  border: 1px solid grey;
+
+  div.frame {
+    padding: 0.4em;
+  }
+
+  .termsAndConditions {
+    .text {
+      padding: 0;
+    }
+    .frame p {
+      width: 80%;
+      margin-left: 10%;
+    }
+  }
+}
