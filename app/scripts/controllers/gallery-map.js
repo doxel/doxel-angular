@@ -50,6 +50,62 @@ angular.module('doxelApp')
       'Karma'
     ];
     angular.extend($scope,{
+      defaults: {
+          worldCopyJump: true,
+          inertia: false,
+          zoomControlPosition: 'topright',
+          minZoom: 2
+      },
+      layers: {
+        baselayers: {
+          blue_marble: {
+            name: 'Blue-Marble',
+            url: '//{s}.tileserver:3000/blue-marble/{z}/{x}/{y}.png',
+            type: 'xyz',
+            layerOptions: {
+              tms: true
+            }
+          },
+          osm: {
+              name: 'OpenStreetMap',
+              url: '//{s}.tileserver:3000/osm/{z}/{x}/{y}.png',
+              type: 'xyz'
+
+          }
+        },
+        overlays: {
+          osm: {
+              name: 'OpenStreetMap',
+              url: '//{s}.tileserver:3000/osm/{z}/{x}/{y}.png?layers=T',
+              type: 'xyz',
+              layerOptions: {
+                transparent: true,
+                transparentColor: 'white',
+                opacity: 0.2
+              }
+
+          },
+
+          labels: {
+              visible: true,
+              name: 'Stamen toner-labels',
+              url: '//{s}.tileserver:3000/stamen/toner/{z}/{x}/{y}.png',
+              type: 'xyz',
+              layerOptions: {
+                opacity: 0.2
+              }
+          },
+          lines: {
+              name: 'Stamen toner-lines',
+              url: '//{s}.tileserver:3000/stamen/toner-lines/{z}/{x}/{y}.png',
+              type: 'xyz',
+              layerOptions: {
+                opacity: 1
+              }
+          }
+        }
+
+      },
 
       getMap: function(){
         // opbtain a reference for the leaflet map
@@ -66,6 +122,10 @@ angular.module('doxelApp')
         $scope.map_visible=false;
 
         if (!$rootScope.gotmap) $scope.getMap();
+
+        $scope.map_promise.then(function(map){
+          map.options.inertia=false;
+        });
 
         $timeout(function(){
           $scope.map_visible=($state.current.name=='gallery.view.map');
@@ -92,6 +152,7 @@ angular.module('doxelApp')
                 $scope.getMap();
               }
               $scope.map_promise.then(function(map){
+                map.options.inertia=false;
                 if ($scope.params.s) {
                   $scope.getSegment($scope.params.s,function(segment){
                     $scope.setView(segment);
@@ -150,17 +211,6 @@ TODO: use geopoint and using the smallest map dimension
         scale: true
       },
 
-      defaults: {
-        zoomControlPosition: 'topright',
-        minZoom: 3
-      },
-/*
-      // initial map bounds
-      bounds: leafletBoundsHelpers.createBoundsFromArray([
-        [ -40, -40 ],
-        [ 40, 40 ]
-      ]),
-*/
       // pan and zoom
       setView: function(segment){
        console.log('setView');
