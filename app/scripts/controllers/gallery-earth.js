@@ -63,6 +63,15 @@ angular.module('doxelApp')
           $scope.update(toState);
         });
 
+        // show location on segment.clicked
+        $scope.$on('segment.clicked',function($event,args){
+          if (!$scope.earth_visible) {
+            return;
+          }
+          var segment=args.segment;
+          $scope.setView(segment);
+        });
+
 
         $scope.update($state.current);
       },
@@ -111,12 +120,10 @@ angular.module('doxelApp')
 
       show: function() {
         WE_init();
-
+        earth.setView([-172,-47],-4);
+        $scope.earth_reallyvisible=true;
 
         $timeout(function(){
-
-            earth.setZoom(-4);
-            $scope.earth_reallyvisible=true;
 
             zoomandpan({
                 from: {
@@ -167,6 +174,20 @@ angular.module('doxelApp')
           });
         }
 */
+      },
+
+      setView: function(segment){
+        zoomandpan({
+          to: {
+            lon: segment.lng,
+            lat: segment.lat
+          },
+          steps: 15,
+          sameZoom: true,
+          noConstraints: true,
+          forceStayTheCourse: true
+
+        });
       }
 
     });
@@ -186,7 +207,7 @@ angular.module('doxelApp')
       };
       earth=$scope.earth = new WE.map('earth_div', options);
 
-      var blueMarble=WE.tileLayer('/blue-marble/{z}/{x}/{y}.png',{
+      var blueMarble=WE.tileLayer('//{s}.tileserver:3000/blue-marble/{z}/{x}/{y}.png',{
           attribution: 'Blue-Marble imagery is (c) 2004 NASA',
           tilesize: 256,
           tms: true,
@@ -194,14 +215,14 @@ angular.module('doxelApp')
       });
       blueMarble.addTo(earth);
 
-      var osm=WE.tileLayer('/osm/{z}/{x}/{y}.png',{
+      var osm=WE.tileLayer('//{s}.tileserver:3000/osm/{z}/{x}/{y}.png',{
          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
          subdomains: ['a','b','c'],
          opacity: 0
       });
       osm.addTo(earth);
 
-      var toner = WE.tileLayer('/stamen/toner/{z}/{x}/{y}.png', {
+      var toner = WE.tileLayer('//{s}.tileserver:3000/stamen/toner/{z}/{x}/{y}.png', {
         attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.',
         opacity:0
       });
@@ -227,10 +248,19 @@ angular.module('doxelApp')
         if (window.parentScope) {
           $rootScope.$broadcast('webglearth2.loaded');
 
+          if ($scope.params.s) {
+            $scope.getSegment($scope.params.s,function(segment){
+              $scope.setView(segment);
+            });
+          }
+
+
         } else {
           loadMarkers();
         }
     }
+
+
 
     function loadMarkers(){
         $.ajax({
@@ -401,8 +431,8 @@ angular.module('doxelApp')
 
        function loop() {
            if (window.zoomandpanId!=now) return;
-           earth.setView([cur.lat,cur.lon],cur.zoom);
-           if (++i>=options.steps) {
+           earth.setView([cur.lat,cur.lon],options.sameZoom?undefined:cur.zoom);
+           if (++i>options.steps) {
              window.zoomandpanForceStayTheCourse=false;
              options.callback();
              return;
@@ -410,7 +440,9 @@ angular.module('doxelApp')
            requestAnimationFrame(loop);
            cur.lon=Math.easeOutCubic(i,from.lon,delta.lon,options.steps);
            cur.lat=Math.easeOutCubic(i,from.lat,delta.lat,options.steps);
-           cur.zoom=Math.easeOutCubic(i,from.zoom,delta.zoom,options.steps);
+           if (!options.sameZoom) {
+             cur.zoom=Math.easeOutCubic(i,from.zoom,delta.zoom,options.steps);
+           }
        }
        loop();
    }
