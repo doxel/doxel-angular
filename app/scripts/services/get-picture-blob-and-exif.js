@@ -47,6 +47,22 @@ angular.module('doxelApp')
     return function(picture,format) {
       var q=$q.defer();
 
+      function errorMessageFromBlob(blob){
+        var reader=new FileReader();
+        reader.addEventListener('loadend',function(){
+          if (reader.error) {
+            console.log(reader);
+            q.reject(new Error('Internal server error'));
+
+          } else {
+            q.reject(new Error(reader.result));
+          }
+        });
+        reader.readAsText(blob);
+
+      } // errorErrorMessageFromBlob
+
+
       // load thumbnail as blob
       $http({
         method: 'GET',
@@ -55,40 +71,54 @@ angular.module('doxelApp')
         url: picture.url+(format ? '?what='+format : '')
 
       }).then(function successCallback(response) {
-        if (response.status==200) {
+        if (response.status!=200) {
+          console.log(response);
+          q.reject(new Error('Could not load image'));
+          return;
+        }
 
-          // show thumbnail
-          picture.blob=window.URL.createObjectURL(response.data);
+        if (response.data.type.split('/')[0]=='text') {
+          console.log(response);
+          errorMessageFromBlob(response.data);
+          return;
+        }
 
-          // extract exif
-          var reader=new FileReader();
-          reader.addEventListener('loadend',function(){
-            if (reader.error) {
-              console.log(reader.error);
-              q.reject(new Error('Could not read image'));
+        // show thumbnail
+        picture.blob=window.URL.createObjectURL(response.data);
 
-            } else {
-              try {
-                picture.exif=piexif.load(reader.result);
+        // extract exif
+        var reader=new FileReader();
+        reader.addEventListener('loadend',function(){
+          if (reader.error) {
+            console.log(response,reader);
+            q.reject(new Error('Could not read image'));
 
-              } catch(e) {
-                console.log(e);
-                q.reject(new Error('Could not parse EXIF'));
-              }
+          } else {
+            try {
+              picture.exif=piexif.load(reader.result);
 
-              q.resolve(picture);
+            } catch(e) {
+              console.log(response,e);
+              q.reject(new Error('Could not parse EXIF'));
             }
 
-          });
-          reader.readAsBinaryString(response.data);
+            q.resolve(picture);
+          }
 
-        } else {
-          q.reject(new Error('Could not load image'));
-        }
+        });
+        reader.readAsBinaryString(response.data);
 
       }, function errorCallback(response) {
         console.log(response);
-        q.reject(new Error('Internal server error'));
+
+        if (response.data.type.split('/')[0]=='text') {
+          errorMessageFromBlob(response.data);
+          return;
+
+        } else {
+          q.reject(new Error('Internal server error'));
+        }
+
       });
 
       return q.promise;
