@@ -48,11 +48,15 @@ angular.module('doxelApp')
 
     this.show=function(options){
       if (typeof(options)=="string") {
-        err=options;
+        err=new Error(options);
 
       } else {
-        var scope=options.scope;
-        var err=options.err;
+        if (options.constructor && options.constructor.name=="Error") {
+          err=options;
+        } else {
+          var scope=options.scope;
+          var err=options.err;
+        }
       }
 
       if (!err && scope) {
@@ -80,7 +84,8 @@ angular.module('doxelApp')
 
       } else {
         var title=scope && (scope.error[err] && scope.error[err].title) || '';
-        var message=scope && (scope.error[err] && scope.error[err].msg || err) || err || 'Unexpected error.';
+        var message=scope && (scope.error[err] && scope.error[err].msg) || err.message || 'Unexpected error.';
+        console.log(message);
         BootstrapDialog.show({
           title: title,
           size: BootstrapDialog.SIZE_SMALL,
