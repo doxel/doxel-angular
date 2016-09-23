@@ -148,8 +148,6 @@ angular.module('doxelApp')
               }
         }]
     });
-    console.log(dialog);
-    $window.dia=dialog;
   };
 
   $scope.doSignup=function(really){
@@ -300,7 +298,7 @@ angular.module('doxelApp')
 
   $scope.resetPassword=function(){
     //send an email with instructions to reset an existing user's password
-    if ($scope.mailSent) {
+    if ($scope.emailSent) {
       errorMessage.show("An email has already been sent.");
       return;
     }
