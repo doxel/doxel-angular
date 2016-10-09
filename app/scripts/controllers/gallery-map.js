@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state) {
+  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state,appConfig) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -51,16 +51,30 @@ angular.module('doxelApp')
     ];
     angular.extend($scope,{
       defaults: {
+          // display the markers again after scrolling n times 360 degrees laterally
           worldCopyJump: true,
+          // disable inertia because of weird behaviour when using map.worldCopyJump
+          // (must be done manually below on init and state change
           inertia: false,
           zoomControlPosition: 'topright',
-          minZoom: 2
+          minZoom: 2,
+          maxBoundsViscosity: 1.0 // not working
+      },
+      maxbounds: {
+        southWest: {
+          lat: 89,
+          lng: -1800000
+        },
+        northEast: {
+          lat: -89,
+          lng: 1800000
+        }
       },
       layers: {
         baselayers: {
           blue_marble: {
             name: 'Blue-Marble',
-            url: '//{s}.tileserver:3000/blue-marble/{z}/{x}/{y}.png',
+            url: '//{s}.'+appConfig.tileServer+'/blue-marble/{z}/{x}/{y}.png',
             type: 'xyz',
             layerOptions: {
               tms: true
@@ -68,7 +82,7 @@ angular.module('doxelApp')
           },
           osm: {
               name: 'OpenStreetMap',
-              url: '//{s}.tileserver:3000/osm/{z}/{x}/{y}.png',
+              url: '//{s}.'+appConfig.tileServer+'/osm/{z}/{x}/{y}.png',
               type: 'xyz'
 
           }
@@ -76,7 +90,7 @@ angular.module('doxelApp')
         overlays: {
           osm: {
               name: 'OpenStreetMap',
-              url: '//{s}.tileserver:3000/osm/{z}/{x}/{y}.png?layers=T',
+              url: '//{s}.'+appConfig.tileServer+'/osm/{z}/{x}/{y}.png?layers=T',
               type: 'xyz',
               layerOptions: {
                 transparent: true,
@@ -89,7 +103,7 @@ angular.module('doxelApp')
           labels: {
               visible: true,
               name: 'Stamen toner-labels',
-              url: '//{s}.tileserver:3000/stamen/toner/{z}/{x}/{y}.png',
+              url: '//{s}.'+appConfig.tileServer+'/stamen/toner/{z}/{x}/{y}.png',
               type: 'xyz',
               layerOptions: {
                 opacity: 0.2
@@ -97,7 +111,7 @@ angular.module('doxelApp')
           },
           lines: {
               name: 'Stamen toner-lines',
-              url: '//{s}.tileserver:3000/stamen/toner-lines/{z}/{x}/{y}.png',
+              url: '//{s}.'+appConfig.tileServer+'/stamen/toner-lines/{z}/{x}/{y}.png',
               type: 'xyz',
               layerOptions: {
                 opacity: 1
@@ -107,31 +121,52 @@ angular.module('doxelApp')
 
       },
 
-      getMap: function(){
-        // opbtain a reference for the leaflet map
+      /**
+      * @function GalleryMapCtrl.getMap
+      * @desc Set and/or get the leaflet map object promise ($rootScope.map_promise)
+      * @param callback {function} Optional "then" callback
+      * @return promise {object}
+      */
+      getMap: function(callback){
+        if ($rootScope.map_promise) {
+          if (callback) {
+            return $rootScope.map_promise.then(callback);
+          } else {
+            return $rootScope.map_promise;
+          }
+        }
+        // obtain a reference for the leaflet map
         var q=$q.defer();
         $rootScope.map_promise=q.promise;
-        $rootScope.gotmap=true;
+
         $timeout(function(){
           q.resolve(leafletData.getMap('main'))
         },500);
+
+        if (callback) {
+          return q.promise.then(callback);
+        } else {
+          return q.promise;
+        }
+
       },
 
       init: function(){
 
+        // map must be visible first so that leaflet initialize properly
         $scope.map_visible=false;
 
-        if (!$rootScope.gotmap) $scope.getMap();
-
-        $scope.map_promise.then(function(map){
+        // get map object and disable inertia
+        $scope.getMap(function(map){
           map.options.inertia=false;
         });
 
+        // update visibility
         $timeout(function(){
           $scope.map_visible=($state.current.name=='gallery.view.map');
         },1);
 
-        // show location on segment.clicked
+        // show location on segment.clicked event
         $scope.$on('segment.clicked',function($event,args){
           if (!$scope.map_visible) {
             return;
@@ -140,6 +175,7 @@ angular.module('doxelApp')
           $scope.setView(segment);
         });
 
+        // update
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
           var visible=(toState.name=='gallery.view.map');
 
@@ -148,11 +184,9 @@ angular.module('doxelApp')
           if (visible) {
             if (!$scope.map_visible) {
               $scope.map_visible=true;
-              if (!$rootScope.gotmap) {
-                $scope.getMap();
-              }
-              $scope.map_promise.then(function(map){
+              $scope.getMap(function(map){
                 map.options.inertia=false;
+                // select and show current segment
                 if ($scope.params.s) {
                   $scope.getSegment($scope.params.s,function(segment){
                     $scope.setView(segment);
@@ -162,13 +196,13 @@ angular.module('doxelApp')
             }
           } else {
             $scope.map_visible=false;
-            $rootScope.gotmap=false;
+            $rootScope.map_promise=null;
           }
 
         });
 
+        // update query string on centerUrlHash change
         $scope.$on('centerUrlHash',function(event,hash){
-          console.log(hash);
           $rootScope.params.c=hash;
           $location.search($rootScope.params).replace();
         });
@@ -203,7 +237,7 @@ TODO: use geopoint and using the smallest map dimension
       events: {
         map: {
           enable:  ['moveend', 'click'],
-          login: 'emit'
+          logic: 'emit'
         }
       },
 
@@ -214,7 +248,7 @@ TODO: use geopoint and using the smallest map dimension
       // pan and zoom
       setView: function(segment){
        console.log('setView');
-       $rootScope.map_promise.then(function(map){
+       $scope.getMap(function(map){
           map.setView({
             lat: segment.lat,
             lng: segment.lng
