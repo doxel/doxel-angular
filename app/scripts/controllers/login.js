@@ -43,7 +43,7 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($window, $scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q, $timeout, $compile) {
+.controller('LoginCtrl', function ($window, $scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q, $timeout, $compile, $state) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
@@ -172,7 +172,7 @@ angular.module('doxelApp')
         LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
         LoopBackAuth.rememberMe=true;
         LoopBackAuth.save();
-        $location.path($location.pathAfterSignin||'/upload');
+        $state.transitionTo($scope.stateAfterSignin||'upload');
       },
       function(err){
         $timeout(function(){
@@ -259,7 +259,7 @@ angular.module('doxelApp')
       LoopBackAuth.rememberMe=true;
       LoopBackAuth.save();
       socketService.connect();
-      $location.path($location.pathAfterSignin||'/');
+      $state.transitionTo($scope.stateAfterSignin||'home');
     },
     function(err){
       console.log(err);
