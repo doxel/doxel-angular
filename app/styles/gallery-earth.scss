@@ -2,32 +2,11 @@
 #gallery-earth {
 
   position: relative;
-
   background-color: black;
+  height: 100%;
 
   .we-pp-content {
       text-align: center;
-  }
-
-  a.thumb {
-      display: block;
-      width: 300px;
-      height:168px;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: cover;
-      margin: 16px 0px;
-      box-shadow: 4px 4px 4px rgba(0,0,0,0.3);
-  }
-
-  a.thumb:hover {
-      transform: scale(0.995);
-      box-shadow: 3.5px 3.5px 4px rgba(0,0,0,0.4);
-  }
-
-  a.thumb:active {
-      transform: scale(0.98);
-      box-shadow: 2px 2px 4px rgba(0,0,0,0.6);
   }
 
   .we-pm-icon {
@@ -43,13 +22,16 @@
   }
 
   #earth_div {
-    position: fixed;
+    position:fixed;
     height: 100%;
     width: 100%;
+    top: -55px;
 
     .webglearth2 {
+      position: relative;
       height: 100%;
       width: 100%;
+      margin-top: 55px;
       padding: 55px 2px 2px 0px;
     }
   }
