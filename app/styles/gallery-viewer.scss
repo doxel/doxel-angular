@@ -1,0 +1,26 @@
+
+#gallery-viewer {
+  position: relative;
+  height: 100%;
+
+  iframe.viewer {
+    position: fixed;
+    top: 55px;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 57px;
+    border: none;
+  }
+}
+
+.thumbs-left #gallery-viewer {
+  iframe.viewer {
+    padding-right: 267px;
+  }
+}
+.thumbs-bottom #gallery-viewer {
+  iframe.viewer {
+    padding-bottom: 196px;
+    top: 52px;
+  }
+}

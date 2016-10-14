@@ -4,6 +4,10 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 @import "font-awesome/scss/font-awesome.scss";
 // endbower
 
+#main.thumbs-left {
+  padding-left: 265px;
+}
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;
@@ -44,6 +48,11 @@ div.header {
     padding-bottom: 19px;
   }
 }
+
+.thumbs-left .navbar {
+//  left: 265px;
+}
+
 
 body > div.container > div.ng-scope {
   margin-top: 80px;
@@ -208,6 +217,7 @@ ng-message {
   margin: auto;
 }
 */
+
 .navbar .collapse {
   width: 320px;
   margin: auto;
@@ -262,7 +272,7 @@ a * {
 @import "../styles/gallery-map.scss";
 @import "../styles/gallery-earth.scss";
 @import "../styles/gallery-viewer.scss";
-@import "../styles/rotate.scss";
+//@import "../styles/rotate.scss";
 @import "../styles/login.scss";
 @import "../styles/upload.scss";
 @import "../styles/browser.scss";

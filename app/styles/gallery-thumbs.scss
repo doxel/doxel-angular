@@ -1,51 +1,26 @@
-#gallery-thumbs {
-  #segments {
-    z-index: 100;
-    height: 100%;
-    margin-top: 64px;
-    margin-bottom: -64px;
-    .date {
-      background: black;
-      color: white;
-    }
-    .thumb.selected {
-      border: 4px solid yellow;
-      border-radius: 3px;
-    }
+#segments {
+  left: 65px;
+  padding-right: 65px;
+  position: absolute;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin-top: 55px;
+  margin-bottom: -64px;
+  padding-bottom: 57px;
+  text-align: center;
 
-    a {
-      border: 1px solid black;
-      border-radius: 3px;
-    }
+  .segments {
+    text-align: center;
+    width: 100%;
+    overflow-y: auto;
+    height: 100%;
+    padding-bottom: 104px;
   }
 
-  #segments._bottom {
-    left: 0;
-    position: absolute;
-    overflow: hidden;
-    height: 144px;
-    width: 100%;
-    bottom: 10px;
-    margin: 0;
-    text-align: center;
-    background-color: rgba(0,0,0,0.4);
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-
-    .segments {
-      text-align: center;
-      width: 100%;
-      overflow-y: auto;
-      height: 144px;
-      padding-bottom: 0px;
-      padding-top: 0px;
-    }
-
-    picture {
-      width: 192px;
-      height: 120px;
-    }
+  picture {
+    width: 192px;
+    height: 120px;
 
     .thumb {
       background-size: cover;
@@ -53,10 +28,70 @@
       width: 192px;
       height: 120px;
     }
-    .segment-details .thumb {
-      margin: auto;
+    .thumb.selected {
+      border: 4px solid yellow;
+    }
+
+  }
+
+  .segment-details .thumb {
+    margin: auto;
+  }
+
+  a {
+    width: 192px;
+    height: 140px;
+
+    .date {
+      background-color: black;
+      color: white;
+    }
+    margin-bottom: 4px;
+  }
+
+
+}
+
+
+.thumbs-bottom #gallery-thumbs {
+  #segments {
+    height: auto;
+    width: 100%;
+    left: 0;
+    margin: 0;
+    overflow-y: hidden;
+    white-space: nowrap;
+    bottom: 0;
+    padding: 0;
+
+
+    .segments {
+      height: autp;
+      width: 100%;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 4px 2px 2px 2px;
+
+    }
+    a {
+      margin-bottom: 0;
     }
 
 
+  }
+}
+
+.thumbs-left #gallery-thumbs {
+  #segments {
+    width: 200px;
+
+    .segments {
+      position: relative;
+      text-align: center;
+      width: 200px;
+      height: 100%;
+      padding-bottom: 64px;
+      padding-top: 0px;
+    }
   }
 }
