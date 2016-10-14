@@ -68,12 +68,12 @@ var app=angular
 
     // enable getting query string object with $location.search()
     // (base href must be set in index.html)
-/*    $locationProvider.html5Mode({
+    $locationProvider.html5Mode({
       enabled: true,
       // TODO: in production requireBase must be set to true and base href must be set in index.html
       requireBase: true
     });
-*/
+
 
     var params={
     }
@@ -90,25 +90,25 @@ var app=angular
             //Now clearing the loopback values from client browser for safe logout...
             LoopBackAuth.clearUser();
             LoopBackAuth.clearStorage();
-            if ($location.path()!='/logout' && $location.path()!='/login') {
-               $location.pathAfterSignin = $location.path();
+            if ($scope.$state.current.name!='logout' && $scope.$state.current.name!='login') {
+               $scope.$state.stateAfterSignin = $scope.$state.current.name;
             }
-            $location.path('/login');
+            $scope.$state.transitionTo('login');
           }
           return $q.reject(rejection);
         }
       };
     });
 
-    $urlRouterProvider.otherwise('/');
+    $urlRouterProvider.otherwise('/gallery');
     $stateProvider
-      .state('home', {
+/*      .state('home', {
         url: '/',
         templateUrl: 'views/main.html',
         controller: 'MainCtrl',
         controllerAs: 'main'
       })
-      .state('login', {
+  */    .state('login', {
         url: '/login',
         templateUrl: 'views/login.html',
         controller: 'LoginCtrl',
@@ -120,13 +120,14 @@ var app=angular
         controller: 'LogoutCtrl',
         controllerAs: 'logout'
       })
-      .state('profile', {
+
+  /*    .state('profile', {
         url: '/profile',
         templateUrl: 'views/profile.html',
         controller: 'ProfileCtrl',
         controllerAs: 'profile'
       })
-      .state('reset-password', {
+*/      .state('reset-password', {
         url: '/reset-password',
         templateUrl: 'views/reset-password.html',
         controller: 'ResetPasswordCtrl',
@@ -188,12 +189,12 @@ var app=angular
         url: '/thumbs',
         controller: 'GalleryThumbsCtrl'
       })
-
+/*
       .state('gallery.view.info', {
         url: '/info',
         controller: 'GalleryInfoCtrl'
       })
-
+*/
       .state('gallery.view.map', {
         url: '/map',
         controller: 'GalleryMapCtrl'
@@ -215,6 +216,7 @@ var app=angular
         controller: 'TosCtrl',
         controllerAs: 'tos'
       })
+      /*
       .state('segments', {
         url: '/segments',
         templateUrl: 'views/segments.html',
@@ -245,15 +247,158 @@ var app=angular
         controller: 'ViewerCtrl',
         controllerAs: 'viewer'
       })
+      */
   })
-  .run(function ($rootScope,$state,$location) {
+  .run(function ($rootScope,$state,$location,$window,User,$cookies,LoopBackAuth,appConfig,$timeout) {
     $rootScope.$state=$state;
     $rootScope.params={};
 
+    // broadcast location.search event on query string change
     $rootScope.$watch(function(){
       return $location.search();
     }, function(newValue,oldValue){
       $rootScope.$broadcast('location.search',arguments);
+    });
+
+    // return gallery thumbs style
+    $rootScope.getClass=function(){
+  // TODO: too many calls, find another way
+  //    console.log($state);
+      if ($state.current.name.substr(0,7)=='gallery') {
+        return $rootScope.thumbsPosition||'';
+      } else {
+        return '';
+      }
+    }
+
+    angular.element($window).bind('resize',function(e){
+      console.log('resize');
+      $rootScope.$broadcast('window.resize',e);
+    });
+
+    angular.element($window).bind('orientationchange',function(e){
+      console.log('orientationchange');
+      $rootScope.$broadcast('orientationchange',e);
+    });
+
+    /*
+    $rootScope.$on('viewer.show',function(event,segment){
+      if (appConfig && appConfig.viewerInMainWindow) {
+        // open viewer view
+        $location.path('/viewer').search({
+          sid: segment.id,
+          sts: segment.timestamp
+        });
+      } else {
+        // open viewer in another window
+        segment.viewerWindow=$window.open('/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html');
+      }
+    });
+    */
+
+    /*
+    $rootScope.$on('segment.show',function(event,segment){
+      $location.path('/segments').search({
+        sid: segment.id,
+        sts: segment.timestamp
+      });
+    });
+    */
+
+    // Whenever the route changes we see if either the user is logged in or is
+    // trying to access a public route. Otherwise she will be redirected to
+    // login.
+    $rootScope.$on('$stateChangeStart', function (event, next) {
+      $rootScope.authenticated=User.isAuthenticated();
+      var state=next.name;
+
+      // When the user just logged in with passport,
+      // bind and switch to parent user if any
+      var cookies=$cookies.getAll();
+
+      if (cookies && cookies['pp-access_token']) {
+        $cookies.remove('pp-access_token',{path:'/'});
+        $cookies.remove('pp-userId',{path:'/'});
+
+        if ($rootScope.authenticated && cookies['pp-userId']=='undefined') {
+          $state.transitionTo('profile');
+          // user linked a third-party account
+          return;
+
+        }
+        if (cookies['pp-userId']!='undefined') {
+          // user logged in with third-party account (returned credentials may be for main account)
+          LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
+          LoopBackAuth.save();
+          $state.transitionTo($location.stateAfterSignin||'upload');
+          return;
+
+        }
+      }
+
+      if (User.isAuthenticated()) {
+        if (state=='login') {
+          event.preventDefault();
+          return;
+        }
+
+      } else {
+        switch(state) {
+          case 'upload':
+          case 'profile':
+            $location.stateAfterSignin=state;
+            event.preventDefault();
+            $state.transitionTo('login');
+//            $location.path('/login');
+            return;
+
+          case 'logout':
+            event.preventDefault();
+            return;
+        }
+      }
+    });
+
+    // syncronize rootScope.params and location.search()
+    $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+      var search=$location.search();
+      var params=$rootScope.params;
+
+      // check for changed querystring param
+      var changed=false;
+      for (var prop in params) {
+        if (params.hasOwnProperty(prop)) {
+          if (params[prop]!=search[prop]) {
+            changed=true;
+            break;
+          }
+        }
+      }
+      if (!changed) {
+        for (var prop in search) {
+          if (search.hasOwnProperty(prop)) {
+            if (params[prop]!=search[prop]) {
+              changed=true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (changed) {
+        angular.extend($rootScope.params,$location.search());
+        $timeout(function(){
+          $location.search($rootScope.params).replace();
+        },1);
+      }
+
+      if (toState.name) {
+        $rootScope.view=toState.name;
+        $rootScope.$broadcast('rebuild:scrollbar');
+
+      } else {
+        $rootScope.view=null;
+      }
     });
 
   });
