@@ -1,5 +1,7 @@
 <div id="gallery-earth" ng-if="earth_visible" ng-cloak>
   <!--iframe class="earth" src="about:blank"></iframe-->
 
-    <div ng-style="earth_reallyvisible" id="earth_div"></div>
+    <div ng-style="earth_reallyvisible" id="earth_div">
+      <webglearth2 scope="scope" layers="layers" options="options" markers="markers" center="center"></webglearth2>
+    </div>
 </div>

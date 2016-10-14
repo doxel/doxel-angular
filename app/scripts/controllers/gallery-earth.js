@@ -50,6 +50,7 @@ angular.module('doxelApp')
       'Karma'
     ];
 
+    $scope.scope=$scope;
     var mousewheelTimeout;
     var mousemoveTimeout;
 
@@ -69,7 +70,7 @@ angular.module('doxelApp')
             return;
           }
           var segment=args.segment;
-          $scope.setView(segment);
+          $scope.we2.setView(segment);
         });
 
 
@@ -108,9 +109,15 @@ angular.module('doxelApp')
 
           $scope.earth_reallyvisible=false;
           $scope.earth_visible=true;
-          $timeout($scope.show,1);
+          $timeout(function(){
+            $scope.we2.ready.then(function(){
+              $scope.show();
+            });
+          },1);
         } else {
           if ($scope.earth_visible) {
+            clearTimeout($scope.layerOpacityInterval);
+            $rootScope.earth=$scope.earth=earth=null;
             $scope.earth_visible=false;
             $scope.earth_reallyvisible=false;
             $(window).off('.earth');
@@ -119,21 +126,32 @@ angular.module('doxelApp')
       },
 
       show: function() {
-        WE_init();
-        earth.setView([-172,-47],-4);
+
+        //WE_init();
+        
+        var c;
+        if (false && $scope.params.c) {
+          c=$scope.params.c.split(':');
+          c[0]=Number(c[0]);
+          c[1]=Number(c[1]);
+          c[2]=Number(c[2]);
+          while (c[0]<0) c[0]+=360;
+          while (c[1]<0) c[1]+=180;
+        } else {
+          c=[8,47,3];
+        }
+
+//        if (!$scope.alreadyShown) {
+        $scope.we2.earth.setView([-172,-47],-4);
         $scope.earth_reallyvisible=true;
 
-        $timeout(function(){
+//        $timeout(function(){
 
-            zoomandpan({
-                from: {
-                    lon: -172,
-                    lat: -47,
-                    zoom: -4
-                },
+
+            $scope.we2.zoomAndPan({
                 to: {
-                    lon: 8,
-                    lat: 47,
+                    lon: c[0],
+                    lat: c[1],
                     zoom: 3
                 },
                 steps: 90,
@@ -142,8 +160,16 @@ angular.module('doxelApp')
                 firstPan: true,
                 callback: loaded
             });
+            $scope.alreadyShown=true;
+ /*       } else {
+        $scope.we2.earth.setView([c[0],c[1]]);
+            $scope.earth_reallyvisible=true;
+        $scope.earth_reallyvisible=true;
+        loaded();
+        }
 
-        }, 2000);
+
+ //       }, 2000);
 
       /*
         var iframe=$('iframe.earth');
@@ -174,20 +200,6 @@ angular.module('doxelApp')
           });
         }
 */
-      },
-
-      setView: function(segment){
-        zoomandpan({
-          to: {
-            lon: segment.lng,
-            lat: segment.lat
-          },
-          steps: 15,
-          sameZoom: true,
-          noConstraints: true,
-          forceStayTheCourse: true
-
-        });
       }
 
     });
@@ -205,9 +217,9 @@ angular.module('doxelApp')
         center: [8, 47],
         zoom: 3
       };
-      earth=$scope.earth = new WE.map('earth_div', options);
+      earth=$rootScope.earth=$scope.earth= new WE.map('earth_div', options);
 
-      var blueMarble=WE.tileLayer('//{s}.tileserver:3000/blue-marble/{z}/{x}/{y}.png',{
+      var blueMarble=WE.tileLayer('//{s}.'+appConfig.tileServer+'/blue-marble/{z}/{x}/{y}.png',{
           attribution: 'Blue-Marble imagery is (c) 2004 NASA',
           tilesize: 256,
           tms: true,
@@ -215,22 +227,21 @@ angular.module('doxelApp')
       });
       blueMarble.addTo(earth);
 
-      var osm=WE.tileLayer('//{s}.tileserver:3000/osm/{z}/{x}/{y}.png',{
+      var osm=WE.tileLayer('//{s}.'+appConfig.tileServer+'/osm/{z}/{x}/{y}.png',{
          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
          subdomains: ['a','b','c'],
          opacity: 0
       });
       osm.addTo(earth);
 
-      var toner = WE.tileLayer('//{s}.tileserver:3000/stamen/toner/{z}/{x}/{y}.png', {
+      var toner = WE.tileLayer('//{s}.'+appConfig.tileServer+'/stamen/toner/{z}/{x}/{y}.png', {
         attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under CC BY SA.',
         opacity:0
       });
       toner.addTo(earth);
 
-      window.osm=osm;
       var prevZoom=earth.getZoom();
-      setInterval(function(){
+      $scope.layerOpacityInterval=setInterval(function(){
         var newZoom=earth.getZoom();
         if (newZoom!=prevZoom) {
           prevZoom=newZoom;
@@ -243,26 +254,27 @@ angular.module('doxelApp')
 
     } // WE_init
 
-    window.zoomandpanForceStayTheCourse=true;
+//    $scope.we2.zoomandpanForceStayTheCourse=true;
     function loaded() {
-        if (window.parentScope) {
+      return;
           $rootScope.$broadcast('webglearth2.loaded');
 
-          if ($scope.params.s) {
+          if ($scope.params.c) {
+            var c=$scope.params.c.split(':');
+            $scope.we2.setView(c,c[2]);
+          } else if ($scope.params.s) {
             $scope.getSegment($scope.params.s,function(segment){
-              $scope.setView(segment);
+              $scope.we2.setView(segment);
             });
-          }
+          } 
 
-
-        } else {
           loadMarkers();
-        }
+
+
     }
 
-
-
     function loadMarkers(){
+      return;
         $.ajax({
             url: "../../markers.json",
             dataType: 'json',
@@ -361,155 +373,6 @@ angular.module('doxelApp')
        }
 
    } // addMarkers
-
-   function zoomandpan(options) {
-       var from=options.from||{};
-       var to=options.to;
-
-       if (window.zoomandpanForceStayTheCourse===true && options.firstPan!==true) {
-         return;
-       }
-       window.zoomandpanForceStayTheCourse=options.forceStayTheCourse;
-
-       Math.easeOutCubic = function (time, base, delta, duration) {
-           time /= duration;
-           --time;
-           return base+delta*(time*time*time+1);
-       };
-
-       if (!from.center) {
-         var center=earth.getCenter();
-         from.lat=center[0];
-         from.lon=center[1];
-       }
-
-       if (from.zoom===undefined) {
-           from.zoom=earth.getZoom();
-       }
-
-       if (to.zoom===undefined) {
-         to.zoom=earth.getZoom();
-       }
-
-       if (!options.callback) {
-         options.callback=function(){};
-       }
-
-       if (!options.steps) {
-         options.steps=1;
-       }
-
-       var cur={
-           lat: from.lat,
-           lon: from.lon,
-           zoom: from.zoom
-       }
-
-       var delta={
-           lat: (to.lat-from.lat)%90,
-           lon: (to.lon-from.lon)%360,
-           zoom: (to.zoom-from.zoom)
-       }
-
-       if (!options.noConstraints) {
-         if (delta.lon>180) {
-           delta.lon=delta.lon-360;
-         } else if (delta.lon<-180) {
-           delta.lon=360+delta.lon;
-         }
-
-         if (delta.lat>90) {
-           delta.lat=delta.lat-180;
-         } else if (delta.lat<-90) {
-           delta.lat=180+delta.lat;
-         }
-       }
-
-       var i=0;
-       var now=Date.now();
-       window.zoomandpanId=now;
-
-       function loop() {
-           if (window.zoomandpanId!=now) return;
-           earth.setView([cur.lat,cur.lon],options.sameZoom?undefined:cur.zoom);
-           if (++i>options.steps) {
-             window.zoomandpanForceStayTheCourse=false;
-             options.callback();
-             return;
-           }
-           requestAnimationFrame(loop);
-           cur.lon=Math.easeOutCubic(i,from.lon,delta.lon,options.steps);
-           cur.lat=Math.easeOutCubic(i,from.lat,delta.lat,options.steps);
-           if (!options.sameZoom) {
-             cur.zoom=Math.easeOutCubic(i,from.zoom,delta.zoom,options.steps);
-           }
-       }
-       loop();
-   }
-
-   var getLocalTime_prev_request=0;
-   var getLocalTime_q=[];
-   function getLocalTime(timestamp,lat,lng,callback){
-
-     getLocalTime_q.push({
-         timestamp: timestamp,
-         lat: lat,
-         lng: lng,
-         callback: callback
-     });
-
-     if (getLocalTime_q.length>1) {
-         return;
-     }
-
-     function loop() {
-         var timestamp=getLocalTime_q[0].timestamp;
-         var lat=getLocalTime_q[0].lat;
-         var lng=getLocalTime_q[0].lng;
-         var callback=getLocalTime_q[0].callback;
-
-         var now = new Date().getTime();
-         var delay=now-getLocalTime_prev_request;
-
-         delay=(delay<1000)?1100-delay:1;
-         getLocalTime_prev_request=now;
-
-         setTimeout(function(){
-
-             $.ajax({
-               url:"https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lng + "&timestamp=" + timestamp,
-               cache: false,
-               type: "POST",
-
-             }).done(function(response){
-                 console.log(response);
-
-               getLocalTime_q.shift();
-               if (getLocalTime_q.length) {
-                   setTimeout(loop,1);
-               }
-
-               if(response.timeZoneId != null){
-                 var diff=(response.rawOffset+response.dstOffset)/3600;
-                 var d = new Date(1000*(timestamp+new Date().getTimezoneOffset()*60+diff*3600));
-                 var mm=d.getMonth()+1;
-                 if (mm<10) mm='0'+mm;
-                 var dd=d.getDate();
-                 if (dd<10) dd='0'+dd;
-                 callback(d.getFullYear()+'-'+mm+'-'+dd+' @ '+d.toLocaleTimeString()+' UTC'+(diff>0?'+':'')+diff);
-
-               } else {
-                   callback('Could not compute local date');
-               }
-
-             });
-
-         },delay);
-     }
-
-     loop();
-
-   }
 
     $scope.init();
 

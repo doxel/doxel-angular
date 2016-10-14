@@ -1,21 +1,7 @@
 
-iframe.earth,
-iframe.viewer {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0px;
-  margin-right: 0px;
-  border: 0px;
-  margin-top: 52px;
-  margin-bottom: -52px;
-}
-
-
 #gallery-earth {
 
   position: relative;
-  height: 100%;
 
   background-color: black;
 
@@ -56,12 +42,28 @@ iframe.viewer {
       pointer-events: all;
   }
 
-  #earth_div  {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+  #earth_div {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+
+    .webglearth2 {
+      height: 100%;
+      width: 100%;
+      padding: 55px 2px 2px 0px;
+    }
   }
 
+
+
+}
+
+.thumbs-left #gallery-earth #earth_div {
+  padding-right: 265px;
+}
+.thumbs-bottom #gallery-earth #earth_div {
+  padding-bottom: 142px;
+  .webglearth2 {
+    padding: 52px 0px 2px 0px;
+  }
 }
