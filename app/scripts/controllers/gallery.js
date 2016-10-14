@@ -104,8 +104,11 @@ angular.module('doxelApp')
     $scope.segmentFind=Segment.find({
       filter: {
         where: {
-          lat: {exists: true}
-        }
+          lat: {exists: true},
+          status: 'R'
+        },
+        limit: 18,
+        order: 'timestamp DESC'
       }
     }, function(segments){
       $scope.segments=segments;
