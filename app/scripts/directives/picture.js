@@ -53,16 +53,26 @@ angular.module('doxelApp')
         label: '@'
       },
       controller: function($scope, errorMessage, getPictureBlobAndExif) {
+        if (!$scope.style) {
+          $scope.style=[
+            'background-image: url(/images/ajax-loader.gif);',
+            'background-position: center;',
+            'background-size: auto;',
+            'background-repeat: no-repeat;'
+          ].join(' ');
+        }
         $scope.updatePicture=function() {
           var picture=$scope.picture;
           if (picture.blob) {
-            $scope.blob=picture.blob;
+            $scope.style="background-image: url("+picture.blob+");";
             return;
           }
-          $scope.blob=''; //TODO: eg animated gif or font-awesome spinner
+          var pictureClass=$scope.pictureClass;
+          $scope.pictureClass+=' loading';
           picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
-          getPictureBlobAndExif(picture,(($scope.pictureClass=='thumb')?'thumb':undefined)).then(function(picture){
-            $scope.blob=picture.blob;
+          getPictureBlobAndExif(picture,((pictureClass=='thumb')?'thumb':undefined)).then(function(picture){
+            $scope.pictureClass=pictureClass;
+            $scope.style="background-image: url("+picture.blob+");";
             picture.loaded=true;
             if (typeof($scope.pictureOnload)=='function') {
               $scope.pictureOnload({
@@ -84,10 +94,10 @@ angular.module('doxelApp')
           }
         });
         if (scope.picture.selected) {
-          pictureClass+=' selected';
+          scope.pictureClass+=' selected';
         }
 
       },
-      template: '<div class="{{pictureClass}}" style="background-image: url({{blob}});"><div class="label">{{label}}</div></div>'
+      template: '<div class="{{pictureClass}}" style="{{style}});"><div class="label">{{label}}</div></div>'
     };
   });
