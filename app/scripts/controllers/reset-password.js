@@ -8,7 +8,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('ResetPasswordCtrl', function ($scope,$cookies,errorMessage,LoopBackAuth,$routeParams,User,$rootScope,$location) {
+  .controller('ResetPasswordCtrl', function ($scope,$cookies,errorMessage,LoopBackAuth,$routeParams,User,$rootScope,$location,$state) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -78,7 +78,7 @@ angular.module('doxelApp')
               $cookies.remove('userId',{path:'/'});
               $cookies.remove('pp-access_token',{path:'/'});
               $cookies.remove('pp-userId',{path:'/'});
-              $location.path('/login');
+              $state.transitionTo('login');
 
             }, function(err){
               console.log('logout failed',err)
@@ -86,7 +86,7 @@ angular.module('doxelApp')
               $cookies.remove('userId',{path:'/'});
               $cookies.remove('pp-access_token',{path:'/'});
               $cookies.remove('pp-userId',{path:'/'});
-              $location.path('/login');
+              $state.transitionTo('login');
             });
 
           }, function(err){
