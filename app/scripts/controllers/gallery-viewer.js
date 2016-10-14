@@ -84,7 +84,7 @@ angular.module('doxelApp')
       },
 
       show: function(){
-        var segmentId=$location.search().s;
+        var segmentId=$location.search().s || $scope.params.s;
         if (!segmentId) {
           return;
         }

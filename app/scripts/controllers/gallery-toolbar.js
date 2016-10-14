@@ -80,9 +80,10 @@ angular.module('doxelApp')
       getClass: function(what) {
         var name=$state.current.name.split('.');
         if (what=='cloud') {
-          if ($location.search().s) {
-            var segment=$scope.selected[$location.search().s];
-            if (segment&&segment.status=='R') {
+          var segmentId=$location.search().s||$scope.params.s;
+          if (segmentId) {
+            var segment=$scope.selected[segmentId];
+            if (segment&&segment.status&&segment.status.search('R')>=0) {
               return '';
             } else {
               return 'disabled';
