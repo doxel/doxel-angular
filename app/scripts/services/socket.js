@@ -63,7 +63,7 @@ angular.module('doxelApp')
 
     this.connect=function socketService_connect(){
       //Creating connection with server
-      var socket = self.ioSocket = io.connect('https://localhost:3000');
+      var socket = self.ioSocket = io.connect(location.origin);
       console.log(socket);
 
       //This part is only for login users for authenticated socket connection between client and server.
