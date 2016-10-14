@@ -43,15 +43,13 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryThumbsCtrl', function ($scope,$rootScope,errorMessage,Segment,$q,$location,$state,$timeout) {
+  .controller('GalleryThumbsCtrl', function ($scope,$rootScope,errorMessage,Segment,$q,$location,$state,$timeout,$window) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
 
-
-    // we inherit $scope.visible from GalleryCtrl
     $scope.thumbs_visible=false;
     $scope.segmentFind.$promise.then(function(){
       $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
@@ -184,7 +182,7 @@ angular.module('doxelApp')
       $scope.showThumb=function(thumb){
         if (thumb && thumb.length) {
           var nicescroll=thumb.closest('[ng-nicescroll]');
-          if ($scope.isVertical) {
+          if ($scope.thumbsVerticalScroll) {
             var itemTop=thumb.position().top;
             var offset=(nicescroll.height()-thumb.height())/2;
             nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-(offset>0?offset:0));
@@ -196,8 +194,14 @@ angular.module('doxelApp')
         }
       }
 
-      $scope.getClass=function(){
-        return ($state.name=='gallery.view.thumbs')?'':'_bottom';
+      $scope.isWide=function(){
+        var w=$(window).width();
+        var h=$(window).height();
+        return (w>h);
+      }
+
+      $scope.getThumbsStyle=function(){
+        return $scope.isWide()?'thumbs-left':'thumbs-bottom';
       }
 
       $scope.updateVisibility=function(state){
@@ -207,14 +211,22 @@ angular.module('doxelApp')
       $scope.updateThumbsStyle=function(state){
         if (state.name=="gallery.view.thumbs") {
           // full screen for thumbs view
-          $scope.isVertical=true;
-          $('#gallery-thumbs #segments').removeClass('_bottom');
+          $scope.thumbsVerticalScroll=true;
+          $rootScope.thumbsPosition='';
         } else {
           // one row or column of thumbs for map and earth view
-          $scope.isVertical=false;
-          $('#gallery-thumbs #segments').addClass('_bottom');
+          $scope.thumbsVerticalScroll=false;
+          $rootScope.thumbsPosition=$scope.getThumbsStyle();
         }
       }
+
+      $scope.$on('window.resize',function(){
+        $scope.updateThumbsStyle($rootScope.$state.current);
+      });
+
+      $scope.$on('orientationchange',function(){
+        $scope.updateThumbsStyle($rootScope.$state.current);
+      });
 
       $scope.updateSelection=function(segmentId,dontUpdateQuery){
         if ($scope.thumbs_visible) {
@@ -239,6 +251,10 @@ angular.module('doxelApp')
             }
           }
         }
+      }
+
+      $scope.scrollEnd=function(){
+        console.log(arguments);
       }
 
       $scope.update=function(state){
