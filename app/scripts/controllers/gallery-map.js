@@ -70,25 +70,34 @@ angular.module('doxelApp')
           lng: 1800000
         }
       },
+      markerURL: undefined,
+
       layers: {
         baselayers: {
-          blue_marble: {
-            name: 'Blue-Marble',
-            url: '//{s}.'+appConfig.tileServer+'/blue-marble/{z}/{x}/{y}.png',
-            type: 'xyz',
-            layerOptions: {
-              tms: true
-            }
-          },
           osm: {
               name: 'OpenStreetMap',
               url: '//{s}.'+appConfig.tileServer+'/osm/{z}/{x}/{y}.png',
-              type: 'xyz'
+              type: 'xyz',
+              layerOptions: {
+              minZoom: 9,
+              maxZoom: 19
+            }
 
           }
         },
         overlays: {
-          osm: {
+          blue_marble: {
+            visible: true,
+            name: 'Blue-Marble',
+            url: '//{s}.'+appConfig.tileServer+'/blue-marble/{z}/{x}/{y}.png',
+            type: 'xyz',
+            layerOptions: {
+              maxZoom: 8,
+              tms: true
+            }
+          },
+          /*
+        osm: {
               name: 'OpenStreetMap',
               url: '//{s}.'+appConfig.tileServer+'/osm/{z}/{x}/{y}.png?layers=T',
               type: 'xyz',
@@ -99,23 +108,31 @@ angular.module('doxelApp')
               }
 
           },
-
+*/
           labels: {
               visible: true,
               name: 'Stamen toner-labels',
               url: '//{s}.'+appConfig.tileServer+'/stamen/toner/{z}/{x}/{y}.png',
               type: 'xyz',
               layerOptions: {
+                maxZoom: 8,
                 opacity: 0.2
               }
           },
           lines: {
+              visible: true,
               name: 'Stamen toner-lines',
               url: '//{s}.'+appConfig.tileServer+'/stamen/toner-lines/{z}/{x}/{y}.png',
               type: 'xyz',
               layerOptions: {
+                maxZoom: 8,
                 opacity: 1
               }
+          },
+          markers: {
+            name: 'Markers',
+            type: 'markercluster',
+            visible: true
           }
         }
 
@@ -151,6 +168,35 @@ angular.module('doxelApp')
 
       },
 
+      updateVisibility: function(state){
+        var visible=(state.name=='gallery.view.map');
+
+        // needed so that ui-leflet behave properly,
+        // when switching views in gallery
+        if (visible) {
+          console.log('map visible');
+      if (!$scope.map_visible) {
+            console.log('map was not visible');
+            $scope.map_visible=true;
+            $scope.getMap(function(map){
+              map.options.inertia=false;
+              // select and show current segment
+              if ($scope.params.s) {
+                $scope.getSegment($scope.params.s,function(segment){
+                  $scope.setView(segment);
+                });
+              }
+              $scope.updateMarkers(map);
+              console.log('updateMarkers');
+            });
+          }
+        } else {
+          $scope.map_visible=false;
+          $rootScope.map_promise=null;
+        }
+
+      },
+
       init: function(){
 
         // map must be visible first so that leaflet initialize properly
@@ -177,34 +223,19 @@ angular.module('doxelApp')
 
         // update
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-          var visible=(toState.name=='gallery.view.map');
-
-          // needed so that ui-leflet behave properly,
-          // when switching views in gallery
-          if (visible) {
-            if (!$scope.map_visible) {
-              $scope.map_visible=true;
-              $scope.getMap(function(map){
-                map.options.inertia=false;
-                // select and show current segment
-                if ($scope.params.s) {
-                  $scope.getSegment($scope.params.s,function(segment){
-                    $scope.setView(segment);
-                  });
-                }
-              });
-            }
-          } else {
-            $scope.map_visible=false;
-            $rootScope.map_promise=null;
-          }
-
+          $scope.updateVisibility(toState);
         });
+        $scope.updateVisibility($rootScope.$state.current);
+        console.log('state',$rootScope.$state.current);
 
         // update query string on centerUrlHash change
         $scope.$on('centerUrlHash',function(event,hash){
           $rootScope.params.c=hash;
           $location.search($rootScope.params).replace();
+        });
+
+        $scope.$on('leafletDirectiveMarker.click', function(event, args){
+console.log(args)
         });
 
         $scope.$on('leafletDirectiveMap.moveend',function(){
@@ -232,11 +263,23 @@ TODO: use geopoint and using the smallest map dimension
 */
         });
 
-      },
+      }, // init
 
+			watchOptions: {
+					markers: {
+							type: null,
+							individual: {
+									type: null
+							}
+					}
+			},
       events: {
         map: {
           enable:  ['moveend', 'click'],
+          logic: 'emit'
+        },
+        marker: {
+          enable: ['click'],
           logic: 'emit'
         }
       },
@@ -258,17 +301,21 @@ TODO: use geopoint and using the smallest map dimension
           });
 
           if ($scope.currentMarker) {
+            // there is already a current marker
             var m=$scope.currentMarker._latlng;
             if (m.lat!=segment.lat || m.lng!=segment.lng) {
+              // current marker changed
               if (map.hasLayer($scope.currentMarker)) {
+                // remove existing marker
                 map.removeLayer($scope.currentMarker)
               }
+              // add new marker
               $scope.currentMarker=L.marker([segment.lat,segment.lng]);
               map.addLayer($scope.currentMarker);
 
             } else {
               if (!map.hasLayer($scope.currentMarker)) {
-                // it was on another map instance, we must reinstantiate it
+                // marker was on another map instance, we must reinstantiate it
                 $scope.currentMarker=L.marker([segment.lat,segment.lng]);
                 map.addLayer($scope.currentMarker);
               }
@@ -277,9 +324,34 @@ TODO: use geopoint and using the smallest map dimension
             $scope.currentMarker=L.marker([segment.lat,segment.lng]);
             map.addLayer($scope.currentMarker);
           }
+					$scope.currentMarker.setZIndexOffset(99999999999);
 
         });
-      }
+      }, // setView
+
+      updateMarkers: function(map){
+        var markers=[];
+        $scope.segments.some(function(segment,idx){
+          if (!segment.marker) {
+//            segment.marker=L.CircleMarker([segment.lat,segment.lng]);
+//            markers.addLayer(segment.marker);
+              segment.marker={
+                layer: 'markers',
+                lng: segment.lng,
+                lat: segment.lat
+              }
+          }
+          markers.push(segment.marker);
+        });
+  //      if (!map.hasLayer(markers)) {
+   //       map.addLayer(markers);
+    //    }
+        leafletData.getDirectiveControls().then(function(controls) {
+          controls.markers.create(markers,$scope.markers);
+          $scope.markers=markers;
+        });
+      } // updateMarkers
+
     });
 
     $scope.init();

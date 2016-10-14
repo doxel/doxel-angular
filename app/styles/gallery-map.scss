@@ -4,10 +4,23 @@
 
   .map-container {
     position: fixed;
-    padding-top: 52px;
-    bottom: 0px;
-    height: 100%;
+    top: 55px;
     width: 100%;
+    bottom: 2px;
   }
 
+}
+
+.thumbs-left #gallery-map {
+  .map-container {
+    padding-right: 267px;
+  }
+}
+
+
+.thumbs-bottom #gallery-map {
+  .map-container {
+    padding-bottom: 142px;
+    top: 52px;
+  }
 }
