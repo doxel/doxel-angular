@@ -2,7 +2,7 @@
 <html>
   <head>
     <!--- base href is required in production for $locationProvider html5Mode -->
-    <!--base href="/app/"-->
+    <base href="/">
     <meta charset="utf-8">
     <title></title>
     <meta name="description" content="">
@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
     <link rel="stylesheet" href="bower_components/angular-ui-layout/src/ui-layout.css" />
     <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css" />
+    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -27,7 +29,7 @@
 
   </head>
   <body>
-    <div ng-app="doxelApp" ng-controller="MainCtrl" ng-cloak>
+    <div ng-app="doxelApp" ng-controller="MainCtrl" id="main" ng-class="getClass()" ng-cloak>
       <!--[if lte IE 8]>
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -52,7 +54,7 @@
                 <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
                   <ul class="nav navbar-nav">
-                    <li ng-class="getClass('home')"><a ui-sref="home" class="home fa fa-home"><span>Home</span></a></li>
+                    <!--li ng-class="getClass('home')"><a ui-sref="home" class="home fa fa-home"><span>Home</span></a></li-->
                     <li ng-class="getClass('gallery')"><a ui-sref="gallery" class="gallery fa fa-photo"><span>Gallery</span></a></li>
                     <li ng-show="!authenticated" ng-class="getClass('login')"><a ui-sref="login" class="login fa fa-sign-in"><span>Login</span></a></li>
                     <li ng-show="authenticated" ng-class="getClass('upload')"><a ui-sref="upload" class="upload fa fa-upload"><span>Upload</span></a></li>
@@ -143,6 +145,7 @@
           <script src="bower_components/ng-tags-input/ng-tags-input.js"></script>
           <script src="bower_components/angular-ui-router.stateHelper/statehelper.js"></script>
           <script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
+          <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
           <!-- endbower -->
           <script src="scripts/webglearth2/api.js"></script>
           <!-- endbuild -->
@@ -165,21 +168,17 @@
           <script src="scripts/directives/segment-preview.js"></script>
           <script src="scripts/directives/segment-details.js"></script>
           <script src="scripts/directives/picture.js"></script>
-          <script src="scripts/directives/picture-details.js"></script>
           <script src="scripts/services/get-picture-blob-and-exif.js"></script>
           <script src="scripts/directives/segment-map.js"></script>
-          <script src="scripts/directives/segment-status.js"></script>
           <script src="scripts/directives/dnd.js"></script>
           <script src="scripts/directives/picture-set.js"></script>
           <script src="scripts/directives/segment-set.js"></script>
           <script src="scripts/services/layout.js"></script>
           <script src="scripts/services/socket.js"></script>
           <script src="scripts/services/app-config.js"></script>
-          <script src="scripts/directives/toggle.js"></script>
           <script src="scripts/services/element-selection.js"></script>
           <script src="scripts/services/dnd-service.js"></script>
           <script src="scripts/controllers/tos.js"></script>
-          <script src="scripts/controllers/browser.js"></script>
           <script src="scripts/controllers/gallery-map.js"></script>
           <script src="scripts/controllers/gallery-earth.js"></script>
           <script src="scripts/controllers/gallery.js"></script>
@@ -187,6 +186,11 @@
           <script src="scripts/controllers/gallery-thumbs.js"></script>
           <script src="scripts/controllers/gallery-info.js"></script>
           <script src="scripts/controllers/gallery-viewer.js"></script>
+          <script src="scripts/directives/webglearth2.js"></script>
+          <!--script src="scripts/directives/picture-details.js"></script>
+          <script src="scripts/directives/segment-status.js"></script>
+          <script src="scripts/directives/toggle.js"></script>
+          <script src="scripts/controllers/browser.js"></script>
           <!-- endbuild -->
 
     </div>
