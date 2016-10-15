@@ -126,6 +126,7 @@ angular.module('doxelApp')
       }
 
       $scope.$on('segment.click',function($event,segment){
+        console.log('segment.click');
         $event.stopPropagation();
         $event.preventDefault();
         $scope.segmentClick({
@@ -239,7 +240,7 @@ angular.module('doxelApp')
                 $scope.showThumb(thumb);
               },150);
             } else {
-              $scope.getSegment(segmentId, function(segment){
+              $scope.getSegment(segmentId).then(function(segment){
                 $timeout(function(){
                   $scope.segmentClick({
                     segment: segment,
@@ -254,7 +255,10 @@ angular.module('doxelApp')
       }
 
       $scope.scrollEnd=function(){
-        console.log(arguments);
+        if ($scope.loadingSegments) {
+          return;
+        }
+        $scope.loadSegments();
       }
 
       $scope.update=function(state){

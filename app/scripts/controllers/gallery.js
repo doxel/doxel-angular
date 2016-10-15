@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryCtrl', function ($scope,$rootScope,$state,errorMessage,Segment,$timeout,$location) {
+  .controller('GalleryCtrl', function ($scope,$rootScope,$state,errorMessage,Segment,$timeout,$location,$q,appConfig) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -52,95 +52,128 @@ angular.module('doxelApp')
 
     angular.extend($scope,{
       selected: {},
-      center: [0,0]
-    });
+      segments: [],
+      center: [0,0],
+      init: function(){
 
-    $scope.$on('segments',function(event,segments){
-      $scope.segments=segments;
-    })
+        $scope.$on('segments-loaded',function(event,segments){
+          $timeout(function(){
+            $('.segments').getNiceScroll().doScrollPos();
+          },$scope.segments.length>9?0:3000);
 
-    //// on state change success
-    $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-      // scope is visible when beginning with 'gallery'
-      $scope.visible=(toState.name.substr(0,7)=='gallery');
-      if (!$scope.visible) return;
+        });
 
-      var params=$rootScope.params;
+        //// on state change success
+        $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+          // scope is visible when beginning with 'gallery'
+          $scope.visible=(toState.name.substr(0,7)=='gallery');
+          if (!$scope.visible) return;
 
-      // when state is literal "gallery", switch to saved child view name,
-      // if any, else switch to gallery.view.thumbs
-      if (toState.name!='gallery') {
-        params.v=toState.name.split('.').pop();
-      } else {
-        params.v=$location.search().v||params.v||'thumbs';
-      }
+          var params=$rootScope.params;
 
-        // timeout is needed so that ui-leaflet display and behave properly,
-        // when returning to gallery from other tabs
-        if (toState.name=='gallery')
-        $timeout(function(){
-          console.log('redir',$state.current.name,'gallery.view.'+(params.v||'thumbs'));
-          $state.go('gallery.view.'+(params.v||'thumbs'),{},{
+          // when state is literal "gallery", switch to saved child view name,
+          // if any, else switch to gallery.view.thumbs
+          if (toState.name!='gallery') {
+            params.v=toState.name.split('.').pop();
+          } else {
+            params.v=$location.search().v||params.v||'thumbs';
+          }
+
+            // timeout is needed so that ui-leaflet display and behave properly,
+            // when returning to gallery from other tabs
+            if (toState.name=='gallery')
+            $timeout(function(){
+              console.log('redir',$state.current.name,'gallery.view.'+(params.v||'thumbs'));
+              $state.go('gallery.view.'+(params.v||'thumbs'),{},{
+                location: 'replace'
+              });
+            },1)
+
+        });
+
+        //// onload
+        // scope is visible when beginning with 'gallery'
+        $scope.visible=($state.current.name.substr(0,7)=='gallery');
+        if ($state.current.name=='gallery') {
+          // when state is literal "gallery", switch to gallery.view.thumbs
+          var view=$location.search().v||$rootScope.params.v||'thumbs';
+          $state.go('gallery.view.'+view,{
             location: 'replace'
           });
-        },1)
-
-    });
-
-    //// onload
-    // scope is visible when beginning with 'gallery'
-    $scope.visible=($state.current.name.substr(0,7)=='gallery');
-    if ($state.current.name=='gallery') {
-      // when state is literal "gallery", switch to gallery.view.thumbs
-      var view=$location.search().v||$rootScope.params.v||'thumbs';
-      $state.go('gallery.view.'+view,{
-        location: 'replace'
-      });
-    }
-
-
-    // load segments
-    // TODO: load chunks
-    $scope.segmentFind=Segment.find({
-      filter: {
-        where: {
-          lat: {exists: true},
-          status: 'R'
-        },
-        limit: 18,
-        order: 'timestamp DESC'
-      }
-    }, function(segments){
-      $scope.segments=segments;
-
-/*
-      $scope.place_list={};
-      segments.forEach(function(segment){
-        place_list[segment.id]={
-          segmentId: segment.id,
-          lon: segment.lng,
-          lat: segment.lat,
-          timestamp: segment.timestamp,
-          thumb: '/api/segments/preview/'+segment.id+'/'+segment.timestamp+'/'+segment.previewId
-        };
-      });
-
-      $scope.q.promise.then(function(){
-        $scope.iframe_earth.contentWindow.setMarkers(place_list);
-      });
-*/
-    }, function(err){
-      errorMessage.show('Could not load segments');
-    });
-
-    $scope.getSegment=function(segmentId,callback){
-      $scope.segmentFind.$promise.then(function(segments){
-        for (var i in segments) {
-          if (segments[i].id==segmentId) {
-            return callback(segments[i]);
-          }
         }
-      });
-    }
+
+        $scope.loadSegments();
+
+      }, // init
+
+      loadSegments: function() {
+        if ($scope.loadingSegments) {
+          return;
+        }
+        $scope.loadingSegments=true;
+        // load segments
+        $scope.segmentFind=Segment.find({
+          filter: {
+            where: {
+              lat: {exists: true},
+              status: 'R'
+            },
+            limit: appConfig.segmentsChunkSize,
+            skip: $scope.segments.length,
+            order: 'timestamp DESC'
+          }
+        }, function(segments){
+          if (segments && segments.length) {
+            $scope.segments=($scope.segments||[]).concat(segments);
+          }
+          $scope.loadingSegments=false;
+          $rootScope.$broadcast('segments-loaded',segments);
+
+          return $scope.segments;
+    /*
+          $scope.place_list={};
+          segments.forEach(function(segment){
+            place_list[segment.id]={
+              segmentId: segment.id,
+              lon: segment.lng,
+              lat: segment.lat,
+              timestamp: segment.timestamp,
+              thumb: '/api/segments/preview/'+segment.id+'/'+segment.timestamp+'/'+segment.previewId
+            };
+          });
+
+          $scope.q.promise.then(function(){
+            $scope.iframe_earth.contentWindow.setMarkers(place_list);
+          });
+    */
+        }, function(err){
+          $scope.loadingSegments=false;
+          errorMessage.show('Could not load segments');
+        });
+      },
+
+      getSegment: function(segmentId,callback){
+          var q=$q.defer();
+          // get segment details
+          $scope.segmentFind.$promise.then(function(_segments){
+            var found;
+            _segments.some(function(segment){
+              if (segment.id==segmentId) {
+                found=true;
+                q.resolve(segment);
+                return true;
+              }
+            });
+            if (!found) {
+              Segment.findById({id: segmentId},function(segment){
+                  q.resolve(segment);
+              },q.reject);
+            }
+          });
+          return q.promise;
+      } // getSegment
+    });
+
+    $scope.init();
 
   });

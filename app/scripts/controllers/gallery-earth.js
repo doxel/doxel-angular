@@ -128,7 +128,7 @@ angular.module('doxelApp')
       show: function() {
 
         //WE_init();
-        
+
         var c;
         if (false && $scope.params.c) {
           c=$scope.params.c.split(':');
@@ -263,10 +263,10 @@ angular.module('doxelApp')
             var c=$scope.params.c.split(':');
             $scope.we2.setView(c,c[2]);
           } else if ($scope.params.s) {
-            $scope.getSegment($scope.params.s,function(segment){
+            $scope.getSegment($scope.params.s).then(function(segment){
               $scope.we2.setView(segment);
             });
-          } 
+          }
 
           loadMarkers();
 

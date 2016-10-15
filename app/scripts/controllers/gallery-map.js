@@ -174,15 +174,14 @@ angular.module('doxelApp')
         // needed so that ui-leflet behave properly,
         // when switching views in gallery
         if (visible) {
-          console.log('map visible');
-      if (!$scope.map_visible) {
+          if (!$scope.map_visible) {
             console.log('map was not visible');
             $scope.map_visible=true;
             $scope.getMap(function(map){
               map.options.inertia=false;
               // select and show current segment
               if ($scope.params.s) {
-                $scope.getSegment($scope.params.s,function(segment){
+                $scope.getSegment($scope.params.s).then(function(segment){
                   $scope.setView(segment);
                 });
               }
@@ -226,7 +225,6 @@ angular.module('doxelApp')
           $scope.updateVisibility(toState);
         });
         $scope.updateVisibility($rootScope.$state.current);
-        console.log('state',$rootScope.$state.current);
 
         // update query string on centerUrlHash change
         $scope.$on('centerUrlHash',function(event,hash){
