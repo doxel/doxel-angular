@@ -47,7 +47,9 @@ angular.module('doxelApp')
     return function(picture,format) {
       var q=$q.defer();
 
-      function errorMessageFromBlob(blob){
+
+      function blobToText(blob){
+        var q=$q.defer();
         var reader=new FileReader();
         reader.addEventListener('loadend',function(){
           if (reader.error) {
@@ -55,10 +57,24 @@ angular.module('doxelApp')
             q.reject(new Error('Internal server error'));
 
           } else {
-            q.reject(new Error(reader.result));
+            q.resolve(reader.result);
           }
         });
         reader.readAsText(blob);
+        return q.promise;
+
+      } // blotToText
+
+
+      function errorMessageFromBlob(blob){
+        blobToText(blob)
+        .then(function(text){
+          console.log(text);
+          q.reject(new Error(text));
+        })
+        .catch(function(err){
+          q.reject(err);
+        });
 
       } // errorErrorMessageFromBlob
 
@@ -78,7 +94,6 @@ angular.module('doxelApp')
         }
 
         if (response.data.type.split('/')[0]=='text') {
-          console.log(response);
           errorMessageFromBlob(response.data);
           return;
         }

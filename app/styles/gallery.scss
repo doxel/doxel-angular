@@ -3,3 +3,10 @@
   height: 100%;
   margin-bottom: -64px;
 }
+
+#gallery-thumbs #segments picture .thumb.loading {
+  background-image: url(/images/ajax-loader.gif);
+  background-position: center;
+  background-size: inherit;
+  background-repeat: no-repeat;
+}
