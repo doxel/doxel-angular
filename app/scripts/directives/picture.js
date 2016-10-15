@@ -50,17 +50,12 @@ angular.module('doxelApp')
         picture: '=',
         pictureClass: '@',
         pictureOnload: '&',
+        pictureError: '&',
         label: '@'
       },
       controller: function($scope, errorMessage, getPictureBlobAndExif) {
-        if (!$scope.style) {
-          $scope.style=[
-            'background-image: url(/images/ajax-loader.gif);',
-            'background-position: center;',
-            'background-size: auto;',
-            'background-repeat: no-repeat;'
-          ].join(' ');
-        }
+        $scope._class=$scope.pictureClass;
+        $scope.pictureClass+=' loading';
         $scope.updatePicture=function() {
           var picture=$scope.picture;
           if (picture.blob) {
@@ -83,7 +78,10 @@ angular.module('doxelApp')
             }
 
           }, function(err) {
-            errorMessage.show(err);
+            $scope.pictureClass=pictureClass+' load-error';
+            if (typeof($scope.pictureOnError)=='function') {
+              $scope.pictureOnError(err,$scope.picture);
+            }
           });
         };
       },
