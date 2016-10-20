@@ -51,6 +51,7 @@ angular.module('doxelApp')
       scope: {
         segment: '=',
         segmentPreviewClass: '@',
+        label: '@',
         watch: '@'
       },
       controller: function($scope){
@@ -79,6 +80,6 @@ angular.module('doxelApp')
         }
       },
 
-      template: '<picture ng-if="picture" picture="picture" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}" />'
+      template: '<picture ng-if="picture" picture="picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}" />'
     };
   });
