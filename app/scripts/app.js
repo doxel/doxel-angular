@@ -57,11 +57,10 @@ var app=angular
     'ct.ui.router.extras.sticky',
     'ui.bootstrap',
     'ui-leaflet',
-    'ngScrollbar',
     'ngTable',
-    'angular-nicescroll',
     'btford.socket-io',
-    'ngTagsInput'
+    'ngTagsInput',
+    'ngScrollbars'
 
   ])
   .config(function ($httpProvider, $urlRouterProvider, $stateProvider,$locationProvider) {
@@ -134,7 +133,7 @@ var app=angular
         controllerAs: 'resetPassword'
       })
       .state('upload', {
-        url: '/upload',
+        url: '/upload/',
         templateUrl: 'views/upload.html',
         controller: 'UploadCtrl',
         controllerAs: 'upload'
@@ -152,16 +151,12 @@ var app=angular
       .state('gallery.view', {
         abstract: true,
         views: {
-          'gallery-toolbar': {
+/*          'gallery-toolbar': {
             templateUrl: 'views/gallery-toolbar.html',
             controller: 'GalleryToolbarCtrl',
             controllerAs: 'toolbar'
           },
-          'gallery-thumbs': {
-            templateUrl: 'views/gallery-thumbs.html',
-            controller: 'GalleryThumbsCtrl',
-            controllerAs: 'thumbs',
-          },
+  */
           'gallery-map': {
             templateUrl: 'views/gallery-map.html',
             controller: 'GalleryMapCtrl',
@@ -182,6 +177,12 @@ var app=angular
             controller: 'GalleryViewerCtrl',
             controllerAs: 'viewer'
           },
+          // must be the last one (z-index)
+          'gallery-thumbs': {
+            templateUrl: 'views/gallery-thumbs.html',
+            controller: 'GalleryThumbsCtrl',
+            controllerAs: 'thumbs',
+          }
         }
       })
 
