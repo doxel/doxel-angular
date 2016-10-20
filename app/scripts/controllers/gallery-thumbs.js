@@ -50,22 +50,104 @@ angular.module('doxelApp')
       'Karma'
     ];
 
-    $scope.thumbs_visible=false;
-    $scope.segmentFind.$promise.then(function(){
-      $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
-    });
+    angular.extend($scope,{
+      scrollPos: [],
+      loadThreshold: 16,
+      verticalScrollConfig: {
+        axis: 'y',
+        theme: 'light',
+        scrollButtons: {
+          enable: false
+        },
+        scrollbarPosition: "outside",
+        mouseWheel:{ preventDefault: true },
+        advanced: {
+          updateOnContentResize: true
+        },
+        callbacks: {
+          /*
+          onTotalScrollOffset: 320,
+          onTotalScroll: function(){
+            return $scope.onTotalScroll.apply(this,Array.prototype.slice.call(arguments));
+          },
+          onScroll: function vsb_onscroll(){
+            console.log(arguments);
+          },
+          */
+          whileScrolling: function vsb_whileScrolling(){
+            var count=$scope.segments.length;
+            var pos=$scope.scrollPos;
+            pos.push((count-1)*this.mcs.topPct/100);
+            if (pos.length==2) {
+              if (pos[0]<pos[1]) {
+                // forward
+                if (Math.abs(count-pos[1])<$scope.loadThreshold) {
+                  $scope.loadSegments();
+                }
+              } else if (pos[0]>pos[1]) {
+                // backward
+              }
+              $scope.scrollPos.shift();
+            }
+          }
 
-      $scope.updateButtons=function(){
-        var selection=$scope.getSelection();
-        if (selection.length) {
         }
-      }
 
-      $scope.segmentClick=function(options) {
+      },
+      horizontalScrollConfig: {
+        axis: 'x',
+        theme: 'light',
+        scrollButtons: {
+          enable: false
+        },
+        mouseWheel:{ preventDefault: true },
+        advanced: {
+          updateOnContentResize: true
+        },
+        callbacks: {
+          /*
+          onTotalScrollOffset: 320,
+          onTotalScroll: function(){
+            return $scope.onTotalScroll.apply(this,Array.prototype.slice.call(arguments));
+          },
+          onScroll: function vsb_onscroll(){
+            console.log(arguments);
+          },
+          */
+          whileScrolling: function vsb_whileScrolling(){
+            var count=$scope.segments.length;
+            var pos=$scope.scrollPos;
+            pos.push((count-1)*this.mcs.leftPct/100);
+            if (pos.length==2) {
+              if (pos[0]<pos[1]) {
+                // forward
+                if (Math.abs(count-pos[1])<$scope.loadThreshold) {
+                  $scope.loadSegments();
+                }
+              } else if (pos[0]>pos[1]) {
+                // backward
+              }
+              $scope.scrollPos.shift();
+            }
+          }
+
+        }
+
+
+      },
+      segmentClick: function(options) {
+        console.log('segment click',options.segment,$scope.selected);
          var segment=options.segment;
          var dontUpdateQuery=options.dontUpdateQuery;
          var show=options.show;
+         var setView=options.setView;
 
+console.trace();
+        /*
+         if ($scope.$state.current.name=='gallery.view.thumbs') {
+           $scope.$state.transitionTo('gallery.view.cloud');
+         }
+        */
 
   //      $scope.$root.$broadcast('segment.show',segment);
   //      $state.go('gallery',{segmentId: segment.id},{notify: false, reload:' gallery.details'});
@@ -78,8 +160,10 @@ angular.module('doxelApp')
           if (!dontUpdateQuery) {
             $location.search($rootScope.params);
           }
-          $rootScope.$broadcast('segment.clicked',{segment: segment});
-          $scope.$emit('updateButtons');
+          if (setView) {
+            $rootScope.$broadcast('segment.setview',{segment: segment});
+          }
+          $rootScope.$broadcast('updateButtons');
 
   /*
         if ($('iframe.viewer.visible').length) {
@@ -104,38 +188,11 @@ angular.module('doxelApp')
         $scope.iframe_earth.contentWindow.zoomandpan(options);
         */
 
-      };
+      },
 
-      $scope.getSelection=function(){
-        var result=[];
-        for (var segmentId in $scope.selected) {
-          if ($scope.selected.hasOwnProperty(segmentId)) {
-            result.push(segmentId);
-          }
-        }
-        return result;
-      }
-
-      // TODO: find a way to preserve $scope.selected when switching states
-      // eg between home and gallery
-      // in the meanwhile, rebuild $scope.selected:
-      for (var s in $scope.segments) {
-        if (s.selected) {
-          $scope.selected[s.id]=true;
-        }
-      }
-
-      $scope.$on('segment.click',function($event,segment){
-        console.log('segment.click');
-        $event.stopPropagation();
-        $event.preventDefault();
-        $scope.segmentClick({
-          segment: segment
-        });
-      });
 
       // select segment in thumb list
-      $scope.select=function(segment,options) {
+      select: function(segment,options) {
         if (!options) {
           options={
             selected: true,
@@ -175,10 +232,64 @@ angular.module('doxelApp')
 
           if (options.selected) {
             // scroll to selected item
-            $scope.showThumb(thumb);
+            $scope.$emit('showThumb',thumb);
           }
         }
+      },
+
+
+    });
+
+    $scope.thumbs_visible=false;
+    $scope.segmentFind.$promise.then(function(){
+      $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
+    });
+
+
+
+      $scope.updateButtons=function(){
+        var selection=$scope.getSelection();
+        if (selection.length) {
+        }
       }
+
+
+      $scope.getSelection=function(){
+        var result=[];
+        for (var segmentId in $scope.selected) {
+          if ($scope.selected.hasOwnProperty(segmentId)) {
+            result.push(segmentId);
+          }
+        }
+        return result;
+      }
+/*
+      // TODO: find a way to preserve $scope.selected when switching states
+      // eg between home and gallery
+      // in the meanwhile, rebuild $scope.selected:
+      for (var s in $scope.segments) {
+        if (s.selected) {
+          $scope.selected[s.id]=true;
+        }
+      }
+*/
+      $scope.$on('segment.click',function($event,segment,options){
+        console.log('segment.click');
+        $event.stopPropagation && $event.stopPropagation();
+        $event.preventDefault();
+        if (options) {
+          // probably clicked on marker
+          $scope.segmentClick(angular.extend({},options,{segment:segment}));
+
+        } else {
+          // was probably sent by segment-set
+          $scope.segmentClick({
+            segment: segment,
+            setView: true
+          });
+        }
+      });
+
 
       $scope.showThumb=function(thumb){
         if (thumb && thumb.length) {
@@ -207,6 +318,12 @@ angular.module('doxelApp')
 
       $scope.updateVisibility=function(state){
         $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
+        $timeout(function(){
+          if ($scope.thumbs_visible && !$scope.scrollBarVisible()) {
+            console.log('more');
+            $scope.loadSegments();
+          }
+        },1000);
       }
 
       $scope.updateThumbsStyle=function(state){
@@ -216,10 +333,23 @@ angular.module('doxelApp')
           $rootScope.thumbsPosition='';
         } else {
           // one row or column of thumbs for map and earth view
-          $scope.thumbsVerticalScroll=false;
           $rootScope.thumbsPosition=$scope.getThumbsStyle();
+          $scope.thumbsVerticalScroll=($rootScope.thumbsPosition!='thumbs-bottom');
         }
       }
+
+      $scope.scrollBarVisible=function(){
+        return $('#gallery-thumbs .mCSB_draggerContainer:visible').length>0;
+      }
+
+      $scope.$on('segments-loaded',function(event,segments){
+        if (!$scope.scrollBarVisible()) {
+          $timeout(function(){
+            console.log('more');
+            $scope.loadSegments();
+          });
+        }
+      });
 
       $scope.$on('window.resize',function(){
         $scope.updateThumbsStyle($rootScope.$state.current);
@@ -254,12 +384,17 @@ angular.module('doxelApp')
         }
       }
 
-      $scope.scrollEnd=function(){
+      $scope.scrollEnd=function(e){
         if ($scope.loadingSegments) {
           return;
         }
         $scope.loadSegments();
+
       }
+
+      $scope.$on('showthumb', function(thumb) {
+        $scope.showThumb(thumb);
+      });
 
       $scope.update=function(state){
         $scope.updateVisibility(state);
@@ -275,7 +410,9 @@ angular.module('doxelApp')
 
       $scope.$on('location.search',function(event,value){
         if (value[0].s!=value[1].s) {
-          $scope.updateSelection(value[0].s,true);
+          // update selection for history back here
+          console.log('TODO: update selection on history back without messing with click');
+    //      $scope.updateSelection(value[0].s,true);
         }
       });
 
