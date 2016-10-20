@@ -77,7 +77,7 @@ angular.module('doxelApp')
     $scope.$on('$stateChangeSuccess',function(e, next, params, current){
         var iframe=$('iframe.upload');
         if (!iframe.attr('src')) {
-          iframe.attr('src','/upload/index.php');
+          iframe.attr('src','/uploader/');
         }
         iframe.show().height($('body').height()-102);
         $(window).off('resize.upload').on('resize.upload',function(){
