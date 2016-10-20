@@ -51,7 +51,7 @@ angular.module('doxelApp')
         pictureClass: '@',
         pictureOnload: '&',
         pictureError: '&',
-        label: '@'
+        label: '=?'
       },
       controller: function($scope, errorMessage, getPictureBlobAndExif) {
         $scope._class=$scope.pictureClass;
