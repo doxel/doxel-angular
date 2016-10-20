@@ -230,6 +230,11 @@ a * {
   cursor: pointer;
 }
 
+.footer p {
+  margin: 0;
+}
+
+
 @import "../styles/gallery.scss";
 @import "../styles/gallery-thumbs.scss";
 @import "../styles/gallery-toolbar.scss";

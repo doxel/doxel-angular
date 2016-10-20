@@ -15,12 +15,32 @@
 
 .thumbs-left #gallery-viewer {
   iframe.viewer {
-    padding-right: 202px;
+    left: 0;
+    padding-right: 0;
   }
 }
+
+@media screen and (min-width: 768px) {
+  .thumbs-left #gallery-viewer {
+    iframe.viewer {
+      left: auto;
+      padding-right: 202px;
+    }
+  }
+}
+
+.thumbs-bottom #gallery-viewer {
+  iframe.viewer {
+    padding-bottom: 52px;
+    top: 52px;
+  }
+}
+
+@media screen and (min-height: 768px) {
 .thumbs-bottom #gallery-viewer {
   iframe.viewer {
     padding-bottom: 196px;
     top: 52px;
   }
+}
 }

@@ -18,14 +18,32 @@
 
 .thumbs-left #gallery-map {
   .map-container {
-    padding-right: 202px;
+    left: 0;
+    padding-right: 0;
   }
 }
 
+@media screen and (min-width: 768px) {
+  .thumbs-left #gallery-map {
+    .map-container {
+      left: auto;
+      padding-right: 202px;
+    }
+  }
+}
 
 .thumbs-bottom #gallery-map {
   .map-container {
-    padding-bottom: 142px;
+    padding-bottom: 0;
     top: 52px;
+  }
+}
+
+@media screen and (min-height: 768px) {
+  .thumbs-bottom #gallery-map {
+    .map-container {
+      padding-bottom: 142px;
+      top: 52px;
+    }
   }
 }
