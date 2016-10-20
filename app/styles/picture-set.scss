@@ -1,9 +1,25 @@
 picture-set,
 segment-set {
   display: block;
+  > span {
+    display: inline-block;
+    height: 150px;
+    width: 202px;
+
+    div.date {
+      top: 120px;
+    }
+  }
+
+}
+segment-preview {
+  height: 116px;
+  width: 192px;
+  display: inline-block;
 }
 
 picture-set a,
 segment-set a {
   display: inline-table;
+  border: 1px solid black;
 }

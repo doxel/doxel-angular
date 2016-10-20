@@ -1,14 +1,17 @@
 #gallery-thumbs {
   position: relative;
   height: 100%;
+//  z-index: 1000;
 
   #segments {
     position: fixed;
     top: 55px;
-    left: 65px;
+    left: 0;
     bottom: 2px;
+    z-index: 1001;
 
-    padding-right: 65px;
+
+    padding-right: 0;
     overflow: hidden;
     height: 100%;
     width: 100%;
@@ -71,6 +74,9 @@
 }
 
 .thumbs-bottom #gallery-thumbs {
+
+  .mCSB_outside + .mCSB_scrollTools{bottom: -6px;} /* scrollbar position: outside */
+
   #segments {
     height: auto;
     width: 100%;
@@ -81,6 +87,10 @@
     padding: 0 2px 0 2px;
     top: auto;
 
+    .segments {
+      height: 140px;
+    }
+
     a {
       margin-bottom: 0;
     }
@@ -90,6 +100,9 @@
 }
 
 .thumbs-left #gallery-thumbs {
+  .mCSB_inside > .mCSB_container { margin-right: 0; }
+  .mCSB_outside + .mCSB_scrollTools{right: -6px;} /* scrollbar position: outside */
+
   #segments {
     width: 200px;
 
@@ -98,7 +111,6 @@
       text-align: center;
       width: 200px;
       height: 100%;
-      padding-bottom: 64px;
       padding-top: 0px;
     }
   }

@@ -11,7 +11,7 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 // endbower
 
 #main.thumbs-left {
-  padding-left: 265px;
+  padding-left: 200px;
 }
 
 .browsehappy {
@@ -37,7 +37,7 @@ div.header,
 div.footer {
   padding-left: 15px;
   padding-right: 15px;
-  z-index: 10;
+  z-index: 100000;
 }
 
 /* Custom page header */
@@ -54,11 +54,6 @@ div.header {
     padding-bottom: 19px;
   }
 }
-
-.thumbs-left .navbar {
-//  left: 265px;
-}
-
 
 body > div.container > div.ng-scope {
   margin-top: 80px;
@@ -114,8 +109,6 @@ div.footer {
   }
 }
 
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
   .container {
     max-width: 730px;
   }
@@ -131,7 +124,7 @@ div.footer {
   .jumbotron {
     border-bottom: 0;
   }
-}
+
 
 .navbar-inner {
     min-height: 40px;
@@ -162,7 +155,6 @@ div.footer {
     -moz-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
 }                               .input-error-container {
-    min-width: 150px;
     position: absolute;
     z-index: 9999;
 }
@@ -211,40 +203,6 @@ ng-message {
   border-style: dashed;
 }
 
-
-@media screen and (min-width: 384px) {
-
-.nav span {
-  display: none;
-
-}
-/*
-.navbar-inner {
-  margin: auto;
-}
-*/
-
-.navbar .collapse {
-  width: 320px;
-  margin: auto;
-}
-.navbar .container {
-  width: 100%;
-}
-}
-
-@media screen and (min-width: 768px) {
-  .navbar .collapse {
-    width: auto;
-  }
-  .nav span {
-    display: inline;
-  }
-  .navbar-inner: {
-    margin: auto;
-    width: auto;
-  }
-}
 
 .modal-dialog {
   p {

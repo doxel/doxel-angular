@@ -10,3 +10,10 @@
   background-size: inherit;
   background-repeat: no-repeat;
 }
+
+#gallery-thumbs #segments picture .thumb.load-error {
+  background-image: url(/images/ajax-loade-error.gif);
+  background-position: center;
+  background-size: inherit;
+  background-repeat: no-repeat;
+}
