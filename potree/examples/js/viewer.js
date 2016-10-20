@@ -115,7 +115,8 @@ function initGUI(){
 
 	// dat.gui
 	gui = new dat.GUI({
-    closed: 1
+    closed: true
+
 		//height : 5 * 32 - 1
 	});
 	
