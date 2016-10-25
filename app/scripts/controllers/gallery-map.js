@@ -80,8 +80,9 @@ angular.module('doxelApp')
               type: 'xyz',
               layerOptions: {
               minZoom: 9,
-              maxZoom: 19
-            }
+              maxZoom: 19,
+              "showOnSelector": false
+          }
 
           }
         },
@@ -94,6 +95,9 @@ angular.module('doxelApp')
             layerOptions: {
               maxZoom: 8,
               tms: true
+            },
+            layerParams: {
+              "showOnSelector": false
             }
           },
           /*
@@ -114,9 +118,13 @@ angular.module('doxelApp')
               name: 'Stamen toner-labels',
               url: '//{s}.'+appConfig.tileServer+'/stamen/toner/{z}/{x}/{y}.png',
               type: 'xyz',
+              showOnSelector: false,
               layerOptions: {
                 maxZoom: 8,
-                opacity: 0.2
+                opacity: 0.2,
+              },
+              layerParams: {
+                "showOnSelector": false
               }
           },
           lines: {
@@ -127,6 +135,10 @@ angular.module('doxelApp')
               layerOptions: {
                 maxZoom: 8,
                 opacity: 1
+              },
+              layerParams: {
+                showOnSelector: false
+
               }
           },
           markers: {
@@ -195,7 +207,12 @@ angular.module('doxelApp')
         }
 
       },
-
+/*
+      marker: L.icon({
+        iconUrl: 'marker-icon-selected.png',
+        iconRetinaUrl: 'marker-icon-selected-2x.png'
+      }),
+*/
       init: function(){
 
         // map must be visible first so that leaflet initialize properly
@@ -211,8 +228,14 @@ angular.module('doxelApp')
           $scope.map_visible=($state.current.name=='gallery.view.map');
         },1);
 
-        // show location on segment.clicked event
-        $scope.$on('segment.clicked',function($event,args){
+        // update markers when more segments are loaded
+        $scope.$on('segments-loaded',function(event,segments){
+          $scope.getMap($scope.updateMarkers);
+        });
+
+
+        // show location on segment.setview event
+        $scope.$on('segment.setview',function($event,args){
           if (!$scope.map_visible) {
             return;
           }
@@ -233,7 +256,11 @@ angular.module('doxelApp')
         });
 
         $scope.$on('leafletDirectiveMarker.click', function(event, args){
-console.log(args)
+          console.log(args.model.segmentId);
+          $scope.getSegment(args.model.segmentId).then(function(segment){
+            $rootScope.$broadcast('segment.click',segment,{show:true});
+
+          });
         });
 
         $scope.$on('leafletDirectiveMap.moveend',function(){
@@ -261,7 +288,32 @@ TODO: use geopoint and using the smallest map dimension
 */
         });
 
+        $scope.$on('window.resize',function(){
+          $scope.invalidateSize();
+        });
+
+        $scope.$on('orientationchange',function(){
+          $scope.invalidateSize();
+        });
+
+        $('.thumbs-handle').on('click',function(){
+          $scope.invalidateSize();
+        });
+
+        $('.navbar .menu-handle').on('click',function(){
+          $scope.invalidateSize();
+        });
+
       }, // init
+
+      invalidateSize: function(){
+        $scope.getMap(function(map){
+          clearTimeout($scope.invalidateTimeout);
+          $scope.invalidateTimeout=setTimeout(function(){
+            map.invalidateSize();
+          },1000);
+        });
+      }, // invalidateSize
 
 			watchOptions: {
 					markers: {
@@ -308,7 +360,7 @@ TODO: use geopoint and using the smallest map dimension
                 map.removeLayer($scope.currentMarker)
               }
               // add new marker
-              $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+              $scope.currentMarker=L.marker([segment.lat,segment.lng],$scope.marker);
               map.addLayer($scope.currentMarker);
 
             } else {
@@ -336,7 +388,8 @@ TODO: use geopoint and using the smallest map dimension
               segment.marker={
                 layer: 'markers',
                 lng: segment.lng,
-                lat: segment.lat
+                lat: segment.lat,
+                segmentId: segment.id
               }
           }
           markers.push(segment.marker);
