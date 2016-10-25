@@ -65,6 +65,9 @@ angular.module('doxelApp')
           updateOnContentResize: true
         },
         callbacks: {
+          onInit: function() {
+            $scope.mcs=this.mcs;
+          },
           /*
           onTotalScrollOffset: 320,
           onTotalScroll: function(){
@@ -93,7 +96,8 @@ angular.module('doxelApp')
 
         }
 
-      },
+      }, // verticalScrollConfig
+
       horizontalScrollConfig: {
         axis: 'x',
         theme: 'light',
@@ -105,7 +109,10 @@ angular.module('doxelApp')
           updateOnContentResize: true
         },
         callbacks: {
-          /*
+          onInit: function() {
+            $scope.mcs=this.mcs;
+          },
+        /*
           onTotalScrollOffset: 320,
           onTotalScroll: function(){
             return $scope.onTotalScroll.apply(this,Array.prototype.slice.call(arguments));
@@ -134,20 +141,91 @@ angular.module('doxelApp')
         }
 
 
-      },
+      }, // horizontalScrollConfig
+
+      initEventHandlers: function() {
+
+        $scope.$on('segment.click',function($event,segment,options){
+          console.log('segment.click');
+          $event.stopPropagation && $event.stopPropagation();
+          $event.preventDefault();
+          if (options) {
+            // probably clicked on marker
+            $scope.segmentClick(angular.extend({},options,{segment:segment}));
+
+          } else {
+            // was probably sent by segment-set
+            $scope.segmentClick({
+              segment: segment,
+              setView: true
+            });
+          }
+        });
+
+        $scope.$on('showThumb', function(event,segmentId) {
+          $scope.showThumb(segmentId);
+        });
+
+        $scope.$on('$stateChangeSuccess', function (event, toState) {
+          $scope.update(toState);
+        });
+
+        $scope.$on('location.search',function(event,value){
+          if (value[0].s!=value[1].s) {
+            // update selection for history back here
+            console.log('TODO: update selection on history back without messing with click');
+            $scope.updateSelection(value[0].s);
+          }
+        });
+
+        $scope.$on('segments-loaded',function(event,segments){
+          if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
+            $timeout(function(){
+              console.log('more');
+              $scope.loadSegments();
+            });
+          }
+        });
+
+        $scope.$on('window.resize',function(){
+          $scope.updateThumbsStyle($rootScope.$state.current);
+          // allow loading more thumbs
+          $scope.updateVisibility($rootScope.$state.current);
+        });
+
+        $scope.$on('orientationchange',function(){
+          $scope.updateThumbsStyle($rootScope.$state.current);
+          // allow loading more thumbs
+          $scope.updateVisibility($rootScope.$state.current);
+        });
+
+        $('.thumbs-handle').on('click',function(){
+          $('body').toggleClass('thumbs-hidden');
+        });
+
+      }, // initEventHandlers
+
+      init: function() {
+        $scope.initEventHandlers();
+        $scope.thumbs_visible=false;
+        $scope.segmentFind.$promise.then(function(){
+          $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
+          $scope.update($state.current);
+        });
+        $scope.update($state.current);
+
+      }, // init
+
       segmentClick: function(options) {
         console.log('segment click',options.segment,$scope.selected);
          var segment=options.segment;
-         var dontUpdateQuery=options.dontUpdateQuery;
+         var justRestoringSelection=options.justRestoringSelection;
          var show=options.show;
          var setView=options.setView;
 
 console.trace();
-        /*
-         if ($scope.$state.current.name=='gallery.view.thumbs') {
-           $scope.$state.transitionTo('gallery.view.cloud');
-         }
-        */
+
+
 
   //      $scope.$root.$broadcast('segment.show',segment);
   //      $state.go('gallery',{segmentId: segment.id},{notify: false, reload:' gallery.details'});
@@ -157,39 +235,26 @@ console.trace();
             show: show
           });
           $rootScope.params.s=segment.id;;
-          if (!dontUpdateQuery) {
+
+          // user clicked ?
+          if (!justRestoringSelection) {
+            // update query string
             $location.search($rootScope.params);
+            // open viewer
+            if ($scope.$state.current.name=='gallery.view.thumbs') {
+              $scope.$state.transitionTo('gallery.view.cloud');
+              return;
+            }
           }
+
           if (setView) {
+            // show segment on map
             $rootScope.$broadcast('segment.setview',{segment: segment});
           }
+
           $rootScope.$broadcast('updateButtons');
 
-  /*
-        if ($('iframe.viewer.visible').length) {
-          $('iframe.viewer').attr('src','/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html');
-          return;
-
-        }
-
-        var center=$scope.earth.getCenter();
-        var zoom=$scope.earth.getZoom();
-        var options={
-          to: {
-            lon: segment.lng,
-            lat: segment.lat
-          },
-          steps: 25
-        };
-        if (zoom<18 && Math.abs(center[1]-segment.lng)<1e-6 && Math.abs(center[0]-segment.lat)<1e-6) {
-          options.to.zoom=Math.min(18,zoom+1);
-        }
-
-        $scope.iframe_earth.contentWindow.zoomandpan(options);
-        */
-
-      },
-
+      }, // segmentClick
 
       // select segment in thumb list
       select: function(segment,options) {
@@ -204,7 +269,7 @@ console.trace();
           if (options.unique) {
             // unselect other tree paths
             for (var segmentId in $scope.selected) {
-              if ($scope.selected.hasOwnProperty(segmentId)){
+              if ($scope.selected.hasOwnProperty(segmentId) && segmentId!=segment.id){
                 delete $scope.selected[segmentId].selected;
                 delete $scope.selected[segmentId];
               }
@@ -225,36 +290,12 @@ console.trace();
         }
 
         if (options.show) {
-          // clicked in other view
-          // get thumbnail
-          var thumb;
-          thumb=$('#gallery-thumbs a[data-sid='+segment.id+'] .thumb');
-
-          if (options.selected) {
-            // scroll to selected item
-            $scope.$emit('showThumb',thumb);
-          }
+          $scope.$emit('showThumb',segment.id);
         }
-      },
 
+      }, // select
 
-    });
-
-    $scope.thumbs_visible=false;
-    $scope.segmentFind.$promise.then(function(){
-      $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
-    });
-
-
-
-      $scope.updateButtons=function(){
-        var selection=$scope.getSelection();
-        if (selection.length) {
-        }
-      }
-
-
-      $scope.getSelection=function(){
+      getSelection: function(){
         var result=[];
         for (var segmentId in $scope.selected) {
           if ($scope.selected.hasOwnProperty(segmentId)) {
@@ -262,119 +303,95 @@ console.trace();
           }
         }
         return result;
-      }
-/*
-      // TODO: find a way to preserve $scope.selected when switching states
-      // eg between home and gallery
-      // in the meanwhile, rebuild $scope.selected:
-      for (var s in $scope.segments) {
-        if (s.selected) {
-          $scope.selected[s.id]=true;
+      }, // getSelection
+
+      updateButtons: function(){
+  /*      var selection=$scope.getSelection();
+        if (selection.length) {
         }
-      }
-*/
-      $scope.$on('segment.click',function($event,segment,options){
-        console.log('segment.click');
-        $event.stopPropagation && $event.stopPropagation();
-        $event.preventDefault();
-        if (options) {
-          // probably clicked on marker
-          $scope.segmentClick(angular.extend({},options,{segment:segment}));
+  */
+      },
 
-        } else {
-          // was probably sent by segment-set
-          $scope.segmentClick({
-            segment: segment,
-            setView: true
-          });
-        }
-      });
-
-
-      $scope.showThumb=function(thumb){
+      showThumb: function(segmentId){
+        return;
+        var thumb=$('[data-sid='+segmentId+']');
         if (thumb && thumb.length) {
-          var nicescroll=thumb.closest('[ng-nicescroll]');
+          var container=thumb.closest('.mCSB_container');
           if ($scope.thumbsVerticalScroll) {
             var itemTop=thumb.position().top;
-            var offset=(nicescroll.height()-thumb.height())/2;
-            nicescroll.scrollTop(nicescroll.scrollTop()+itemTop-(offset>0?offset:0));
+            var offset=(container.height()-thumb.height())/2;
+            $scope.scrollTo=Math.abs($scope.mcs.top)+itemTop-(offset>0?offset:0);
           } else {
             var itemLeft=thumb.position().left;
             var offset=(nicescroll.width()-thumb.width())/2;
             nicescroll.scrollLeft(nicescroll.scrollLeft()+itemLeft-(offset>0?offset:0));
           }
         }
-      }
+      },
 
-      $scope.isWide=function(){
+      isWide: function(){
         var w=$(window).width();
         var h=$(window).height();
         return (w>h);
-      }
+      },
 
-      $scope.getThumbsStyle=function(){
+      getThumbsStyle: function(){
         return $scope.isWide()?'thumbs-left':'thumbs-bottom';
-      }
+      },
 
-      $scope.updateVisibility=function(state){
+      updateVisibility: function(state){
         $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
         $timeout(function(){
-          if ($scope.thumbs_visible && !$scope.scrollBarVisible()) {
+          if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
             console.log('more');
             $scope.loadSegments();
           }
         },1000);
-      }
+      },
 
-      $scope.updateThumbsStyle=function(state){
+      updateThumbsStyle: function(state){
         if (state.name=="gallery.view.thumbs") {
           // full screen for thumbs view
           $scope.thumbsVerticalScroll=true;
-          $rootScope.thumbsPosition='';
+          $timeout(function(){
+            $rootScope.thumbsPosition='';
+            $('body').removeClass('thumbs-hidden'); // TODO: restore state when leaving
+          });
         } else {
           // one row or column of thumbs for map and earth view
-          $rootScope.thumbsPosition=$scope.getThumbsStyle();
-          $scope.thumbsVerticalScroll=($rootScope.thumbsPosition!='thumbs-bottom');
-        }
-      }
-
-      $scope.scrollBarVisible=function(){
-        return $('#gallery-thumbs .mCSB_draggerContainer:visible').length>0;
-      }
-
-      $scope.$on('segments-loaded',function(event,segments){
-        if (!$scope.scrollBarVisible()) {
           $timeout(function(){
-            console.log('more');
-            $scope.loadSegments();
+            $rootScope.thumbsPosition=$scope.getThumbsStyle();
+            $scope.thumbsVerticalScroll=($rootScope.thumbsPosition!='thumbs-bottom');
           });
         }
-      });
+      },
 
-      $scope.$on('window.resize',function(){
-        $scope.updateThumbsStyle($rootScope.$state.current);
-      });
+      galleryShown: function(){
+        return $('#gallery-thumbs:visible').length;
+      },
 
-      $scope.$on('orientationchange',function(){
-        $scope.updateThumbsStyle($rootScope.$state.current);
-      });
+      scrollBarVisible: function(){
+        return $('#gallery-thumbs .mCSB_draggerContainer:visible').length>0;
+      },
 
-      $scope.updateSelection=function(segmentId,dontUpdateQuery){
+      isSelected: function(segmentId){
+        return $scope.selected.segmentId!==undefined;
+      },
+
+      updateSelection: function(segmentId){
         if ($scope.thumbs_visible) {
           // restore (single) thumb selection
           if (segmentId) {
-            var thumb=$('#gallery-thumbs a[data-sid='+segmentId+'] .thumb');
-            if (thumb.hasClass('selected')) {
-              console.log('showthumb');
+            if ($scope.isSelected(segmentId)) {
               $timeout(function(){
-                $scope.showThumb(thumb);
+                $scope.showThumb(segmentId);
               },150);
             } else {
               $scope.getSegment(segmentId).then(function(segment){
                 $timeout(function(){
                   $scope.segmentClick({
                     segment: segment,
-                    dontUpdateQuery: true,
+                    justRestoringSelection: true,
                     show: true
                   });
                 },150);
@@ -382,40 +399,25 @@ console.trace();
             }
           }
         }
-      }
+      },
 
-      $scope.scrollEnd=function(e){
+      scrollEnd: function(e){
         if ($scope.loadingSegments) {
           return;
         }
         $scope.loadSegments();
 
-      }
+      },
 
-      $scope.$on('showthumb', function(thumb) {
-        $scope.showThumb(thumb);
-      });
-
-      $scope.update=function(state){
+      update: function(state){
         $scope.updateVisibility(state);
         $scope.updateThumbsStyle(state);
         $scope.updateSelection($rootScope.params.s);
-      }
+      },
 
-      $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-        $scope.update(toState);
-      });
+    });
 
-      $scope.update($state.current);
-
-      $scope.$on('location.search',function(event,value){
-        if (value[0].s!=value[1].s) {
-          // update selection for history back here
-          console.log('TODO: update selection on history back without messing with click');
-    //      $scope.updateSelection(value[0].s,true);
-        }
-      });
-
+    $scope.init();
   /*
       $scope.$on('webglearth2.viewer',function($event,place){
         $('iframe.earth').attr('src','about:blank');
