@@ -51,24 +51,40 @@ angular.module('doxelApp')
     ];
 
     $scope.getClass = function (path) {
-      if ($state.current.name.split('.')[0] === path) {
+      if (path.split(',').indexOf($state.current.name)>=0) {
           return 'active';
       } else {
           return '';
       }
     };
 
-    $scope.goto=function(dest){
+    $scope.autoHide = function() {
+      clearTimeout($scope.timeout);
+      $scope.timeout=setTimeout(function(){
+        $('body').addClass('navbar-hidden');
+      },3000);
+    }
 
-      switch(dest) {
-        case 'github':
-          $scope.githubHref="https://www.github.com/doxel/doxel-loopback";
-          break;
-
-        default:
-    //      $location.path(dest);
-          break;
+    $('.header').on('mouseenter',function(){
+      if ($scope.autoHide_enabled) {
+        clearTimeout($scope.timeout);
+        $('body').removeClass('navbar-hidden');
       }
-    };
+    });
+
+    $('.header').on('mouseleave',function(){
+      if ($scope.autoHide_enabled) {
+        $scope.autoHide();
+      }
+    });
+
+    $('.navbar .menu-handle').on('click',function(){
+      clearTimeout($scope.timeout);
+      $('body').toggleClass('navbar-hidden');
+    });
+
+    $scope.autoHide();
+
+
 
   });
