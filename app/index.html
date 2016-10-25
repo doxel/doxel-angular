@@ -6,9 +6,12 @@
     <meta charset="utf-8">
     <title></title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
+    <!--link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.18.1/build/cssreset/cssreset-min.css"-->
+
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
@@ -21,15 +24,15 @@
     <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css" />
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
-
   </head>
-  <body>
-    <div ng-app="doxelApp" ng-controller="MainCtrl" id="main" ng-class="getClass()" ng-cloak>
+  <body ng-app="doxelApp" ng-controller="MainCtrl" fullscreen="isFullscreem" ng-click="toggleFullscreen()">
+    <div id="main" ng-class="getClass()" ng-cloak >
       <!--[if lte IE 8]>
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -48,14 +51,16 @@
                     <span class="icon-bar"></span>
                   </button>
 
-                  <!--a class="navbar-brand">DOXEL</a-->
+                  <a class="navbar-brand">DOXEL</a>
                 </div>
 
-                <div class="collapse navbar-collapse" id="js-navbar-collapse">
+                <div class="collapse navbar-collapse" id="js-navbar-collapse"><!-- data-toggle="collapse" data-target="#js-navbar-collapse"-->
 
                   <ul class="nav navbar-nav">
                     <!--li ng-class="getClass('home')"><a ui-sref="home" class="home fa fa-home"><span>Home</span></a></li-->
-                    <li ng-class="getClass('gallery')"><a ui-sref="gallery" class="gallery fa fa-photo"><span>Gallery</span></a></li>
+                    <li ng-class="getClass('gallery.view.thumbs')"><a ui-sref="gallery.view.thumbs" class="gallery fa fa-photo"><span>Gallery</span></a></li>
+                    <li ng-class="getClass('gallery.view.map,gallery.view.earth')"><a ui-sref="gallery.view.map" class="map fa fa-globe"><span>Map</span></a></li>
+                    <li ng-class="getClass('gallery.view.cloud')"><a ui-sref="gallery.view.cloud" class="viewer fa fa-eye"><span>Viewer</span></a></li>
                     <li ng-show="!authenticated" ng-class="getClass('login')"><a ui-sref="login" class="login fa fa-sign-in"><span>Login</span></a></li>
                     <li ng-show="authenticated" ng-class="getClass('upload')"><a ui-sref="upload" class="upload fa fa-upload"><span>Upload</span></a></li>
                     <li ng-show="authenticated" ng-class="getClass('logout')"><a ui-sref="logout" class="logout fa fa-sign-out"><span>Logout</span></a></li>
@@ -72,6 +77,7 @@
                 </div>
               </div>
             </div>
+            <a><div class="menu-handle"><i class="fa fa-fw fa-bars"></i></div></a>
           </div>
         </div>
 
@@ -146,6 +152,10 @@
           <script src="bower_components/angular-ui-router.stateHelper/statehelper.js"></script>
           <script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
           <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+          <script src="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
+          <script src="bower_components/ng-scrollbars/src/scrollbars.js"></script>
+          <script src="bower_components/bootstrap-autohidingnavbar/src/jquery.bootstrap-autohidingnavbar.js"></script>
+          <script src="bower_components/angular-fullscreen/src/angular-fullscreen.js"></script>
           <!-- endbower -->
           <script src="scripts/webglearth2/api.js"></script>
           <!-- endbuild -->
@@ -162,7 +172,6 @@
           <script src="scripts/controllers/navbar.js"></script>
           <script src="scripts/services/error-message.js"></script>
           <script src="scripts/controllers/reset-password.js"></script>
-          <script src="scripts/controllers/segments.js"></script>
           <script src="scripts/filters/format-timestamp.js"></script>
           <script src="scripts/directives/dom-onload.js"></script>
           <script src="scripts/directives/segment-preview.js"></script>
@@ -178,6 +187,7 @@
           <script src="scripts/services/app-config.js"></script>
           <script src="scripts/services/element-selection.js"></script>
           <script src="scripts/services/dnd-service.js"></script>
+          <script src="scripts/services/global.js"></script>
           <script src="scripts/controllers/tos.js"></script>
           <script src="scripts/controllers/gallery-map.js"></script>
           <script src="scripts/controllers/gallery-earth.js"></script>
@@ -192,6 +202,11 @@
           <script src="scripts/directives/toggle.js"></script>
           <script src="scripts/controllers/browser.js"></script>
           <!-- endbuild -->
+          <script>
+          $(document).ready(function(){
+            window.scrollTo(0,1);
+          });
+          </script>
 
     </div>
   </body>
