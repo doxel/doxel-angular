@@ -14,6 +14,9 @@ angular.module('doxelApp')
   $.extend(this,{
     hostname: 'ww3.doxel.org',
     tileServer: 'doxel.org',
-    segmentsChunkSize: 9
+    segmentsChunkSize: 9,
+    stateAfterSignin: 'upload',
+    stateAfterSignout: 'gallery.view.thumbs'
+
   });
 });
