@@ -51,17 +51,10 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
-      selected: {},
       segments: [],
+      selected: {},  // unloaded segment could be selected because of paging or page reload. TODO: restore selection on load
       center: [0,0],
       init: function(){
-
-        $scope.$on('segments-loaded',function(event,segments){
-          $timeout(function(){
-            $('.segments').getNiceScroll().doScrollPos();
-          },$scope.segments.length>9?0:3000);
-
-        });
 
         //// on state change success
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
@@ -71,23 +64,16 @@ angular.module('doxelApp')
 
           var params=$rootScope.params;
 
-          // when state is literal "gallery", switch to saved child view name,
-          // if any, else switch to gallery.view.thumbs
-          if (toState.name!='gallery') {
-            params.v=toState.name.split('.').pop();
-          } else {
-            params.v=$location.search().v||params.v||'thumbs';
-          }
+          // when state is "gallery", switch gallery.view.thumbs
 
-            // timeout is needed so that ui-leaflet display and behave properly,
-            // when returning to gallery from other tabs
-            if (toState.name=='gallery')
-            $timeout(function(){
-              console.log('redir',$state.current.name,'gallery.view.'+(params.v||'thumbs'));
-              $state.go('gallery.view.'+(params.v||'thumbs'),{},{
-                location: 'replace'
-              });
-            },1)
+          // timeout is needed so that ui-leaflet display and behave properly,
+          // when returning to gallery from other tabs
+          if (toState.name=='gallery')
+          $timeout(function(){
+            $state.go('gallery.view.thumbs',{},{
+              location: 'replace'
+            });
+          },1)
 
         });
 
@@ -152,24 +138,37 @@ angular.module('doxelApp')
         });
       },
 
-      getSegment: function(segmentId,callback){
+
+      getSegment: function(segmentId){
           var q=$q.defer();
-          // get segment details
-          $scope.segmentFind.$promise.then(function(_segments){
-            var found;
-            _segments.some(function(segment){
-              if (segment.id==segmentId) {
-                found=true;
-                q.resolve(segment);
-                return true;
-              }
-            });
-            if (!found) {
-              Segment.findById({id: segmentId},function(segment){
-                  q.resolve(segment);
-              },q.reject);
+          var found;
+          // search in loaded segments
+          $scope.segments.some(function(segment){
+            if (segment.id==segmentId) {
+              found=true;
+              q.resolve(segment);
+              return true;
             }
           });
+          if (!found || $scope.segmentFind.$resolved===false) {
+            // search in segment being loaded
+            $scope.segmentFind.$promise.then(function(_segments){
+              _segments.some(function(segment){
+                if (segment.id==segmentId) {
+                  found=true;
+                  q.resolve(segment);
+                  return true;
+                }
+              });
+              if (!found) {
+                // or finally load the required segment
+                // TODO: "scroll" to this segment and load segments around
+                Segment.findById({id: segmentId},function(segment){
+                    q.resolve(segment);
+                },q.reject);
+              }
+            });
+          }
           return q.promise;
       } // getSegment
     });
