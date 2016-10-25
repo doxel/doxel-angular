@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('LogoutCtrl', function ($scope, $rootScope, $location, User, LoopBackAuth, $cookies, socketService, $state) {
+  .controller('LogoutCtrl', function ($scope, $rootScope, $location, User, LoopBackAuth, $cookies, socketService, $state, appConfig) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -69,7 +69,7 @@ angular.module('doxelApp')
       $cookies.remove('userId',{path:'/'});
       $cookies.remove('pp-access_token',{path:'/'});
       $cookies.remove('pp-userId',{path:'/'});
-      $state.transitionTo('home');
+      $state.transitionTo(appConfig.stateAfterSignout);
 
     }, function(err){
       console.log('logout failed',err)
@@ -77,7 +77,7 @@ angular.module('doxelApp')
       $cookies.remove('userId',{path:'/'});
       $cookies.remove('pp-access_token',{path:'/'});
       $cookies.remove('pp-userId',{path:'/'});
-      $state.transitionTo('home');
+      $state.transitionTo(appConfig.stateAfterSignout);
     });
 
     if (socketService.ioSocket.connected) {
