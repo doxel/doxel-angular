@@ -1,3 +1,7 @@
+html {
+  overflow: hidden;
+}
+
 /* this style is to test non fullscreen canvas */
 /*#renderArea{
 	position: absolute;
@@ -37,3 +41,14 @@ body{
 	margin: 0; 
 	padding: 0
 }
+
+#tools {                                                                                                         
+  display: none;
+}
+ 
+@media screen and (min-width: 768px) {
+  #tools {
+    display: block;
+  }
+}
+
