@@ -51,8 +51,8 @@ angular.module('doxelApp')
       scope: {
         segment: '=',
         segmentPreviewClass: '@',
-        label: '@',
-        watch: '@'
+        label: '@'
+//        watch: '@'
       },
       controller: function($scope){
         $scope.updateSegment=function(){
@@ -69,15 +69,15 @@ angular.module('doxelApp')
         }; // updateSegment
       },
       link: function(scope, element, attrs) {
-        if (scope.watch!==false) {
+//        if (scope.watch!==false) {
           scope.$watch('segment', function(newValue, oldValue) {
             if (newValue) {
               scope.updateSegment();
             }
           }, false);
-        } else {
-          scope.updateSegment();
-        }
+//        } else {
+//          scope.updateSegment();
+//        }
       },
 
       template: '<picture ng-if="picture" picture="picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}" />'
