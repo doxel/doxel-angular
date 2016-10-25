@@ -76,7 +76,7 @@ angular.module('doxelApp')
           $scope.updateViewerVisibility(toState.name);
         });
 
-        $scope.$on('segment.clicked',function(event,segment){
+        $scope.$on('segment.setview',function(event,segment){
           if ($scope.$state.current.name==$scope.viewer_state) {
             $scope.show();
           }
@@ -84,29 +84,20 @@ angular.module('doxelApp')
       },
 
       show: function(){
-        var segmentId=$location.search().s || $scope.params.s;
+        var segmentId=$location.search().s || $scope.params.s || ($scope.segments && $scope.segments[0] && $scope.segments[0].id);
         if (!segmentId) {
+          $scope.segmentFind.$promise.then(function(_segments) {
+            $rootScope.$broadcast('segment.click',_segments[0]);
+          });
           return;
         }
 
         var q=$q.defer();
 
         // get segment details
-        $scope.segmentFind.$promise.then(function(_segments){
-          var found;
-          _segments.some(function(segment){
-            if (segment.id==segmentId) {
-              found=true;
-              q.resolve(segment);
-              return true;
-            }
-          });
-          if (!found) {
-            Segment.findById({id: segmentId},function(segment){
-                q.resolve(segment);
-            },q.reject);
-          }
-        });
+        $scope.getSegment(segmentId).then(function(segment){
+          q.resolve(segment);
+        },q.reject);
 
         q.promise.then(function(segment){
           var src=$('iframe.viewer').attr('src');
