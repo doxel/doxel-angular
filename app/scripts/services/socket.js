@@ -94,7 +94,7 @@ angular.module('doxelApp')
 //      this.init();
     }
 
-    if (!this.connected) {
+    if (this.enabled && !this.connected) {
       this.connect();
     }
     return this;
