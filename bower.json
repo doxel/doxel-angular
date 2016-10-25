@@ -35,11 +35,12 @@
     "socket-io-client": "^1.4.5",
     "angular-ui-layout": "^1.4.2",
     "ng-tags-input": "^3.0.0",
-    "jquery.nicescroll": "https://github.com/inuyaksa/jquery.nicescroll.git",
     "angular-ui-router.stateHelper": "https://github.com/marklagendijk/ui-router.stateHelper.git",
     "jquery-mousewheel": "^3.1.13",
     "leaflet.markercluster": "^1.0.0",
-    "ng-scrollbars": "^0.0.11"
+    "ng-scrollbars": "https://github.com/iominh/ng-scrollbars.git",
+    "bootstrap-autohidingnavbar": "^1.0.6",
+    "angular-fullscreen": "^1.0.1"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
@@ -62,6 +63,11 @@
     "ui-leaflet": {
       "main": [
         "dist/ui-leaflet_dev_mapped.js"
+      ]
+    },
+    "ng-scrollbars": {
+      "main": [
+        "src/scrollbars.js"
       ]
     }
   },
