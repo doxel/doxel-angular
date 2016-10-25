@@ -7,6 +7,8 @@
   height: 100%;
 
   .map-container {
+    transition-property: top;
+    transition-duration: 0.5s;
     position: fixed;
     top: 55px;
     width: 100%;
@@ -30,6 +32,13 @@
       padding-right: 202px;
     }
   }
+
+  .thumbs-hidden .thumbs-left #gallery-map {
+    .map-container {
+      left: 0;
+      padding-right: 0;
+    }
+  }
 }
 
 .thumbs-bottom #gallery-map {
@@ -39,6 +48,11 @@
   }
 }
 
+.navbar-hidden #gallery-map .map-container {
+  top: 0px;
+  padding-bottom: 0;
+}
+
 @media screen and (min-height: 768px) {
   .thumbs-bottom #gallery-map {
     .map-container {
@@ -46,4 +60,19 @@
       top: 52px;
     }
   }
+
+  .navbar-hidden .thumbs-bottom #gallery-map .map-container {
+    top: 0px;
+    padding-bottom: 142px;
+  }
+
+  .thumbs-hidden .thumbs-bottom #gallery-map .map-container {
+    padding-bottom: 0px;
+  }
+
+  .thumbs-hidden.navbar-hidden .thumbs-bottom #gallery-map .map-container {
+    top: 0px;
+    padding-bottom: 0px;
+  }
+
 }

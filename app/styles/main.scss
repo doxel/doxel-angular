@@ -21,6 +21,10 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
   padding: 0.2em 0;
 }
 
+body {
+  overflow: hidden;
+}
+
 html, body {
   padding: 0;
   width: 100%;
@@ -31,6 +35,27 @@ html, body {
   margin-top: 64px;
   margin-bottom: 0px;
 }
+
+.navbar {
+  transition-property: top;
+  transition-duration: 0.5s;
+}
+
+.navbar-hidden {
+  .view {
+    margin-top: 12px;
+  }
+
+  .navbar {
+    top: -52px;
+  }
+
+  .header {
+    height: 16px;
+  }
+
+}
+
 /* Everything but the jumbotron gets side spacing for mobile first views */
 div.header,
 .marketing,
@@ -58,6 +83,10 @@ div.header {
 body > div.container > div.ng-scope {
   margin-top: 80px;
   z-index: -1;
+}
+
+body.navbar-hidden > div.container > div.ng-scope {
+  margin-top: 28px;
 }
 
 /* NavBar links cursor */
@@ -159,6 +188,11 @@ div.footer {
     z-index: 9999;
 }
 
+.navbar {
+  background-color: transparent;
+  border: 0px;
+}
+
 ng-message {
   position: absolute;
 
@@ -232,6 +266,37 @@ a * {
 
 .footer p {
   margin: 0;
+}
+
+.modal-open .header {
+  display: none;
+}
+
+.menu-handle {
+  width: 4em;
+  border: 1px solid #d4d4d4;
+  border-top: 0px;
+  margin: auto;
+  background-color: #f2f2f2;
+  text-align: center;
+  border-radius: 0px 0px 4px 4px;
+  margin-top: -1px;
+
+}
+
+.thumbs-bottom {
+  .footer {
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+    right: 0px;
+    text-align: center;
+    width: 20px;
+    padding-left: 10px;
+    line-height: 0px;
+    /* color: black; */
+    //background-color: #d4d4d4;
+    top: 50%;
+  }
 }
 
 

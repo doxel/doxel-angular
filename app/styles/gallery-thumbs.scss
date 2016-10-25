@@ -2,8 +2,10 @@
   position: relative;
   height: 100%;
   //  z-index: 1000;
-
   #segments {
+    transition-property: top;
+    transition-duration: 0.5s;
+
     position: fixed;
     top: 55px;
     left: 0;
@@ -71,11 +73,33 @@
 
 
   }
+
+
+}
+
+.navbar-hidden #gallery-thumbs #segments {
+  top: 0px;
+  padding-bottom: 2px;
 }
 
 
-.thumbs-bottom #gallery-thumbs {
+.thumbs-handle {
   display: none;
+  position: absolute;
+  width: 4em;
+  text-align: center;
+  z-index: 99999999;
+  background-color: #d4d4d4;
+  border: 1px solid #d4d4d4;
+}
+
+.thumbs-left,
+.thumbs-bottom {
+
+  #gallery-thumbs {
+    display: none;
+  }
+
 }
 
 @media screen and (min-height: 768px) {
@@ -105,28 +129,84 @@
 
     }
   }
+
+  .thumbs-bottom .thumbs-handle {
+    transition-property: margin-top;
+    transition-duration: 0.5s;
+    display: block;
+    left: 50%;
+    transform: none;
+  //  transform: translateX(-2em);
+    border: 1px solid #d4d4d4;
+    border-bottom: 0px;
+    border-radius: 4px 4px 0px 0px;
+    bottom: 144px;
+  }
+
+  .thumbs-hidden .thumbs-bottom #gallery-thumbs #segments {
+    bottom: -144px;
+  }
+
 }
 
-.thumbs-left #gallery-thumbs {
-  display: none;
+.thumbs-left .navbar-hidden {
+  .thumbs-handle {
+    margin-top: -26px;
+  }
+}
+
+.thumbs-hidden {
+
+// no animation, just hide
+  #gallery-thumbs #segments {
+    visibility: hidden;
+  }
+
+  .thumbs-left {
+    #gallery-thumbs #segments {
+      left: -200px;
+    }
+    .thumbs-handle {
+      left: 0px;
+    }
+  }
+  .thumbs-bottom {
+    .thumbs-handle {
+      bottom: 0px;
+    }
+
+  }
 }
 
 @media screen and (min-width: 768px) {
-  .thumbs-left #gallery-thumbs {
-    display: block;
-    .mCSB_inside > .mCSB_container { margin-right: 0; }
-    .mCSB_outside + .mCSB_scrollTools{right: -6px;} /* scrollbar position: outside */
+  .thumbs-left {
+    #gallery-thumbs {
+      display: block;
+      .mCSB_inside > .mCSB_container { margin-right: 0; }
+      .mCSB_outside + .mCSB_scrollTools{right: -6px;} /* scrollbar position: outside */
 
-    #segments {
-      width: 200px;
-
-      .segments {
-        //    position: relative;
-        text-align: center;
+      #segments {
         width: 200px;
-        height: 100%;
-        padding-top: 0px;
+
+        .segments {
+          //    position: relative;
+          text-align: center;
+          width: 200px;
+          height: 100%;
+          padding-top: 0px;
+        }
       }
+    }
+    .thumbs-handle {
+      transition-property: margin-top;
+      transition-duration: 0.5s;
+      display: block;
+      top: 50%;
+      transform: none;
+      transform: translateX(-1.3em) rotateZ(90deg) translateX(-2em);
+      border: 1px solid #d4d4d4;
+      border-left: 0px;
+      border-radius: 4px 4px 0px 0px;
     }
   }
 }
