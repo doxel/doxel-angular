@@ -1,12 +1,11 @@
 <div ng-show="thumbs_visible" id="gallery-thumbs">
   <div id="segments">
-    <!--div ng-if="!thumbsVerticalScroll" class="segments" ng-nicescroll nicescroll-object="nicescroll" nice-scroll-end="scrollEnd(event)" nice-option="{oneaxismousemode: true, overflowy: false, horizrailenabled: true, railvalign: 'top', nativeparentscrolling: false, autohidemode: true, touchbehavior: true, preventmultitouchscrolling: false}"-->
-    <div ng-if="!thumbsVerticalScroll" class="segments" ng-scrollbars ng-scrollbars-config="horizontalScrollConfig">
+    <div ng-if="!thumbsVerticalScroll" class="segments" ng-scrollbars ng-scroll-to="scrollTo" ng-scrollbars-config="horizontalScrollConfig">
         <segment-set segments="segments"></segment-set>
     </div>
-    <!--div ng-if="thumbsVerticalScroll" class="segments" ng-nicescroll nicescroll-object="nicescroll" nice-scroll-end="scrollEnd(event)" nice-option="{oneaxismousemode: true, overflowx: false, horizrailenabled: false, nativeparentscrolling: false, autohidemode: true, touchbehavior: true, preventmultitouchscrolling: false}"-->
-    <div ng-if="thumbsVerticalScroll" class="segments" ng-scrollbars ng-scrollbars-config="verticalScrollConfig">
+    <div ng-if="thumbsVerticalScroll" class="segments" ng-scrollbars ng-scroll-to="scrollTo" ng-scrollbars-config="verticalScrollConfig">
         <segment-set segments="segments"></segment-set>
     </div>
   </div>
 </div>
+<a><div class="thumbs-handle"><i class="fa fa-fw fa-bars"></i></div></a>
