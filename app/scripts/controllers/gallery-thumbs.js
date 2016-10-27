@@ -324,22 +324,21 @@ console.trace();
 
       showThumb: function showThumb(segmentId){
         var thumb=$('[data-sid='+segmentId+']');
+
         if (thumb && thumb.length) {
           var scrollOptions={scrollInertia: 0};
           var container=thumb.closest('.mCustomScrollbar');
+
           if ($scope.thumbsVerticalScroll) {
             var pos=thumb.position().top;
             var offset=(container.height()-thumb.height())/2;
-            container.mCustomScrollbar('scrollTo',pos-(offset>0?offset:0),scrollOptions);
-            var itemTop=thumb.position().top;
-            var offset=(container.height()-thumb.height())/2;
-            container.closest('.mCustomScrollbar').mCustomScrollbar('scrollTo',Math.abs($scope.mcs.top)+itemTop-(offset>0?offset:0),scrollOptions);
 
           } else {
             var pos=thumb.position().left;
             var offset=(container.width()-thumb.width())/2;
-            container.mCustomScrollbar('scrollTo',pos-(offset>0?offset:0),scrollOptions);
           }
+
+          container.mCustomScrollbar('scrollTo',Math.max(0,pos-(offset>0?offset:0)),scrollOptions);
         }
       },
 
