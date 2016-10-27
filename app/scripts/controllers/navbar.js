@@ -61,13 +61,18 @@ angular.module('doxelApp')
     $scope.autoHide = function() {
       clearTimeout($scope.timeout);
       $scope.timeout=setTimeout(function(){
+        if ($('.navbar-toggle').attr('aria-expanded')=='true') {
+          setTimeout(function(){
+            $('.navbar-toggle').click();
+          });
+        }
         $('body').addClass('navbar-hidden');
       },3000);
     }
 
     $('.header').on('mouseenter',function(){
+      clearTimeout($scope.timeout);
       if ($scope.autoHide_enabled) {
-        clearTimeout($scope.timeout);
         $('body').removeClass('navbar-hidden');
       }
     });
@@ -80,10 +85,19 @@ angular.module('doxelApp')
 
     $('.navbar .menu-handle').on('click',function(){
       clearTimeout($scope.timeout);
+      var hidden=$('body').hasClass('navbar-hidden');
+      var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
+
+      if ((!hidden && expanded) || (hidden && !expanded)) {
+        setTimeout(function(){
+          $('.navbar-toggle').click();
+        });
+      }
+
       $('body').toggleClass('navbar-hidden');
     });
 
-    $scope.autoHide();
+//    $scope.autoHide();
 
 
 
