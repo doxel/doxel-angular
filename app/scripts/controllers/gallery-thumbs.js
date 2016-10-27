@@ -51,12 +51,15 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
-      whileScrolling: function whileScrolling(){
+      whileScrolling: function whileScrolling(side){
+        if ($scope._loadSegments) {
+          return;
+        }
         var count=$scope.segments.length;
         var pos=$scope.scrollPos;
 
         // store scrollpos in thumbs unit
-        pos.push((count-1)*this.mcs.topPct/100);
+        pos.push((count-1)*this.mcs[side+'Pct']/100);
 
         // the second time we can determine the direction
         if (pos.length==2) {
@@ -112,7 +115,12 @@ angular.module('doxelApp')
             console.log(arguments);
           },
           */
-          whileScrolling: $scope.whileScrolling
+          whileScrolling: function(){
+            var that=this;
+            $timeout(function(){
+              $scope.whileScrolling.apply(that,['top']);
+            });
+          }
         }
 
       }, // verticalScrollConfig
@@ -140,7 +148,12 @@ angular.module('doxelApp')
             console.log(arguments);
           },
           */
-          whileScrolling: $scope.whileScrolling
+          whileScrolling: function(){
+            var that=this;
+            $timeout(function(){
+              $scope.whileScrolling.apply(that,['left']);
+            });
+          }
         }
 
 
@@ -208,11 +221,13 @@ angular.module('doxelApp')
       init: function() {
         $scope.initEventHandlers();
         $scope.thumbs_visible=false;
+        /*
         $scope.segmentFind.$promise.then(function(){
           $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
           $scope.update($state.current);
         });
-        $scope.update($state.current);
+        */
+    //    $scope.update($state.current);
 
       }, // init
 
@@ -355,7 +370,13 @@ console.trace();
       fillScrollableContainer: function() {
         if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
           console.log('more');
-          $scope.loadSegments();
+          $scope.loadSegments().promise.then(function(segments){
+            if(segments.length){
+              $timeout(function(){
+                $scope.fillScrollableContainer();
+              },500);
+            }
+          });
         }
       },
 
@@ -411,7 +432,7 @@ console.trace();
                     justRestoringSelection: true,
                     show: true
                   });
-                },150);
+                },1500);
               });
             }
           }

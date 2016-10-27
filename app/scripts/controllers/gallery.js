@@ -51,6 +51,8 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
+      end: {},
+      loaded: {},
       segments: [],
       selected: {},  // unloaded segment could be selected because of paging or page reload. TODO: restore selection on load
       center: [0,0],
@@ -81,22 +83,43 @@ angular.module('doxelApp')
         // scope is visible when beginning with 'gallery'
         $scope.visible=($state.current.name.substr(0,7)=='gallery');
         if ($state.current.name=='gallery') {
-          // when state is literal "gallery", switch to gallery.view.thumbs
-          var view=$location.search().v||$rootScope.params.v||'thumbs';
-          $state.go('gallery.view.'+view,{
+          $state.go('gallery.view.thumbs',{
             location: 'replace'
           });
         }
 
-        $scope.loadSegments();
+        var segmentId=$rootScope.params.s||$location.search().s;
+        if (segmentId) {
+        /*  $scope.getSegment(segmentId).then(function(segment){
+            $timeout(function(){
+              segment.selected=true;
+              $scope.broadcast('showThumb',segmentId);
+            },1000);
+          });
+*/
+        } else {
+          $scope.loadSegments();
+        }
 
       }, // init
 
       loadSegments: function(direction) {
-        if ($scope.loadingSegments) {
+        console.trace('loadseg');
+        if ($scope._loadSegments) {
+          return $scope._loadSegments;
+        }
+        $scope._loadSegments=$q.defer();
+        $scope._loadSegments.promise.finally(function(){
+          $scope._loadSegments=null;
+        });
+
+        direction=direction||'forward';
+
+        if ($scope.end[direction]) {
+          // end reached
+          $scope._loadSegments.resolve([]);
           return;
         }
-        $scope.loadingSegments=true;
 
         var filter={
           where: {
@@ -106,9 +129,8 @@ angular.module('doxelApp')
           limit: appConfig.segmentsChunkSize
         }
 
-        direction=direction||'forward';
-
         if (direction=='forward') {
+          // load chunk after last segment in $scope.segments
           if ($scope.segments.length) {
             var segment=$scope.segments[$scope.segments.length-1];
             filter.where.timestamp={
@@ -119,8 +141,9 @@ angular.module('doxelApp')
             };
           }
           filter.order='timestamp DESC';
+
         } else {
-          // backward
+          // load chunk before first segment in $scope.segments
           if ($scope.segments.length) {
             var segment=$scope.segments[0];
             filter.where.timestamp={
@@ -129,39 +152,55 @@ angular.module('doxelApp')
             filter.where.id={
               neq: segment.id
             };
-            filter.order='timestamp ASC';
           }
+          filter.order='timestamp ASC';
         }
 
-        // load segments
-        $scope.segmentFind=Segment.find({
+        // do load segments
+        Segment.find({
           filter: filter
+
         }, function(segments){
-          if (segments && segments.length) {
+          if (!segments || !segments.length) {
+            // end reached
+            $scope.end[direction]=true;
+
+          } else {
             if (direction=='backward') {
               // prepend segments
               segments.reverse();
               angular.forEach(segments,function(segment){
-                $scope.segments.unshift(segment);
+                if (!$scope.loaded[segment.id]) {
+                  $scope.segments.unshift(segment);
+                  $scope.loaded[segment.id]=true;
+                }
               });
+
             } else { // direction==forward
               // append segments
-              $scope.segments=($scope.segments||[]).concat(segments);
+              angular.forEach(segments,function(segment){
+                if (!$scope.loaded[segment.id]) {
+                  $scope.segments.push(segment);
+                  $scope.loaded[segment.id]=true;
+                }
+              });
             }
           }
-          $scope.loadingSegments=false;
-          $rootScope.$broadcast('segments-loaded',segments);
-
-          return $scope.segments;
+          $scope._loadSegments.resolve(segments);
+//          $rootScope.$broadcast('segments-loaded',segments);
 
         }, function(err){
-          $scope.loadingSegments=false;
+          console.log(err);
           errorMessage.show('Could not load segments');
+          $scope._loadSegments.reject(err);
         });
+
+        return $scope._loadSegments;
 
       }, // loadSegments
 
       getSegment: function(segmentId){
+        console.trace('getseg');
           var q=$q.defer();
           var found;
           // search in loaded segments
@@ -172,27 +211,54 @@ angular.module('doxelApp')
               return true;
             }
           });
-          if (!found || $scope.segmentFind.$resolved===false) {
-            // search in segment being loaded
-            $scope.segmentFind.$promise.then(function(_segments){
-              _segments.some(function(segment){
-                if (segment.id==segmentId) {
-                  found=true;
-                  q.resolve(segment);
-                  return true;
+          if (!found) {
+            // currently loading segments ?
+            if ($scope._loadSegments && $scope._loadSegments.promise.$$state.pending) {
+              // search in segment being loaded
+              $scope._loadSegments.promise.then(function(_segments){
+                _segments.some(function(segment){
+                  if (segment.id==segmentId) {
+                    found=true;
+                    q.resolve(segment);
+                    return true;
+                  }
+                });
+                if (!found) {
+                  // or finally load the required segment
+                  $scope.loadSegmentsAround(segmentId,function(segment){
+                    q.resolve(segment);
+                  },q.reject);
                 }
               });
-              if (!found) {
-                // or finally load the required segment
-                // TODO: "scroll" to this segment and load segments around
-                Segment.findById({id: segmentId},function(segment){
-                    q.resolve(segment);
-                },q.reject);
-              }
-            });
+            } else {
+              // or finally load the required segment
+              $scope.loadSegmentsAround(segmentId,function(segment){
+                q.resolve(segment);
+              },q.reject);
+            }
           }
           return q.promise;
-      } // getSegment
+      }, // getSegment
+
+      loadSegmentsAround: function(segmentId,_then,_catch) {
+        console.trace('around');
+        Segment.findById({id: segmentId},function(segment){
+          if (segment) {
+            Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
+            $scope.loadSegments('backward').promise.then(function(){
+              $timeout(function(){
+                $scope.loadSegments('forward').promise.then(function(){
+                  _then(segment);
+                },_catch);
+              });
+            },_catch);
+          } else {
+            _catch(new Error('Segment not found !'));
+          }
+        },_catch);
+
+      } // loadSegmentsAround
+
     });
 
     $scope.init();
