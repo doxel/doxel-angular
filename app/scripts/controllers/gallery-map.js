@@ -258,7 +258,11 @@ angular.module('doxelApp')
         $scope.$on('leafletDirectiveMarker.click', function(event, args){
           console.log(args.model.segmentId);
           $scope.getSegment(args.model.segmentId).then(function(segment){
-            $rootScope.$broadcast('segment.click',segment,{show:true});
+            if ($scope.selected[segment.id]) {
+              $scope.$state.transitionTo('gallery.view.cloud');
+            } else {
+              $rootScope.$broadcast('segment.click',segment,{show:true});
+            }
 
           });
         });
