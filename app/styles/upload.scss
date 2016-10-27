@@ -1,7 +1,13 @@
 iframe.upload {
+  transition-property: top;
+  transition-duration: 0.5s;
   position: absolute;
   width: 100%;
   top: 52px;
   left: 0;
   border: 0px;
+}
+
+.navbar-hidden iframe.upload {
+  top: 0;
 }

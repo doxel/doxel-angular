@@ -89,7 +89,7 @@
   width: 4em;
   text-align: center;
   z-index: 99999999;
-  background-color: #d4d4d4;
+  background-color: #f2f2f2;
   border: 1px solid #d4d4d4;
 }
 
@@ -135,6 +135,7 @@
     transition-duration: 0.5s;
     display: block;
     left: 50%;
+    margin-left: -2em;
     transform: none;
   //  transform: translateX(-2em);
     border: 1px solid #d4d4d4;
