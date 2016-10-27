@@ -92,52 +92,74 @@ angular.module('doxelApp')
 
       }, // init
 
-      loadSegments: function() {
+      loadSegments: function(direction) {
         if ($scope.loadingSegments) {
           return;
         }
         $scope.loadingSegments=true;
-        // load segments
-        $scope.segmentFind=Segment.find({
-          filter: {
-            where: {
+
+        var filter={
+          where: {
               lat: {exists: true},
               status: 'R'
-            },
-            limit: appConfig.segmentsChunkSize,
-            skip: $scope.segments.length,
-            order: 'timestamp DESC'
+          },
+          limit: appConfig.segmentsChunkSize
+        }
+
+        direction=direction||'forward';
+
+        if (direction=='forward') {
+          if ($scope.segments.length) {
+            var segment=$scope.segments[$scope.segments.length-1];
+            filter.where.timestamp={
+              lte: segment.timestamp
+            };
+            filter.where.id={
+              neq: segment.id
+            };
           }
+          filter.order='timestamp DESC';
+        } else {
+          // backward
+          if ($scope.segments.length) {
+            var segment=$scope.segments[0];
+            filter.where.timestamp={
+              gte: segment.timestamp
+            };
+            filter.where.id={
+              neq: segment.id
+            };
+            filter.order='timestamp ASC';
+          }
+        }
+
+        // load segments
+        $scope.segmentFind=Segment.find({
+          filter: filter
         }, function(segments){
           if (segments && segments.length) {
-            $scope.segments=($scope.segments||[]).concat(segments);
+            if (direction=='backward') {
+              // prepend segments
+              segments.reverse();
+              angular.forEach(segments,function(segment){
+                $scope.segments.unshift(segment);
+              });
+            } else { // direction==forward
+              // append segments
+              $scope.segments=($scope.segments||[]).concat(segments);
+            }
           }
           $scope.loadingSegments=false;
           $rootScope.$broadcast('segments-loaded',segments);
 
           return $scope.segments;
-    /*
-          $scope.place_list={};
-          segments.forEach(function(segment){
-            place_list[segment.id]={
-              segmentId: segment.id,
-              lon: segment.lng,
-              lat: segment.lat,
-              timestamp: segment.timestamp,
-              thumb: '/api/segments/preview/'+segment.id+'/'+segment.timestamp+'/'+segment.previewId
-            };
-          });
 
-          $scope.q.promise.then(function(){
-            $scope.iframe_earth.contentWindow.setMarkers(place_list);
-          });
-    */
         }, function(err){
           $scope.loadingSegments=false;
           errorMessage.show('Could not load segments');
         });
-      },
 
+      }, // loadSegments
 
       getSegment: function(segmentId){
           var q=$q.defer();

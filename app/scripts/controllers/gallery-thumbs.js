@@ -51,6 +51,41 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
+      whileScrolling: function whileScrolling(){
+        var count=$scope.segments.length;
+        var pos=$scope.scrollPos;
+
+        // store scrollpos in thumbs unit
+        pos.push((count-1)*this.mcs.topPct/100);
+
+        // the second time we can determine the direction
+        if (pos.length==2) {
+          var remain;
+          var direction;
+
+          if (pos[0]<pos[1]) {
+            direction='forward';
+            // how many thumbs remain after scrollpos
+            remain=Math.abs(count-pos[1]);
+
+          } else if (pos[0]>pos[1]) {
+            direction='backward';
+            // how many thumbs remain before scrollpos
+            remain=Math.abs(pos[1]);
+          }
+
+          // scrollbar moving and thumbs remaining is less than threshold
+          if (direction && remain<$scope.loadThreshold) {
+            $scope.loadSegments(direction);
+          }
+
+          // discard oldest scrollpos
+          $scope.scrollPos.shift();
+        }
+      }
+    });
+
+    angular.extend($scope,{
       scrollPos: [],
       loadThreshold: 16,
       verticalScrollConfig: {
@@ -77,23 +112,7 @@ angular.module('doxelApp')
             console.log(arguments);
           },
           */
-          whileScrolling: function vsb_whileScrolling(){
-            var count=$scope.segments.length;
-            var pos=$scope.scrollPos;
-            pos.push((count-1)*this.mcs.topPct/100);
-            if (pos.length==2) {
-              if (pos[0]<pos[1]) {
-                // forward
-                if (Math.abs(count-pos[1])<$scope.loadThreshold) {
-                  $scope.loadSegments();
-                }
-              } else if (pos[0]>pos[1]) {
-                // backward
-              }
-              $scope.scrollPos.shift();
-            }
-          }
-
+          whileScrolling: $scope.whileScrolling
         }
 
       }, // verticalScrollConfig
@@ -121,23 +140,7 @@ angular.module('doxelApp')
             console.log(arguments);
           },
           */
-          whileScrolling: function vsb_whileScrolling(){
-            var count=$scope.segments.length;
-            var pos=$scope.scrollPos;
-            pos.push((count-1)*this.mcs.leftPct/100);
-            if (pos.length==2) {
-              if (pos[0]<pos[1]) {
-                // forward
-                if (Math.abs(count-pos[1])<$scope.loadThreshold) {
-                  $scope.loadSegments();
-                }
-              } else if (pos[0]>pos[1]) {
-                // backward
-              }
-              $scope.scrollPos.shift();
-            }
-          }
-
+          whileScrolling: $scope.whileScrolling
         }
 
 
@@ -179,12 +182,9 @@ angular.module('doxelApp')
         });
 
         $scope.$on('segments-loaded',function(event,segments){
-          if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
-            $timeout(function(){
-              console.log('more');
-              $scope.loadSegments();
-            });
-          }
+          $timeout(function(){
+            $scope.fillScrollableContainer();
+          });
         });
 
         $scope.$on('window.resize',function(){
@@ -225,6 +225,11 @@ angular.module('doxelApp')
 
 console.trace();
 
+        // in map view, switch to cloud on second click
+        if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && $scope.selected[segment.id]) {
+          $scope.$state.transitionTo('gallery.view.cloud');
+          return;
+        }
 
 
   //      $scope.$root.$broadcast('segment.show',segment);
@@ -267,13 +272,18 @@ console.trace();
         }
         if (options.selected) {
           if (options.unique) {
+            var count=0;
             // unselect other tree paths
             for (var segmentId in $scope.selected) {
               if ($scope.selected.hasOwnProperty(segmentId) && segmentId!=segment.id){
+                ++count;
                 delete $scope.selected[segmentId].selected;
                 delete $scope.selected[segmentId];
               }
             };
+            if (!count && $scope.selected[segment.id]) {
+              return;
+            }
           }
 
           segment.selected=true;
@@ -312,19 +322,23 @@ console.trace();
   */
       },
 
-      showThumb: function(segmentId){
-        return;
+      showThumb: function showThumb(segmentId){
         var thumb=$('[data-sid='+segmentId+']');
         if (thumb && thumb.length) {
-          var container=thumb.closest('.mCSB_container');
+          var scrollOptions={scrollInertia: 0};
+          var container=thumb.closest('.mCustomScrollbar');
           if ($scope.thumbsVerticalScroll) {
+            var pos=thumb.position().top;
+            var offset=(container.height()-thumb.height())/2;
+            container.mCustomScrollbar('scrollTo',pos-(offset>0?offset:0),scrollOptions);
             var itemTop=thumb.position().top;
             var offset=(container.height()-thumb.height())/2;
-            $scope.scrollTo=Math.abs($scope.mcs.top)+itemTop-(offset>0?offset:0);
+            container.closest('.mCustomScrollbar').mCustomScrollbar('scrollTo',Math.abs($scope.mcs.top)+itemTop-(offset>0?offset:0),scrollOptions);
+
           } else {
-            var itemLeft=thumb.position().left;
-            var offset=(nicescroll.width()-thumb.width())/2;
-            nicescroll.scrollLeft(nicescroll.scrollLeft()+itemLeft-(offset>0?offset:0));
+            var pos=thumb.position().left;
+            var offset=(container.width()-thumb.width())/2;
+            container.mCustomScrollbar('scrollTo',pos-(offset>0?offset:0),scrollOptions);
           }
         }
       },
@@ -339,23 +353,27 @@ console.trace();
         return $scope.isWide()?'thumbs-left':'thumbs-bottom';
       },
 
+      fillScrollableContainer: function() {
+        if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
+          console.log('more');
+          $scope.loadSegments();
+        }
+      },
+
       updateVisibility: function(state){
         $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
         $timeout(function(){
-          if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
-            console.log('more');
-            $scope.loadSegments();
-          }
+          $scope.fillScrollableContainer();
         },1000);
       },
 
       updateThumbsStyle: function(state){
         if (state.name=="gallery.view.thumbs") {
-          // full screen for thumbs view
+          // full window for thumbs view
           $scope.thumbsVerticalScroll=true;
           $timeout(function(){
             $rootScope.thumbsPosition='';
-            $('body').removeClass('thumbs-hidden'); // TODO: restore state when leaving
+            $('body').removeClass('thumbs-hidden'); // TODO: remove this and modiy scss to dont hide when only thumbs-hidden and not thumbs-left or bottom
           });
         } else {
           // one row or column of thumbs for map and earth view
@@ -399,14 +417,6 @@ console.trace();
             }
           }
         }
-      },
-
-      scrollEnd: function(e){
-        if ($scope.loadingSegments) {
-          return;
-        }
-        $scope.loadSegments();
-
       },
 
       update: function(state){
