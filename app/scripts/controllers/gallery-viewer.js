@@ -44,7 +44,7 @@
  */
 
 angular.module('doxelApp')
-  .controller('GalleryViewerCtrl', function ($scope,$rootScope,$location,$q,Segment,$state,$http,LoopBackAuth,errorMessage) {
+  .controller('GalleryViewerCtrl', function ($timeout,$scope,$rootScope,$location,$q,Segment,$state,$http,LoopBackAuth,errorMessage) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -102,7 +102,6 @@ angular.module('doxelApp')
         q.promise.then(function(segment){
           var src=$('iframe.viewer').attr('src');
           var toSrc='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html';
-          var json='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer/viewer.json';
           if (src!=toSrc) {
             $http.head(toSrc,{
               headers: {
@@ -113,7 +112,10 @@ angular.module('doxelApp')
                 errorMessage.show('Could not open viewer: '+res.statusText);
               } else {
                 $('iframe.viewer').attr('src',toSrc);
-              }
+                $timeout(function(){
+                  $rootScope.$broadcast('showThumb',segment.id);
+                },500);
+            }
             }, function(err){
               console.log(err);
               errorMessage.show('Could not open viewer: '+err.statusText);
