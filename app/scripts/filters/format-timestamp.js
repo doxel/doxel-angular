@@ -36,8 +36,10 @@ angular.module('doxelApp')
         case 'locale':
         console.log(timestamp)
           return date.getFullYear()+' '+formatter.month.format(date)+' '+dd+' '+formatter.day.format(date);
-        default:
+        case 'ymdhms':
           return date.getFullYear()+'/'+mm+'/'+dd+', '+hh+':'+mi+':'+ss;
+        default:
+          return date.getFullYear()+'/'+mm+'/'+dd;
       }
     };
   });
