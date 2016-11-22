@@ -60,7 +60,8 @@ var app=angular
     'ngTable',
     'btford.socket-io',
     'ngTagsInput',
-    'ngScrollbars'
+    'ngScrollbars',
+    'FBAngular'
 
   ])
   .config(function ($httpProvider, $urlRouterProvider, $stateProvider,$locationProvider) {
@@ -126,10 +127,10 @@ var app=angular
         controller: 'ProfileCtrl',
         controllerAs: 'profile'
       })
-*/      .state('reset-password', {
-        url: '/reset-password',
+*/      .state('reset-password-form', {
+        url: '/reset-password-form/:accessToken',
         templateUrl: 'views/reset-password.html',
-        controller: 'ResetPasswordCtrl',
+        controller: 'ResetPass',
         controllerAs: 'resetPassword'
       })
       .state('upload', {
@@ -250,9 +251,13 @@ var app=angular
       })
       */
   })
-  .run(function ($rootScope,$state,$location,$window,User,$cookies,LoopBackAuth,appConfig,$timeout) {
+  .run(function ($rootScope,$state,$location,$window,User,$cookies,LoopBackAuth,appConfig,$timeout,errorMessage) {
     $rootScope.$state=$state;
     $rootScope.params={};
+
+    $rootScope.toggleFullscreen=function(){
+      $rootScope.isFullscreen=true;
+    }
 
     // broadcast location.search event on query string change
     $rootScope.$watch(function(){
@@ -264,7 +269,7 @@ var app=angular
     // return gallery thumbs style
     $rootScope.getClass=function(){
   // TODO: too many calls, find another way
-  //    console.log($state);
+//      console.log($state.current.name);
       if ($state.current.name.substr(0,7)=='gallery') {
         return $rootScope.thumbsPosition||'';
       } else {
@@ -331,7 +336,7 @@ var app=angular
           // user logged in with third-party account (returned credentials may be for main account)
           LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
           LoopBackAuth.save();
-          $state.transitionTo($location.stateAfterSignin||'upload');
+          $state.transitionTo($location.stateAfterSignin||appConfig.stateAfterSignin);
           return;
 
         }
@@ -362,6 +367,14 @@ var app=angular
 
     // syncronize rootScope.params and location.search()
     $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+      // close navbar
+      var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
+      if (expanded) {
+        setTimeout(function(){
+          $('.navbar .menu-handle').click();
+        });
+      }
+
       var search=$location.search();
       var params=$rootScope.params;
 
