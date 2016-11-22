@@ -50,6 +50,7 @@ angular.module('doxelApp')
       'Karma'
     ];
 
+return;
     angular.extend($scope,{
       rootState: 'gallery.view',
 
