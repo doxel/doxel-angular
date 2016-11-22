@@ -86,7 +86,7 @@ angular.module('doxelApp')
       show: function(){
         var segmentId=$location.search().s || $scope.params.s || ($scope.segments && $scope.segments[0] && $scope.segments[0].id);
         if (!segmentId) {
-          $scope.segmentFind.$promise.then(function(_segments) {
+          $scope._loadSegments.promise.then(function(_segments) {
             $rootScope.$broadcast('segment.click',_segments[0]);
           });
           return;
