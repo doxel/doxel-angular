@@ -347,8 +347,8 @@ TODO: use geopoint and using the smallest map dimension
        console.log('setView');
        $scope.getMap(function(map){
           map.setView({
-            lat: segment.lat,
-            lng: segment.lng
+            lat: segment.geo.lat,
+            lng: segment.geo.lng
           },
           segment.zoom||map._zoom, {
             pan: {}
@@ -357,25 +357,25 @@ TODO: use geopoint and using the smallest map dimension
           if ($scope.currentMarker) {
             // there is already a current marker
             var m=$scope.currentMarker._latlng;
-            if (m.lat!=segment.lat || m.lng!=segment.lng) {
+            if (m.lat!=segment.geo.lat || m.lng!=segment.geo.lng) {
               // current marker changed
               if (map.hasLayer($scope.currentMarker)) {
                 // remove existing marker
                 map.removeLayer($scope.currentMarker)
               }
               // add new marker
-              $scope.currentMarker=L.marker([segment.lat,segment.lng],$scope.marker);
+              $scope.currentMarker=L.marker([segment.geo.lat,segment.geo.lng],$scope.marker);
               map.addLayer($scope.currentMarker);
 
             } else {
               if (!map.hasLayer($scope.currentMarker)) {
                 // marker was on another map instance, we must reinstantiate it
-                $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+                $scope.currentMarker=L.marker([segment.geo.lat,segment.geo.lng]);
                 map.addLayer($scope.currentMarker);
               }
             }
           } else {
-            $scope.currentMarker=L.marker([segment.lat,segment.lng]);
+            $scope.currentMarker=L.marker([segment.geo.lat,segment.geo.lng]);
             map.addLayer($scope.currentMarker);
           }
 					$scope.currentMarker.setZIndexOffset(99999999999);
@@ -387,12 +387,12 @@ TODO: use geopoint and using the smallest map dimension
         var markers=[];
         $scope.segments.some(function(segment,idx){
           if (!segment.marker) {
-//            segment.marker=L.CircleMarker([segment.lat,segment.lng]);
+//            segment.marker=L.CircleMarker([segment.geo.lat,segment.geo.lng]);
 //            markers.addLayer(segment.marker);
               segment.marker={
                 layer: 'markers',
-                lng: segment.lng,
-                lat: segment.lat,
+                lng: segment.geo.lng,
+                lat: segment.geo.lat,
                 segmentId: segment.id
               }
           }
