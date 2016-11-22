@@ -104,7 +104,7 @@ angular.module('doxelApp')
       }, // init
 
       loadSegments: function(direction) {
-        console.trace('loadseg');
+        console.trace('loadSegments');
         if ($scope._loadSegments) {
           return $scope._loadSegments;
         }
@@ -122,10 +122,8 @@ angular.module('doxelApp')
         }
 
         var filter={
-          where: {
-              lat: {exists: true},
-              status: 'R'
-          },
+          where: {},
+          include: 'pointCloud',
           limit: appConfig.segmentsChunkSize
         }
 
@@ -200,7 +198,7 @@ angular.module('doxelApp')
       }, // loadSegments
 
       getSegment: function(segmentId){
-        console.trace('getseg');
+        console.trace('getSegment');
           var q=$q.defer();
           var found;
           // search in loaded segments
@@ -241,8 +239,13 @@ angular.module('doxelApp')
       }, // getSegment
 
       loadSegmentsAround: function(segmentId,_then,_catch) {
-        console.trace('around');
-        Segment.findById({id: segmentId},function(segment){
+        console.trace('loadSegmentsAround');
+        Segment.findById({
+          id: segmentId,
+          filter: {
+            include: 'pointCloud'
+          }
+        }, function(segment){
           if (segment) {
             Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
             $scope.loadSegments('backward').promise.then(function(){
