@@ -50,55 +50,65 @@ angular.module('doxelApp')
       'Karma'
     ];
 
-    $scope.getClass = function (path) {
-      if (path.split(',').indexOf($state.current.name)>=0) {
-          return 'active';
-      } else {
-          return '';
-      }
-    };
+    angular.extend($scope, {
 
-    $scope.autoHide = function() {
-      clearTimeout($scope.timeout);
-      $scope.timeout=setTimeout(function(){
-        if ($('.navbar-toggle').attr('aria-expanded')=='true') {
-          setTimeout(function(){
-            $('.navbar-toggle').click();
-          });
+      githubHref: 'https://github.com/doxel/doxel-angular',
+
+      getClass:function (path) {
+        if (path.split(',').indexOf($state.current.name)>=0) {
+            return 'active';
+        } else {
+            return '';
         }
-        $('body').addClass('navbar-hidden');
-      },3000);
-    }
+      },
 
-    $('.header').on('mouseenter',function(){
-      clearTimeout($scope.timeout);
-      if ($scope.autoHide_enabled) {
-        $('body').removeClass('navbar-hidden');
-      }
-    });
+      autoHide: function() {
+        clearTimeout($scope.timeout);
+        $scope.timeout=setTimeout(function(){
+          if ($('.navbar-toggle').attr('aria-expanded')=='true') {
+            setTimeout(function(){
+              $('.navbar-toggle').click();
+            });
+          }
+          $('body').addClass('navbar-hidden');
+        },3000);
+      },
 
-    $('.header').on('mouseleave',function(){
-      if ($scope.autoHide_enabled) {
-        $scope.autoHide();
-      }
-    });
+      init: function() {
 
-    $('.navbar .menu-handle').on('click',function(){
-      clearTimeout($scope.timeout);
-      var hidden=$('body').hasClass('navbar-hidden');
-      var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
 
-      if ((!hidden && expanded) || (hidden && !expanded)) {
-        setTimeout(function(){
-          $('.navbar-toggle').click();
+        $('.header').on('mouseenter',function(){
+          clearTimeout($scope.timeout);
+          if ($scope.autoHide_enabled) {
+            $('body').removeClass('navbar-hidden');
+          }
         });
-      }
 
-      $('body').toggleClass('navbar-hidden');
+        $('.header').on('mouseleave',function(){
+          if ($scope.autoHide_enabled) {
+            $scope.autoHide();
+          }
+        });
+
+        $('.navbar .menu-handle').on('click',function(){
+          clearTimeout($scope.timeout);
+          var hidden=$('body').hasClass('navbar-hidden');
+          var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
+
+          if ((!hidden && expanded) || (hidden && !expanded)) {
+            setTimeout(function(){
+              $('.navbar-toggle').click();
+            });
+          }
+
+          $('body').toggleClass('navbar-hidden');
+        });
+
+    //    $scope.autoHide();
+
+      }
     });
 
-//    $scope.autoHide();
-
-
+    $scope.init();
 
   });
