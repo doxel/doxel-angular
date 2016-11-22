@@ -64,8 +64,8 @@ angular.module('doxelApp')
           $scope.update(toState);
         });
 
-        // show location on segment.clicked
-        $scope.$on('segment.clicked',function($event,args){
+        // show location on segment.setview
+        $scope.$on('segment.setview',function($event,args){
           if (!$scope.earth_visible) {
             return;
           }
