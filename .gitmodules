@@ -4,3 +4,6 @@
 [submodule "app/uploader"]
 	path = app/uploader
 	url = https://github.com/doxel/doxel-uploader.git
+[submodule "viewer"]
+	path = viewer
+	url = https://github.com/doxel/doxel-viewer.git
