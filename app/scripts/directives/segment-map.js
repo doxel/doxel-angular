@@ -80,9 +80,9 @@ angular.module('doxelApp')
             var segment=newValue;
             leafletData.getMap(scope.mapId).then(function(map){
               angular.forEach(segment.pictures,function(picture){
-                if (picture.lng!==undefined) {
+                if (picture.geo!==undefined) {
                   if (!picture.marker) {
-                    var marker=L.marker([picture.lat, picture.lng]).on('click',function(e){
+                    var marker=L.marker([picture.geo.lat, picture.geo.lng]).on('click',function(e){
                       segmentsCtrlScope.picture=e.target.picture;
                     })
                     marker.picture=picture;
