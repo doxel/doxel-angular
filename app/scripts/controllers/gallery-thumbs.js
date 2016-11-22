@@ -161,6 +161,22 @@ angular.module('doxelApp')
 
       initEventHandlers: function() {
 
+        window.jQuery('body').on('mouseenter','.thumb',function(e){
+          $timeout.cancel($scope.nextThumb_timeout);
+          var segmentId=$(e.target).closest('a').data('sid');
+          console.log(segmentId);
+          $scope.nextThumb_timeout=$timeout(function(segmentId){
+          console.log(segmentId);
+            if (segmentId) {
+              $scope.getSegment(segmentId).then(function(segment){
+                // TODO: should be segment.pointCloud.getNextPreview()
+                segment.getNextPreview(segment.previewId,function(previewId){
+                  segment.previewId=previewId;
+                });
+              });
+            }
+          },1500,true,segmentId);
+        });
         $scope.$on('segment.click',function($event,segment,options){
           console.log('segment.click');
           $event.stopPropagation && $event.stopPropagation();
@@ -221,14 +237,6 @@ angular.module('doxelApp')
       init: function() {
         $scope.initEventHandlers();
         $scope.thumbs_visible=false;
-        /*
-        $scope.segmentFind.$promise.then(function(){
-          $scope.thumbs_visible=($state.current.name.substr(0,7)=='gallery');
-          $scope.update($state.current);
-        });
-        */
-    //    $scope.update($state.current);
-
       }, // init
 
       segmentClick: function(options) {
@@ -245,7 +253,6 @@ console.trace();
           $scope.$state.transitionTo('gallery.view.cloud');
           return;
         }
-
 
   //      $scope.$root.$broadcast('segment.show',segment);
   //      $state.go('gallery',{segmentId: segment.id},{notify: false, reload:' gallery.details'});
