@@ -63,10 +63,32 @@
     a {
       width: 192px;
       height: 140px;
+      background-color: black;
+
+      segment-preview {
+        background-color: white;
+      }
 
       .date {
-        background-color: black;
-        color: white;
+        display: none;
+      }
+
+      .points {
+        color: rgba(255,255,255,0.8);
+        float: left;
+        margin-top: 2px;
+        margin-left: 4px;
+      }
+
+      .poses {
+        color: rgba(255,255,255,0.8);
+        float: right;
+        margin-top: 2px;
+        margin-right:4px;
+        
+      }
+      i {
+        margin-right: 2px;
       }
       margin-bottom: 4px;
     }
