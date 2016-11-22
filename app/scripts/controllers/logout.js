@@ -80,7 +80,7 @@ angular.module('doxelApp')
       $state.transitionTo(appConfig.stateAfterSignout);
     });
 
-    if (socketService.ioSocket.connected) {
+    if (socketService.ioSocket && socketService.ioSocket.connected) {
       socketService.ioSocket.close();
     }
 
