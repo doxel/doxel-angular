@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryThumbsCtrl', function ($scope,$rootScope,errorMessage,Segment,$q,$location,$state,$timeout,$window) {
+  .controller('GalleryThumbsCtrl', function ($scope,$rootScope,errorMessage,Pose,Segment,Picture,$q,$location,$state,$timeout,$window) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -52,6 +52,7 @@ angular.module('doxelApp')
 
     angular.extend($scope,{
       whileScrolling: function whileScrolling(side){
+        console.log('whilescrolling');
         if ($scope._loadSegments) {
           return;
         }
@@ -77,9 +78,14 @@ angular.module('doxelApp')
             remain=Math.abs(pos[1]);
           }
 
+          console.log('remain',remain,$scope.maxThumbs/2)
           // scrollbar moving and thumbs remaining is less than threshold
-          if (direction && remain<$scope.loadThreshold) {
-            $scope.loadSegments(direction);
+          if (direction && remain<$scope.maxThumbs/2) {
+            $scope.loadSegments(direction).promise.then(function(){
+              $timeout(function(){
+                $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
+              });
+            });
           }
 
           // discard oldest scrollpos
@@ -90,7 +96,6 @@ angular.module('doxelApp')
 
     angular.extend($scope,{
       scrollPos: [],
-      loadThreshold: 16,
       verticalScrollConfig: {
         axis: 'y',
         theme: 'light',
@@ -159,24 +164,81 @@ angular.module('doxelApp')
 
       }, // horizontalScrollConfig
 
+      showNextPreview: function(options) {
+        var segmentId=options.segmentId;
+        var element=options.element;
+
+        if (segmentId && segmentId==$scope.nextThumb_segmentId) {
+          $scope.getSegment(segmentId).then(function(segment){
+            function getNextPreview(previewId,callback){
+              if (!segment.pointCloud._poses) {
+                segment._poses=Pose.find({
+                  filter: {
+                    fields: "pictureId",
+                    where: { pointCloudId: segment.pointCloudId }
+                  }
+                });
+              }
+              segment._poses.$promise.then(function(poses){
+                segment.poses=poses;
+                var previewId=(segment.picture && segment.picture.id)||segment.previewId;
+                var curPose=segment.poses.findIndex(function(pose){
+                  return pose.pictureId==previewId;
+                });
+                //var nextPose=(curPose+1)%segment.poses.length;
+
+                var nextPose=Math.round(segment.poses.length*element.data('mouse').x/element.width());
+                if (nextPose!=curPose) {
+                  Picture.findById({id: segment.poses[nextPose].pictureId},function(picture){
+                    if ($scope.nextThumb_timeout && $scope.nextThumb_segmentId==segmentId) {
+                      segment.picture=picture;
+                      $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,options);
+                    }
+                  });
+                } else {
+                  if ($scope.nextThumb_timeout && $scope.nextThumb_segmentId==segmentId) {
+                    $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,options);
+                  }
+                }
+              });
+            } // getNextPreview
+            // TODO: should be segment.pointCloud.getNextPreview()
+            getNextPreview(segment.previewId,function(previewId){
+              segment.previewId=previewId;
+            });
+          });
+        }
+      }, // showNextPreview
+
       initEventHandlers: function() {
 
+        window.jQuery('body').on('mousemove','.thumb',updateMousePosition);
+        function updateMousePosition(e){
+          var element=window.jQuery(e.target);
+          var offset=element.offset();
+          element.data('mouse',{
+            x:e.pageX-offset.left,
+            y:e.pageY-offset.top
+          });
+        }
+
         window.jQuery('body').on('mouseenter','.thumb',function(e){
+          updateMousePosition(e);
           $timeout.cancel($scope.nextThumb_timeout);
-          var segmentId=$(e.target).closest('a').data('sid');
-          console.log(segmentId);
-          $scope.nextThumb_timeout=$timeout(function(segmentId){
-          console.log(segmentId);
-            if (segmentId) {
-              $scope.getSegment(segmentId).then(function(segment){
-                // TODO: should be segment.pointCloud.getNextPreview()
-                segment.getNextPreview(segment.previewId,function(previewId){
-                  segment.previewId=previewId;
-                });
-              });
-            }
-          },1500,true,segmentId);
+          $scope.nextThumb_segmentId=$(e.target).closest('a').data('sid');
+          $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,{
+            element: window.jQuery(e.target),
+            segmentId: $scope.nextThumb_segmentId
+          });
         });
+
+        window.jQuery('body').on('mouseleave', '.thumb', function(e){
+          console.log('leave');
+          $timeout.cancel($scope.nextThumb_timeout);
+          $scope.nextThumb_timeout=null;
+          $scope.nextThumb_segmentId=null;
+        });
+
         $scope.$on('segment.click',function($event,segment,options){
           console.log('segment.click');
           $event.stopPropagation && $event.stopPropagation();
@@ -211,19 +273,19 @@ angular.module('doxelApp')
         });
 
         $scope.$on('segments-loaded',function(event,segments){
-          $timeout(function(){
-            $scope.fillScrollableContainer();
-          });
+          $scope.fillScrollableContainer();
         });
 
         $scope.$on('window.resize',function(){
           $scope.updateThumbsStyle($rootScope.$state.current);
+          $scope.updateMetrics($rootScope.$state.current);
           // allow loading more thumbs
           $scope.updateVisibility($rootScope.$state.current);
         });
 
         $scope.$on('orientationchange',function(){
           $scope.updateThumbsStyle($rootScope.$state.current);
+          $scope.updateMetrics($rootScope.$state.current);
           // allow loading more thumbs
           $scope.updateVisibility($rootScope.$state.current);
         });
@@ -300,6 +362,7 @@ console.trace();
               if ($scope.selected.hasOwnProperty(segmentId) && segmentId!=segment.id){
                 ++count;
                 delete $scope.selected[segmentId].selected;
+                $scope.selected[segmentId].picture && delete $scope.selected[segmentId].picture.selected;
                 delete $scope.selected[segmentId];
               }
             };
@@ -316,6 +379,7 @@ console.trace();
           for (var segmentId in $scope.selected) {
             if (segmentId==segment.id) {
               delete $scope.selected[segmentId].selected;
+              $scope.selected[segmentId].picture && delete $scope.selected[segmentId].picture.selected;
               delete $scope.selected[segmentId];
             }
           };
@@ -374,29 +438,98 @@ console.trace();
         return $scope.isWide()?'thumbs-left':'thumbs-bottom';
       },
 
-      fillScrollableContainer: function() {
+      fillScrollableContainer: function(direction) {
+
+        $timeout.cancel($scope.fillTimeout);
+        if (!$scope.end[direction||'forward'])
+        $scope.fillTimeout=$timeout(function(){
+/*
+        // check if the last row is complete
+        var _top;
+        var _count=[0,0];
+        var line=0;
+        var diff;
+        $($('segment-set > span').get().reverse()).each(function(i,span){
+          var top=$(span).position().top;
+          console.log('top',top);
+          if (!i) {
+            _top=top;
+
+          } else {
+            if (top!=_top) {
+              _top=top;
+              ++line;
+              if (line==2) {
+                diff=_count[1]-_count[0];
+                return false;
+              }
+            }
+          }
+          ++_count[line];
+        });
+
+        if (line==2) {
+          console.log('count',_count,'width',$scope.thumbsH);
+        }
+        */
+
+   if (false)     if ($scope.segments && $scope.segments.length > $scope.maxThumbs) {
+          console.log($scope.segments.length,$scope.maxThumbs);
+          if (direction == undefined || direction=='forward') {
+            var count=Math.max($scope.thumbsH,Math.floor(($scope.segments.length - $scope.maxThumbs)/$scope.thumbsH)*$scope.thumbsH)
+            $scope.segments.splice(0,count);
+            $scope.$apply();
+
+            var $mcs=$('#gallery-thumbs .mCustomScrollbar');
+
+            if ($mcs[0].mcs.direction=='y') {
+              $mcs.mCustomScrollbar('scrollTo','+='+(150*(count/$scope.thumbsH)),{
+                scrollInertia: 0
+              });
+
+            } else {
+              $mcs.mCustomScrollbar('scrollTo','+=200',{
+                scrollInertia: 0
+              });
+            }
+
+          } else {
+            $scope.segments.splice($scope.maxThumbs,$scope.segments.length - $scope.maxThumbs);
+          }
+        }
+
         if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
           console.log('more');
-          $scope.loadSegments().promise.then(function(segments){
+          $scope.loadSegments(direction||'forward',$scope.thumbsH).promise.then(function(segments){
             if(segments.length){
               $timeout(function(){
                 $scope.fillScrollableContainer();
-              },500);
+              });
             }
           });
+        } else {
+          /*
+          if (line==2 && diff) {
+            $scope.loadSegments(direction||'forward',diff).promise.then(function(segments){
+              if(segments.length){
+                $scope.fillScrollableContainer(direction);
+              }
+            });
+          }
+          */
         }
+        },1000);
       },
 
       updateVisibility: function(state){
         $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
-        $timeout(function(){
-          $scope.fillScrollableContainer();
-        },1000);
+        $scope.fillScrollableContainer();
       },
 
       updateThumbsStyle: function(state){
         if (state.name=="gallery.view.thumbs") {
           // full window for thumbs view
+
           $scope.thumbsVerticalScroll=true;
           $timeout(function(){
             $rootScope.thumbsPosition='';
@@ -449,6 +582,7 @@ console.trace();
       update: function(state){
         $scope.updateVisibility(state);
         $scope.updateThumbsStyle(state);
+        $scope.updateMetrics($state);
         $scope.updateSelection($rootScope.params.s);
       },
 

@@ -49,6 +49,7 @@ angular.module('doxelApp')
       'AngularJS',
       'Karma'
     ];
+    this.thumbsWidth=200;
 
     angular.extend($scope,{
       end: {},
@@ -58,11 +59,15 @@ angular.module('doxelApp')
       center: [0,0],
       init: function(){
 
+        $scope.updateMetrics();
+
         //// on state change success
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
           // scope is visible when beginning with 'gallery'
           $scope.visible=(toState.name.substr(0,7)=='gallery');
           if (!$scope.visible) return;
+
+          $scope.updateMetrics(toState);
 
           var params=$rootScope.params;
 
@@ -103,7 +108,15 @@ angular.module('doxelApp')
 
       }, // init
 
-      loadSegments: function(direction) {
+      updateMetrics: function(state){
+console.log('updateMetrics');
+        $scope.thumbsH=Math.floor($('#gallery').width()/200);
+        $scope.thumbsV=Math.round(($('#gallery .mCustomScrollbar').height()||$('body').height())/150);
+        $scope.maxThumbs=Math.floor($scope.thumbsH * $scope.thumbsV );
+      },
+
+      loadSegments: function(direction,count) {
+        $scope.updateMetrics();
         console.trace('loadSegments');
         if ($scope._loadSegments) {
           return $scope._loadSegments;
@@ -118,14 +131,22 @@ angular.module('doxelApp')
         if ($scope.end[direction]) {
           // end reached
           $scope._loadSegments.resolve([]);
-          return;
+          return $scope._loadSegments;
         }
 
         var filter={
-          where: {},
-          include: 'pointCloud',
-          limit: appConfig.segmentsChunkSize
+          where: {
+             pointCloudId: {exists: true}
+          },
+          include: {pointCloud: 'previews'},
+          limit: count || Math.min(12,$scope.thumbsH)
         }
+
+        if ( (filter.limit > 1) && ((($scope.segments.length + filter.limit) % $scope.thumbsH ) == 1) ) {
+          --filter.limit;
+        }
+
+        console.log('limit',filter.limit)
 
         if (direction=='forward') {
           // load chunk after last segment in $scope.segments
@@ -185,7 +206,9 @@ angular.module('doxelApp')
             }
           }
           $scope._loadSegments.resolve(segments);
-//          $rootScope.$broadcast('segments-loaded',segments);
+//          $scope._loadSegments.promise.then(function(segments){
+//            $rootScope.$broadcast('segments-loaded',segments);
+//          });
 
         }, function(err){
           console.log(err);
