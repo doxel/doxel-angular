@@ -41,6 +41,8 @@
  * @description
  * # picture
  */
+
+/* TODO: no reference to .thumb, style must be applied to element and scss updated accordingly */
 angular.module('doxelApp')
   .directive('picture', function () {
     return {
@@ -56,29 +58,44 @@ angular.module('doxelApp')
       controller: function($scope, errorMessage, getPictureBlobAndExif) {
         $scope._class=$scope.pictureClass;
         $scope.pictureClass+=' loading';
-        $scope.updatePicture=function() {
+        $scope.updatePicture=function(element) {
+          var thumb=element.find('.thumb');
           var picture=$scope.picture;
+          /* TODO: debug this (picture.selected must be unset on segment deselection)
+          if (picture.selected) {
+           thumb.addClass('selected');
+          } else {
+            thumb.removeClass('selected');
+          }
+          */
           if (picture.blob) {
             $scope.style="background-image: url("+picture.blob+");";
             return;
           }
           var pictureClass=$scope.pictureClass;
-          $scope.pictureClass+=' loading';
+          thumb.addClass('loading');
           picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
           getPictureBlobAndExif(picture,((pictureClass=='thumb')?'thumb':undefined)).then(function(picture){
             $scope.pictureClass=pictureClass;
-            $scope.style="background-image: url("+picture.blob+");";
-            picture.loaded=true;
-            if (typeof($scope.pictureOnload)=='function') {
-              $scope.pictureOnload({
-                $event: {
-                  target: picture
-                }
-              });
-            }
+
+            var img=new Image();
+            $(img).on('load',function(e){
+              $scope.style="background-image: url("+picture.blob+");";
+              picture.loaded=true;
+              thumb.addClass('loaded').removeClass('loading');
+              if (typeof($scope.pictureOnload)=='function') {
+                $scope.pictureOnload({
+                  $event: {
+                    target: picture
+                  }
+                });
+              }
+              img=null;
+            });
+            img.src=picture.blob;
 
           }, function(err) {
-            $scope.pictureClass=pictureClass+' load-error';
+            thumb.addClass('load-error').removeClass('loading');
             if (typeof($scope.pictureOnError)=='function') {
               $scope.pictureOnError(err,$scope.picture);
             }
@@ -88,11 +105,13 @@ angular.module('doxelApp')
       link: function(scope,element,attrs){
         scope.$watch('picture', function(newValue, oldValue) {
           if (newValue) {
-            scope.updatePicture();
+            scope.updatePicture(element);
           }
         });
-        if (scope.picture.selected) {
-          scope.pictureClass+=' selected';
+        if (scope.picture && scope.picture.selected) {
+          element.find('.thumb').addClass('selected');
+        } else {
+          element.find('.thumb').removeClass('selected');
         }
 
       },
