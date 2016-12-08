@@ -52,34 +52,27 @@ angular.module('doxelApp')
         segment: '=',
         segmentPreviewClass: '@',
         label: '@'
-//        watch: '@'
       },
       controller: function($scope){
         $scope.updateSegment=function(){
           var segment=$scope.segment;
-          if (segment.picture) {
-            $scope.picture=segment.picture;
+          if (segment.picture && segment.picture.id==segment.previewId) {
             return;
           }
           Picture.findById({id: segment.previewId},function(picture){
             segment.picture=picture;
-            $scope.picture=picture;
           }, errorMessage.show);
 
         }; // updateSegment
       },
       link: function(scope, element, attrs) {
-//        if (scope.watch!==false) {
           scope.$watch('segment', function(newValue, oldValue) {
             if (newValue) {
               scope.updateSegment();
             }
           }, false);
-//        } else {
-//          scope.updateSegment();
-//        }
       },
 
-      template: '<picture ng-if="picture" picture="picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}" />'
+      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}" />'
     };
   });
