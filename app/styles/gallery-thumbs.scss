@@ -32,10 +32,13 @@
       width: 192px;
       height: 120px;
 
-      .thumb {
-        background-repeat: no-repeat;
+      .thumb.loaded {
         background-size: cover;
         background-position: center;
+      }
+
+      .thumb {
+        background-repeat: no-repeat;
         width: 192px;
         height: 120px;
         box-shadow: 4px 4px 4px rgba(0,0,0,0.3);
