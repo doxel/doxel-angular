@@ -1,0 +1,116 @@
+<div id="home">
+	<div id="mod" class="modal">
+		<div  class="modal-dialog">
+			<div class="modal-content">
+
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-title">
+					<h1 class="text-center">DOXEL.ORG</h1>
+				</div>
+
+				<div class="modal-body">
+					<p><span class="text-center text-bold">
+					You may upload your own photo footage to have a 3D&nbsp;reconstruction.</span>
+					<br />
+
+					Or view existent 3D in our WebGL viewer.
+					</p>
+
+					<p class="text-justify"><big>DOXEL.ORG</big>
+						is currently an early stage Proof of Concept to redesign the way we acquire, store, share and valorize our visual datas.</p>
+
+					<p class="text-justify">
+						<big>DOXEL.ORG</big> is a community driven cloud or self-hosted web portal & mobile app designed to capture, tag, store, manipulate, analyze, display and manage all types of photo & video data for 3D and 4D data extraction.
+					</p>
+
+					<p class="text-justify">
+						Our main assets are a very active community working on Free Software in 3D&nbsp;reconstruction area & the data we acquire and redistribute under Open Licenses such as CC BY-SA.
+					</p>
+
+					<p class="text-center">
+					We have 3 main software groups today:
+					<p>
+
+					<div class="panel-group text-justify" id="accordion">
+						<div class="panel panel-default" id="panel3">
+							<a data-toggle="collapse" data-target="#collapseOne" href="#collapseOne" class="collapsed">
+								<div class="panel-heading">
+									<h4 class="panel-title" class="text-center">
+										Acquisition Software
+									</h4>
+
+								</div>
+							</a>
+							<div id="collapseOne" class="panel-collapse collapse">
+								<div class="panel-body">
+
+									<p>The acquisition software allows you to upload existent photos or take new photos if the device visiting the portal support it (smartphone for example). In that case it also try to record other metadata such as GPS, compass, gyroscope, …</p>
+
+									<p>Acquisition software cryptographically sign the images to insure that they are unique to our service and are correctly uploaded.</p>
+
+									<p>It also automatically segment data by temporal and geographical criteria into separate acquisitions that can be automatically processed.</p>
+
+									<p>In the future the acquisition software will also guide users to acquire the images in the best suitable conditions for 3D reconstruction.</p>
+
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default" id="panel2">
+							<a data-toggle="collapse" data-target="#collapseTwo" href="#collapseTwo" class="collapsed">
+								<div class="panel-heading">
+									<h4 class="panel-title" class="text-center">
+										Processing Pipelines
+									</h4>
+
+								</div>
+							</a>
+							<div id="collapseTwo" class="panel-collapse collapse">
+								<div class="panel-body">
+
+									<p>Once images are uploaded and segmented we launch several software processing pipelines on the data.</p>
+
+									<p>First we create an animated WebM video file from the individual photos. This video will be reused in several ways by the viewer.</p>
+
+									<p>After we do SfM with OpenMVG, filtering, export to PMVS & MVE for densifying, meshing and texturing.</p>
+
+									<p>Finally we do some metadata exports like camera positions and frustums, geolocation of our point-cloud, …</p>
+
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default" id="panel3">
+							<a data-toggle="collapse" data-target="#collapseThree" href="#collapseThree">
+								<div class="panel-heading">
+									<h4 class="panel-title" class="text-center">
+										Web Viewers
+									</h4>
+
+								</div>
+							</a>
+							<div id="collapseThree" class="panel-collapse collapse in">
+								<div class="panel-body">
+
+									<p>This is what makes it all easily usable and fun.</p>
+
+									<p>We aim to develop nice and intuitive data browsing interfaces allowing to get a maximal use of the acquired and processed data.</p>
+
+									<p>Everything works in a browser and can be exported to any specialized software.</p>
+
+									<p>The video we made as first processing step will be used in a video viewer that make use of the smartphone’s gyroscope to get back and forward in the video. This allows you to move around the object by rotating your phone.</p>
+
+									<p>Different views will allow to browse the data through time and space.</p>
+
+									<p>With more different data we will propose more different views to better explore the data.</p>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
