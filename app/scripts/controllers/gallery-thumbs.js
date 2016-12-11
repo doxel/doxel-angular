@@ -60,7 +60,7 @@ angular.module('doxelApp')
         var pos=$scope.scrollPos;
 
         // store scrollpos in thumbs unit
-        pos.push((count-1)*this.mcs[side+'Pct']/100);
+        pos.push(((count||1)-1)*this.mcs[side+'Pct']/100);
 
         // the second time we can determine the direction
         if (pos.length==2) {
@@ -78,10 +78,11 @@ angular.module('doxelApp')
             remain=Math.abs(pos[1]);
           }
 
-          console.log('remain',remain,$scope.maxThumbs/2)
           // scrollbar moving and thumbs remaining is less than threshold
           if (direction && remain<$scope.maxThumbs/2) {
+            console.log('remain',count,pos,remain,$scope.maxThumbs/2)
             $scope.loadSegments(direction).promise.then(function(){
+//              $('#segments .mCustomScrollbar').mCustomScrollbar('update');
               $timeout(function(){
                 $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
               });
@@ -110,6 +111,7 @@ angular.module('doxelApp')
         callbacks: {
           onInit: function() {
             $scope.mcs=this.mcs;
+            $scope.gallery.axis='vertical';
           },
           /*
           onTotalScrollOffset: 320,
@@ -138,11 +140,13 @@ angular.module('doxelApp')
         },
         mouseWheel:{ preventDefault: true },
         advanced: {
-          updateOnContentResize: true
+          updateOnContentResize: true,
+          autoExpandHorizontalScroll: true
         },
         callbacks: {
           onInit: function() {
             $scope.mcs=this.mcs;
+            $scope.gallery.axis='horizontal';
           },
         /*
           onTotalScrollOffset: 320,

@@ -112,7 +112,12 @@ angular.module('doxelApp')
 console.log('updateMetrics');
         $scope.thumbsH=Math.floor($('#gallery').width()/200);
         $scope.thumbsV=Math.round(($('#gallery .mCustomScrollbar').height()||$('body').height())/150);
-        $scope.maxThumbs=Math.floor($scope.thumbsH * $scope.thumbsV );
+        $scope.maxThumbs=Math.floor($scope.thumbsH * $scope.thumbsV ) || 8;
+        while($scope.maxThumbs<8) $scope.maxThumbs*=2;
+      },
+
+      getLimit: function(){
+        return Math.round($scope.thumbsH*$scope.thumbsV*1.5)||12;
       },
 
       loadSegments: function(direction,count) {
@@ -138,8 +143,8 @@ console.log('updateMetrics');
           where: {
              pointCloudId: {exists: true}
           },
-          include: {pointCloud: 'previews'},
-          limit: count || Math.min(12,$scope.thumbsH)
+          include: 'pointCloud',
+          limit: count || $scope.getLimit()
         }
 
         if ( (filter.limit > 1) && ((($scope.segments.length + filter.limit) % $scope.thumbsH ) == 1) ) {
@@ -205,6 +210,7 @@ console.log('updateMetrics');
               });
             }
           }
+          $('#segments .mCustomScrollbar').mCustomScrollbar('update');
           $scope._loadSegments.resolve(segments);
 //          $scope._loadSegments.promise.then(function(segments){
 //            $rootScope.$broadcast('segments-loaded',segments);

@@ -131,7 +131,7 @@
   .thumbs-bottom #gallery-thumbs {
     display: block;
 
-    .mCSB_outside + .mCSB_scrollTools{bottom: -6px;} /* scrollbar position: outside */
+    .mCSB_scrollTools{bottom: 130px;}
 
     #segments {
       height: auto;
