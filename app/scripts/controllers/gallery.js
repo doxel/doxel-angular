@@ -112,6 +112,10 @@ angular.module('doxelApp')
 console.log('updateMetrics');
         $scope.thumbsH=Math.floor($('#gallery').width()/200);
         $scope.thumbsV=Math.round(($('#gallery .mCustomScrollbar').height()||$('body').height())/150);
+        switch($scope.thumbsPosition) {
+          case 'thumbs-left': $scope.thumbsH=1; break;
+          case 'thumbs-bottom': $scope.thumbsV=1; break;
+        }
         $scope.maxThumbs=Math.floor($scope.thumbsH * $scope.thumbsV ) || 8;
         while($scope.maxThumbs<8) $scope.maxThumbs*=2;
       },
@@ -147,9 +151,7 @@ console.log('updateMetrics');
           limit: count || $scope.getLimit()
         }
 
-        if ( (filter.limit > 1) && ((($scope.segments.length + filter.limit) % $scope.thumbsH ) == 1) ) {
-          --filter.limit;
-        }
+        filter.limit+=$scope.thumbsH-((($scope.segments.length + filter.limit) % $scope.thumbsH ));
 
         console.log('limit',filter.limit)
 
