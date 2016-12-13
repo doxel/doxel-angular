@@ -82,7 +82,6 @@ angular.module('doxelApp')
           if (direction && remain<$scope.maxThumbs/2) {
             console.log('remain',count,pos,remain,$scope.maxThumbs/2)
             $scope.loadSegments(direction).promise.then(function(){
-//              $('#segments .mCustomScrollbar').mCustomScrollbar('update');
               $timeout(function(){
                 $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
               });
@@ -334,7 +333,7 @@ console.trace();
             // update query string
             $location.search($rootScope.params);
             // open viewer
-            if ($scope.$state.current.name=='gallery.view.thumbs') {
+            if ($scope.$state.current.name=='gallery.view.thumbs' || $scope.$state.current.name=='gallery.view.home') {
               $scope.$state.transitionTo('gallery.view.cloud');
               return;
             }
