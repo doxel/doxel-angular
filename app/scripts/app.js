@@ -100,15 +100,17 @@ var app=angular
       };
     });
 
-    $urlRouterProvider.otherwise('/gallery');
+    $urlRouterProvider.otherwise('/doxel/home');
     $stateProvider
-/*      .state('home', {
-        url: '/',
+/*
+      .state('home', {
+        url: '/home',
         templateUrl: 'views/main.html',
         controller: 'MainCtrl',
         controllerAs: 'main'
       })
-  */    .state('login', {
+ */
+      .state('login', {
         url: '/login',
         templateUrl: 'views/login.html',
         controller: 'LoginCtrl',
@@ -140,7 +142,7 @@ var app=angular
         controllerAs: 'upload'
       })
       .state('gallery', {
-        url: '/gallery',
+        url: '/doxel',
         views: {
           'gallery': {
             templateUrl: 'views/gallery.html',
@@ -178,6 +180,11 @@ var app=angular
             controller: 'GalleryViewerCtrl',
             controllerAs: 'viewer'
           },
+          'gallery-home': {
+            templateUrl: 'views/main.html',
+            controller: 'MainCtrl',
+            controllerAs: 'main'
+          },
           // must be the last one (z-index)
           'gallery-thumbs': {
             templateUrl: 'views/gallery-thumbs.html',
@@ -187,8 +194,13 @@ var app=angular
         }
       })
 
+      .state('gallery.view.home', {
+        url: '/home',
+        controller: 'MainCtrl'
+      })
+
       .state('gallery.view.thumbs', {
-        url: '/thumbs',
+        url: '/gallery',
         controller: 'GalleryThumbsCtrl'
       })
 /*
@@ -208,7 +220,7 @@ var app=angular
       })
 
       .state('gallery.view.cloud', {
-        url: '/cloud',
+        url: '/viewer',
         controller: 'GalleryViewerCtrl'
       })
 
@@ -315,6 +327,9 @@ var app=angular
     // trying to access a public route. Otherwise she will be redirected to
     // login.
     $rootScope.$on('$stateChangeStart', function (event, next) {
+      if ($rootScope.previousState!=$state.current.name) {
+        $rootScope.previousState=$state.current.name;
+      }
       $rootScope.authenticated=User.isAuthenticated();
       var state=next.name;
 

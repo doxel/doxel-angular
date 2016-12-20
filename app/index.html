@@ -50,6 +50,7 @@
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
+    <link rel="stylesheet" href="styles/theme.min.css">
   </head>
   <body ng-app="doxelApp" ng-controller="MainCtrl" fullscreen="isFullscreem" ng-click="toggleFullscreen()">
     <div id="main" ng-class="getClass()" ng-cloak >
@@ -71,7 +72,7 @@
                     <span class="icon-bar"></span>
                   </button>
 
-                  <a class="navbar-brand"><img src="/favicon-32x32.png" style="display: inline;" >DOXEL</a>
+                  <a class="navbar-brand" ui-sref="gallery.view.home"><img src="/favicon-32x32.png" style="display: inline;" >DOXEL</a>
                 </div>
 
                 <div class="collapse navbar-collapse" id="js-navbar-collapse"><!-- data-toggle="collapse" data-target="#js-navbar-collapse"-->
@@ -98,7 +99,7 @@
                 </div>
               </div>
             </div>
-            <a><div class="menu-handle"><i class="fa fa-fw fa-bars"></i></div></a>
+            <a class="menu-handle-container"><div class="menu-handle"><i class="fa fa-fw fa-bars"></i></div></a>
           </div>
         </div>
 

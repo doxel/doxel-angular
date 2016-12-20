@@ -11,8 +11,13 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 @import "flag-icon-css/sass/_flag-icon.scss";
 // endbower
 
-#main.thumbs-left {
-  padding-left: 200px;
+@media screen and (min-width: 768px) {
+  #main.thumbs-left {
+      padding-left: 200px;
+    }
+}
+.thumbs-hidden #main.thumbs-left {
+    padding-left: 0px;
 }
 
 .browsehappy {
@@ -23,7 +28,7 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 }
 
 body {
-  overflow: hidden;
+  overflow: auto;
 }
 
 html, body {
@@ -159,7 +164,7 @@ div.footer {
     border-bottom: 0;
   }
 
-
+/*
 .navbar-inner {
     min-height: 40px;
     padding-right: 20px;
@@ -201,6 +206,14 @@ div.footer {
   background-color: transparent;
   border: 0px;
 }
+*/
+
+a.menu-handle-container {
+  position: fixed;
+  left: 50%;
+  margin-left: -2em;
+}
+
 
 ng-message {
   position: absolute;
@@ -281,13 +294,16 @@ a * {
   display: none;
 }
 
-.menu-handle {
+.menu-handle, .thumbs-handle {
+  border: 1px solid #444444;
   width: 4em;
-  border: 1px solid #d4d4d4;
+  background-color: #393e43;
+  text-align: center;
+}
+
+.menu-handle {
   border-top: 0px;
   margin: auto;
-  background-color: #f2f2f2;
-  text-align: center;
   border-radius: 0px 0px 4px 4px;
   margin-top: -1px;
 
@@ -327,3 +343,4 @@ a * {
 @import "../styles/useful.scss";
 @import "../styles/picture-set.scss";
 @import "../styles/buttons.scss";
+@import "../styles/home.scss";
