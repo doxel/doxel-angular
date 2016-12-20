@@ -1,10 +1,20 @@
 #gallery-thumbs {
+  .mCSB_outside + .mCSB_scrollTools {
+    right: 0;
+  }
+
   position: relative;
   height: 100%;
   //  z-index: 1000;
   #segments {
     transition-property: top;
     transition-duration: 0.5s;
+    background-color: black;
+
+    picture-set > span,
+    segment-set > span {
+      background-color: #555;
+    }
 
     position: fixed;
     top: 55px;
@@ -69,7 +79,7 @@
       background-color: black;
 
       segment-preview {
-        background-color: white;
+        background-color: #111;
       }
 
       .date {
@@ -110,12 +120,8 @@
 
 .thumbs-handle {
   display: none;
-  position: absolute;
-  width: 4em;
-  text-align: center;
+  position: fixed;
   z-index: 99999999;
-  background-color: #f2f2f2;
-  border: 1px solid #d4d4d4;
 }
 
 .thumbs-left,
@@ -163,7 +169,6 @@
     margin-left: -2em;
     transform: none;
   //  transform: translateX(-2em);
-    border: 1px solid #d4d4d4;
     border-bottom: 0px;
     border-radius: 4px 4px 0px 0px;
     bottom: 144px;
@@ -230,7 +235,6 @@
       top: 50%;
       transform: none;
       transform: translateX(-1.3em) rotateZ(90deg) translateX(-2em);
-      border: 1px solid #d4d4d4;
       border-left: 0px;
       border-radius: 4px 4px 0px 0px;
     }
