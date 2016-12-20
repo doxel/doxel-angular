@@ -33,7 +33,7 @@
  *      Attribution" section of <http://doxel.org/license>.
  */
 
- 'use strict';
+'use strict';
 
 /**
  * @ngdoc function
@@ -43,13 +43,26 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('MainCtrl', function ($timeout, $scope, $location, $q, User, $rootScope, $cookies, LoopBackAuth, errorMessage, socketService, appConfig, $window,$state) {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+  .controller('MainCtrl', [
+    '$scope',
+    function ($scope){
+      this.awesomeThings = [
+        'HTML5 Boilerplate',
+        'AngularJS',
+        'Karma'
+      ];
 
+      $scope.scrollbarsConfig = {
+        autoHideScrollbar: false,
+        theme: 'light',
+        advanced:{
+          updateOnContentResize: true
+        }
+      }
 
+      $scope.$on('$stateChangeSuccess', function (event, toState) { 
+        $scope.home_visible=(toState.name=='gallery.view.home');
+      });
 
-  });
+    }
+  ]);
