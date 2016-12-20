@@ -43,48 +43,68 @@
  * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .service('elementSelection', function () {
+  .service('elementSelection', ['$rootScope', function ($rootScope) {
     // AngularJS will instantiate a singleton by calling "new" on this function
     var self=this;
-    this.selection={};
 
-    this.replace=function(type,elem){
-      var alreadySelected;
+    angular.extend(self,{
+      selection: {},
+      filter: {},
 
-      if (self.selection[type]===undefined) {
-        self.selection[type]=[];
+      list: function(type) {
+        if (self.selection[type]===undefined) {
+          self.selection[type]=[];
+        }
+        return self.selection[type];
+      },
 
-      } else {
-        self.selection[type].forEach(function(el){
-          if (el==elem) {
+      isSelected: function(type,elem) {
+        if (self.filter[type]) {
+          return self.filter[type](elem);
+
+        } else {
+          return self.selection[type] && (self.selection[type].indexOf(elem)>=0);
+        }
+      },
+
+      replace: function(type,elem){
+        var self=this;
+        var alreadySelected;
+
+        self.list(type).forEach(function(el){
+          if (elem==el) {
             alreadySelected=true;
-
           } else {
-            el.removeClass('selected');
+            el.selected=false;
           }
+
         });
-      }
-      self.selection[type]=[elem];
-      elem.addClass('selected');
-    }
 
-    this.add=function(type,elem) {
-      if (self.selection[type]===undefined) {
-        self.selection[type]=[];
-      }
-      if (self.selection[type].indexOf(elem)<0) {
-        self.selection[type].push(elem);
-      }
-    }
+        self.selection[type].splice(0,self.selection[type].length,elem);
+        elem.selected=true;
+        $rootScope.$broadcast(type+'.selection.change');
+      },
 
-    this.remove=function(type,elem) {
-      if (self.selection[type]===undefined) {
-        return;
-      }
-      var index=self.selection[type].indexOf(elem);
-      if (index>=0) {
-        self.selection[type].splice(index,1);
-      }
-    }
+      add: function(type,elem) {
+        self.init(type);
+        if (self.selection[type].indexOf(elem)<0) {
+          self.selection[type].push(elem);
+          elem.selected=true;
+          $rootScope.$broadcast(type+'.selection.change');
+        }
+      },
 
-  });
+      remove: function(type,elem) {
+        if (self.selection[type]===undefined) {
+          return;
+        }
+        elem.selected=false;
+        var index=self.selection[type].indexOf(elem);
+        if (index>=0) {
+          self.selection[type].splice(index,1);
+          $rootScope.$broadcast(type+'.selection.change');
+        }
+      }
+
+    });
+  }]);
