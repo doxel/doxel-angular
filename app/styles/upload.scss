@@ -1,13 +1,124 @@
-iframe.upload {
+#doxel-upload {
   transition-property: top;
   transition-duration: 0.5s;
-  position: absolute;
+  position: fixed;
   width: 100%;
+  height: 100%;
+  margin-bottom: -52px;
   top: 52px;
   left: 0;
   border: 0px;
+  overflow-y: scroll;
+  margin-left: 13px;
+  margin-right: 13px;
+
+  atable {
+    margin-bottom: 150px;
+  }
+
+  .my-drop-zone { border: dotted 3px lightgray; }
+  .nv-file-over { border: dotted 3px red; } /* Default class applied to drop zones on over */
+  .another-file-over-class { border: dotted 3px green; }
+
+  .uploader-preview-wrapper {
+    z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0,0,0,0.8);
+    .uploader-status {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      margin: auto;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border: 1px solid white;
+      background: #3a3f44;
+      a.stop-upload {
+        position: absolute;
+        top: -1em;
+        right: -1em;
+        border-radius: 100%;
+        padding: 10px;
+        background-color: #08f;
+        border: 1px solid white;
+        .fa {
+          font-size: 2em;
+        }
+      }
+      a.stop-upload:hover {
+      }
+      a.stop-upload:active {
+      }
+      .uploader-preview {
+        border: 1px solid white;
+        position:relative;
+        margin: 0;
+        top: 0;
+        left: 0;
+        padding: 10px;
+        margin-bottom: 2em;
+        width: 100%;
+        height: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+      .uploader-progress, .uploader-progress-bar, .uploader-progress-background {
+        bottom: 2em;
+      }
+      .uploader-total-progress, .uploader-total-progress-bar, .uploader-total-progress-background {
+        bottom: 0;
+      }
+      .uploader-progress, .uploader-progress-bar, .uploader-progress-background,
+      .uploader-total-progress, .uploader-total-progress-bar, .uploader-total-progress-background {
+        position: absolute;
+        left: 0;
+        height: 2em;
+        text-align: center;
+        font-family: monospace;
+        font-size: 1em;
+        line-height: 2em;
+        margin: 0;
+      }
+      .uploader-progress-background,
+      .uploader-total-progress-background {
+        background-color: rgba(0,0,0,0.5);
+        width: 100%;
+      }
+      .uploader-progress-bar,
+      .uploader-total-progress-bar {
+        width: 0;
+        background-color: #3269ff;
+      }
+      .uploader-progress,
+      .uploader-total-progress {
+        width: 100%;
+        color: white;
+        background-color: transparent;
+      }
+    }
+      .uploader-total-progress {
+        border: 1px solid white;
+        border-top: 1px solid white
+      }
+    .uploader-status.no-thumb {
+      border: 0px;
+      height: 8em;
+      background: #3a3f44;
+      background-image: none;
+    }
+  }
 }
 
-.navbar-hidden iframe.upload {
+.navbar-hidden #doxel-upload {
   top: 0;
+
 }
