@@ -1,2 +1,105 @@
-<div id="upload">
+<div ng-cloak id="doxel-upload" class="well" nv-file-over="" uploader="uploader">
+  <div class="row">
+
+    <div class="col-md-3">
+
+      <h3>Select files</h3>
+
+      <!-- Example: nv-file-select="" uploader="{Object}" options="{Object}" filters="{String}" -->
+      <label class="btn btn-default btn-file">
+        <span class="glyphicon glyphicon-folder-close" ></span>  Browse...
+        <input type="file" nv-file-select="" uploader="uploader" multiple style="display: none"  />
+      </label>
+
+    </div>
+
+    <div class="col-md-9" style="margin-bottom: 40px">
+
+      <h3>Upload queue</h3>
+      <p>Queue length: {{ uploader.queue.length }}</p>
+
+      <div>
+        <!--div>
+          Queue progress:
+          <div class="progress" style="">
+          <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+          </div>
+          </div-->
+          <button type="button" class="btn btn-s btn-primary" ng-click="uploaderService.startUpload()" ng-disabled="!uploader.getNotUploadedItems().length">
+            <span class="glyphicon glyphicon-upload"></span> Upload all
+          </button>
+          <!--button type="button" class="btn btn-s" ng-click="uploader.thumbStyle=null ; uploader.cancelAll()" ng-disabled="!uploader.isUploading">
+          <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+          </button-->
+          <button type="button" class="btn btn-s btn-danger" ng-click="removeAll()" ng-disabled="!uploader.queue.length">
+            <span class="glyphicon glyphicon-trash"></span> Remove all
+          </button>
+    </div>
+    <div>
+      <!--input id="toggleShowFileList" type="checkbox" ng-model="showFileList"><label for="toggleShowFileList">Show file list</label-->
+    </div>
+    <div>
+      <input id="toggleShowThumb" type="checkbox" ng-model="uploaderService.showThumb"><label for="toggleShowThumb">Show pictures while uploading</label>
+    </div>
+
+  </div>
+
+  <table st-safe-src="uploader.queue" st-table="rows" class="table table-striped" ng-if="showFileList">
+    <thead>
+      <tr>
+        <th width="50%">Name</th>
+        <th ng-show="uploader.isHTML5">Size</th>
+        <!--th ng-show="uploader.isHTML5">Progress</th-->
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="item in rows">
+        <td><strong>{{ item.file.name }}</strong></td>
+        <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+        <!--td ng-show="uploader.isHTML5">
+          <div class="progress" style="margin-bottom: 0;">
+          <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+          </div>
+          </td-->
+          <td class="text-center">
+            <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+            <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+            <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+          </td>
+          <td nowrap>
+            <button type="button" class="btn btn-xs" ng-click="item.remove()">
+              <span class="glyphicon glyphicon-trash"></span> Remove
+            </button>
+          </td>
+      </tr>
+    </tbody>
+		<tfoot>
+			<tr>
+				<td colspan="4" class="text-center">
+					<div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7"></div>
+				</td>
+			</tr>
+		</tfoot>
+  </table>
+
+
+  <div ng-show="uploader.isPaused===false" class="uploader-preview-wrapper">
+    <div class="uploader-status" ng-class="!uploaderService.showThumb && 'no-thumb'">
+      <div class="uploader-preview" ng-style="uploaderService.showThumb && uploader.thumbStyle">
+        <div class="filename">{{ uploaderService.currentItem.file.name }}</div>
+        <div ng-show="uploader.isUploading" class="uploader-progress-background"></div>
+        <div ng-show="uploader.isUploading" class="uploader-progress-bar"></div>
+        <div ng-show="uploader.isUploading" class="uploader-progress"></div>
+      </div>
+      <div class="uploader-total">
+      <div class="uploader-total-progress-background"></div>
+      <div class="uploader-total-progress-bar"></div>
+      <div class="uploader-total-progress"></div>
+      </div>
+      <a class="stop-upload" ng-click="uploaderService.stopUpload()"><i class="fa fa-times" aria-hidden="true"></i></a>
+    </div>
+  </div>
+
 </div>
