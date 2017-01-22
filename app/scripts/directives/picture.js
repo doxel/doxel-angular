@@ -51,25 +51,23 @@ angular.module('doxelApp')
       scope: {
         picture: '=',
         pictureClass: '@',
-        pictureOnload: '&',
-        pictureError: '&',
         label: '=?'
       },
-      controller: function($scope, errorMessage, getPictureBlobAndExif) {
+      controller: function($scope, $rootScope, errorMessage, getPictureBlobAndExif) {
         $scope._class=$scope.pictureClass;
         $scope.pictureClass+=' loading';
         $scope.updatePicture=function(element) {
           var thumb=element.find('.thumb');
           var picture=$scope.picture;
-          /* TODO: debug this (picture.selected must be unset on segment deselection)
           if (picture.selected) {
            thumb.addClass('selected');
           } else {
             thumb.removeClass('selected');
           }
-          */
           if (picture.blob) {
             $scope.style="background-image: url("+picture.blob+");";
+            thumb.addClass('loaded');
+            $rootScope.$broadcast('picture.onload',picture);
             return;
           }
           var pictureClass=$scope.pictureClass;
@@ -83,22 +81,14 @@ angular.module('doxelApp')
               $scope.style="background-image: url("+picture.blob+");";
               picture.loaded=true;
               thumb.addClass('loaded').removeClass('loading');
-              if (typeof($scope.pictureOnload)=='function') {
-                $scope.pictureOnload({
-                  $event: {
-                    target: picture
-                  }
-                });
-              }
+              $rootScope.$broadcast('picture.onload',picture);
               img=null;
             });
             img.src=picture.blob;
 
           }, function(err) {
             thumb.addClass('load-error').removeClass('loading');
-            if (typeof($scope.pictureOnError)=='function') {
-              $scope.pictureOnError(err,$scope.picture);
-            }
+            $rootScope.$broadcast('picture.onerror',picture);
           });
         };
       },
