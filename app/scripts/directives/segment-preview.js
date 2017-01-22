@@ -53,12 +53,19 @@ angular.module('doxelApp')
         segmentPreviewClass: '@',
         label: '@'
       },
-      controller: function($scope){
+      controller: function($scope, $rootScope){
         $scope.updateSegment=function(){
           var segment=$scope.segment;
           if (segment.picture && segment.picture.id==segment.previewId) {
+            $scope.segment.loaded=true;
             return;
           }
+          var listener=$rootScope.$on('picture.onload',function($event,picture){
+            if (picture.segmentId==$scope.segment.id) {
+              $scope.segment.loaded=true;
+              listener();
+            }
+          });
           Picture.findById({id: segment.previewId},function(picture){
             segment.picture=picture;
           }, errorMessage.show);
@@ -67,9 +74,11 @@ angular.module('doxelApp')
       },
       link: function(scope, element, attrs) {
           scope.$on('segment.selection.change',function(){
-            segment.picture.selected=segment.selected;
+            if (scope.segment)
+            scope.segment.picture.selected=scope.segment.selected;
 
           });
+
           scope.$watch('segment', function(newValue, oldValue) {
             if (newValue) {
               scope.updateSegment();
@@ -77,6 +86,6 @@ angular.module('doxelApp')
           }, false);
       },
 
-      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}" />'
+      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}"/>'
     };
   });
