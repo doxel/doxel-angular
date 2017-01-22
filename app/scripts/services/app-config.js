@@ -12,9 +12,8 @@ angular.module('doxelApp')
   // AngularJS will instantiate a singleton by calling "new" on this function
   var appConfig=this;
   $.extend(this,{
-    hostname: 'ww3.doxel.org',
+    hostname: 'www.doxel.org',
     tileServer: 'doxel.org',
-    segmentsChunkSize: 9,
     stateAfterSignin: 'upload',
     stateAfterSignout: 'gallery.view.thumbs'
 
