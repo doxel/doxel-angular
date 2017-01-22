@@ -101,6 +101,9 @@ angular.module('doxelApp')
 
       link: function postLink(scope, element, attrs) {
     //    scope.window.bind('resize',scope.resize);
+        scope.$on('picture.onload',function($event,picture) {
+          $('[data-sid='+picture.segmentId+']').removeClass('loading');
+        });
         scope.element=element;
         scope.container=element.closest('ui-layout-container');
         scope.dndEnable=attrs.dndEnable
