@@ -1,39 +1,4 @@
-/*
- * upload.js
- *
- * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
- * Please read <http://doxel.org/license> for more information.
- *
- * Author(s):
- *
- *      Luc Deschenaux <luc.deschenaux@freesurf.ch>
- *
- * This file is part of the DOXEL project <http://doxel.org>.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Additional Terms:
- *
- *      You are required to preserve legal notices and author attributions in
- *      that material or in the Appropriate Legal Notices displayed by works
- *      containing it.
- *
- *      You are required to attribute the work as explained in the "Usage and
- *      Attribution" section of <http://doxel.org/license>.
- */
-
- 'use strict';
+'use strict';
 
 /**
  * @ngdoc function
@@ -43,45 +8,64 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('UploadCtrl', function ($scope, $location, Picture) {
+.controller('UploadCtrl',[
+  '$scope',
+  '$rootScope',
+  'LoopBackAuth',
+  '$state',
+  'uploaderService',
+  '$window',
+  function ($scope,$rootScope,LoopBackAuth,$state,uploaderService,$window) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
 
-    $scope.isHashUnique=function(options){
-      Picture.isHashUnique({
-        sha256: options.sha256
-
-      }, function(resource) {
-        // exists already
-        options.success((resource.result && resource.result.unique)?{result: resource.result.unique}:{error: {code: 904}});
-
-      }, function(err) {
-        options.success({error: {code: err.status, original: err}});
-
-        if (err.status==401) {
-          // authentication needed
-          $location.path('/login');
-        }
-
-      });
-    };
-
-    // yeah its ugly but faster than rewriting the uploader
-    $scope.$on('$stateChangeStart',function(e, next, current){
-        $('iframe.upload').hide();
-    });
-
-    $scope.$on('$stateChangeSuccess',function(e, next, params, current){
-        var iframe=$('iframe.upload');
-        if (!iframe.attr('src')) {
-          iframe.attr('src','/uploader/');
-        }
-        iframe.show().height($('body').height()-102);
-        $(window).off('resize.upload').on('resize.upload',function(){
-          iframe.height($('body').height()-102);
+    angular.extend($scope,{
+      showFileList: true,
+      uploaderService: uploaderService,
+      itemsByPage: 10,
+      init: function() {
+        angular.extend(uploaderService, {
+          progressBar: $('#doxel-upload .uploader-progress-bar'),
+          progress: $('#doxel-upload .uploader-progress'),
+          totalProgressBar: $('#doxel-upload .uploader-total-progress-bar'),
+          totalProgress: $('#doxel-upload .uploader-total-progress')
         });
+
+        $scope.$on('$stateChangeStart',function(e, next, current){
+          console.log(next);
+          if (next.name=='upload') {
+            if (!LoopBackAuth.accessTokenId) {
+              $rootScope.emit('unauthorized');
+            }
+          }
+        });
+
+        $scope.$on('$stateChangeSuccess',function(e, toState){
+          console.log(toState);
+          if (toState.name=='upload') {
+            if (!LoopBackAuth.accessTokenId) {
+              $rootScope.$emit('unauthorized');
+            }
+          }
+        });
+      }, // init
+
+      removeAll: function(){
+        if ($window.confirm('Are you sure ?')) {
+          var uploader=uploaderService.uploader;
+          uploader.thumbStyle=null;
+          uploader.clearQueue();
+          uploaderService.queued={};
+        }
+      }
+
     });
-  });
+
+    $scope.init();
+
+  }
+
+]);
