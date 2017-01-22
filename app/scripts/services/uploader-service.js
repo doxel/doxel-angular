@@ -51,8 +51,11 @@ angular.module('doxelApp')
      '$state',
      'LoopBackAuth',
      'ngNotify',
-     function ($q, FileUploader, jpegFile, Picture, $state, LoopBackAuth, ngNotify) {
+     '$timeout',
+     function ($q, FileUploader, jpegFile, Picture, $state, LoopBackAuth, ngNotify, $timeout) {
       // AngularJS will instantiate a singleton by calling "new" on this function
+
+//      console.info=console.log=function(){};
 
       var uploaderService=this;
 
@@ -64,117 +67,228 @@ angular.module('doxelApp')
       } // stringToBinary
 
       angular.extend(uploaderService,{
-        initUploader: function() {
-          var uploader=uploaderService.uploader=new FileUploader({
-            url: 'sendfile'
-          });
+        maxQueueLength: 10000,
+        maxFileSize: 100*1024*1024,
+        queued: {},
+        initUploader: function(options) {
+          angular.extend(uploaderService,options);
+          var uploader=uploaderService.uploader=new FileUploader(uploaderService.fileUploaderOptions);
+          uploader.isPaused=true;
           // FILTERS
 
-          uploader.filters.push({
-            name: 'syncFilter',
-            fn: function(item /*{File|FileLikeObject}*/, options) {
-              console.log('syncFilter');
-              return this.queue.length < 10000;
-            }
-          });
           // an async filter
           uploader.filters.push({
             name: 'asyncFilter',
             fn: function(item, options, deferred) {
-              if ($state.current.name!='upload2') {
-                $state.transitionTo('upload2');
-                setTimeout(deferred.resolve, 1e3);
+              if ($state.current.name!='upload') {
+                $state.transitionTo('upload').then(deferred.resolve);
               } else {
                 deferred.resolve();
               }
             }
           });
 
+          uploader.filters.push({
+            name: 'syncFilter',
+            fn: function(item /*{File|FileLikeObject}*/, options) {
+              if (item.type!='image/jpeg') {
+                ngNotify.set('Not a JPEG file: '+item.name);
+                return false;
+              }
+              if (item.size>uploaderService.maxFileSize) {
+                ngNotify.set('File is too big: '+item.name);
+                return false;
+              }
+              if (this.queue.length>uploaderService.maxQueueLength) {
+                if (this.queue.length==uploaderService.maxQueueLength+1) {
+                  ngNotify.set('You cannot queue more than '+uploaderService.maxQueueLength+' files at once.')
+                }
+                return false;
+              }
+              if (uploaderService.queued[item.name+'-'+item.size+'-'+item.lastModified]) {
+                ngNotify.set('Already queued: '+item.name);
+                return false;
+              }
+              uploaderService.queued[item.name+'-'+item.size+'-'+item.lastModified]=true;
+              return true;
+            }
+          });
+
           // CALLBACKS
 
           uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
-            console.info('onWhenAddingFileFailed', item, filter, options);
+//            console.info('onWhenAddingFileFailed', item, filter, options);
           };
           uploader.onAfterAddingFile = function(fileItem) {
-            console.info('onAfterAddingFile', fileItem);
+            // console.info('onAfterAddingFile', fileItem);
           };
           uploader.onAfterAddingAll = function(addedFileItems) {
-            console.info('onAfterAddingAll', addedFileItems);
+//            console.info('onAfterAddingAll', addedFileItems);
           };
           uploader.onBeforeUploadItem = function(item) {
-            console.info('onBeforeUploadItem', item);
+//            console.info('onBeforeUploadItem', item);
+            if (uploader.isPaused) {
+              return $q.reject('paused');
+            }
+
+
+            uploaderService.currentItem=item;
+
+            var promise;
             var q=$q.defer();
-
-            jpegFile.getEXIF({
+            var data={
 							item: item,
-              file: item._file
-            })
-            .then(jpegFile.getHash)
-            .then(uploaderService.isHashUnique)
-            .then(jpegFile.updateEXIF)
-            .then(jpegFile.getTimestamp)
-            .then(jpegFile.getGPSCoords)
-            .then(function(data){
-              console.log(data);
-              var jpeg=data.jpeg_new||data.jpeg;
-              var blob=new Blob([stringToBinary(jpeg)],{type: 'image/jpeg'});
-              blob.name=data.file.name;
-              blob.lastModifiedDate=data.file.lastModifiedDate;
-              blob.lastModified=data.file.lastModified;
-              item._file=blob;
+              file: item._file_orig || item._file
+            };
 
-              item.headers.Authorization=LoopBackAuth.accessTokenId;
-              item.formData.push({
-                sha256: data.sha256,
-                timestamp: data.timestamp,
-                chunks: 1,
-                chunk: 0,
-                name: blob.name
+            if (uploaderService.showThumb) {
+              promise= jpegFile.getFileDataURL(data)
+              .then(jpegFile.preloadImage)
+              .then(jpegFile.getThumb)
+              .then(function(data){
+                if (jpegFile.canvas) {
+                  try {
+                    uploader.thumbDataURL=jpegFile.canvas.toDataURL();
+                  } catch(e) {
+                    console.log(e);
+                  }
+                  uploader.thumbStyle={
+                    'background-image': 'url('+uploader.thumbDataURL+')'
+                  };
+                } 
+                return $q.resolve(data);
+              })
+
+            } else {
+              promise=$q.resolve(data);
+            }
+        
+            promise.finally(function(){
+              jpegFile.getBinaryString(data)
+              .then(jpegFile.getEXIF)
+              .then(jpegFile.getHash)
+              .then(uploaderService.isHashUnique)
+              .then(jpegFile.updateEXIF)
+              .then(jpegFile.getTimestamp)
+              .then(jpegFile.getGPSCoords)
+              .then(function(data){
+                var jpeg=data.jpeg_new||data.jpeg;
+                var blob=new Blob([stringToBinary(jpeg)],{type: 'image/jpeg'});
+                blob.name=data.file.name;
+                blob.lastModifiedDate=data.file.lastModifiedDate;
+                blob.lastModified=data.file.lastModified;
+                item._file_orig=item._file_orig||item._file;
+                item._file=blob;
+
+                if (!data.timestamp) {
+                  var lastModified=String(blob.lastModified);
+                  data.timestamp=lastModified.substr(0,10)+'_'+lastModified.substr(10,3)+'000';
+                }
+
+                if (uploader.isPaused) {
+                  return q.resolve();
+                }
+
+                item.headers.Authorization=LoopBackAuth.accessTokenId;
+                item.formData.push({
+                  sha256: data.sha256,
+                  timestamp: data.timestamp,
+                  chunks: 1,
+                  chunk: 0,
+                  name: blob.name
+                });
+                $timeout(q.resolve);
+              })
+              .catch(function(err){
+                if (err=='skip') {
+                  uploader.cancelItem(item);
+                  item.isCancel=false;
+                  item.isError=false;
+                  item.isSkip=true;
+                  q.reject();
+
+                } else {
+                  ngNotify.set(err.message);
+                  q.reject(err);
+                }
               });
-              q.resolve();
-            })
-            .catch(function(err){
-              if (err=='skip') {
-								uploader.cancelItem(item);
-								q.reject();
-
-							} else {
-								ngNotify.set(err.message);
-								q.reject(err);
-							}
             });
             return q.promise;
           };
 
           uploader.onProgressItem = function(fileItem, progress) {
-            console.info('onProgressItem', fileItem, progress);
+            var value=progress+'%';
+            uploader.isUploading=true;
+            uploaderService.currentItem=fileItem;
+            uploaderService.progressBar && uploaderService.progressBar.width && uploaderService.progressBar.width(value);
+            uploaderService.progress && uploaderService.progress.text && uploaderService.progress.text(value);
+            var totalPercent=(uploaderService.completed+(progress/100))*100/uploaderService.total;
+            uploaderService.totalProgressBar && uploaderService.totalProgressBar.width && uploaderService.totalProgressBar.width(totalPercent+'%');
+            uploaderService.totalProgress && uploaderService.totalProgress.text && uploaderService.totalProgress.text(Math.round(totalPercent)+'%');
+//            console.info('onProgressItem', fileItem, progress);
           };
           uploader.onProgressAll = function(progress) {
-            console.info('onProgressAll', progress);
+ //           console.info('onProgressAll', progress);
           };
           uploader.onSuccessItem = function(fileItem, response, status, headers) {
             if (response.error) {
+              try { console.log(JSON.stringify(response.error)); } catch(e){}
               if (response.error.original && response.error.original.message) {
-                ngNotify.set(response.error.original.message);
+                var message=response.error.original.message;
+                try {
+                  var json=JSON.parse(message);
+                  ngNotify.set(json.error.message);
+                } catch(e) {
+                  ngNotify.set(message);
+                }
+              } else {
+                if (response.error.message) {
+                  ngNotify.set(response.error.message);
+                } else {
+                  ngNotify.set(response.error);
+                }
               }
             }
+            delete uploaderService.queued[fileItem._file.name+'-'+fileItem._file.size+'-'+fileItem._file.lastModified];
             fileItem.remove();
-            console.info('onSuccessItem', fileItem, response, status, headers);
+//            console.info('onSuccessItem', fileItem, response, status, headers);
           };
           uploader.onErrorItem = function(fileItem, response, status, headers) {
-            console.info('onErrorItem', fileItem, response, status, headers);
+//            console.info('onErrorItem', fileItem, response, status, headers);
           };
           uploader.onCancelItem = function(fileItem, response, status, headers) {
-            console.info('onCancelItem', fileItem, response, status, headers);
+//            console.info('onCancelItem', fileItem, response, status, headers);
           };
           uploader.onCompleteItem = function(fileItem, response, status, headers) {
-            console.info('onCompleteItem', fileItem, response, status, headers);
+            if (fileItem.isError) {
+              fileItem.isUploaded=false;
+            }
+            fileItem._xhr=null;
+            fileItem._file=fileItem._file_orig;
+            fileItem._file_orig=null;
+            uploaderService.currentItem=null;
+            ++uploaderService.completed;
+            uploaderService.progressBar && uploaderService.progressBar.width && uploaderService.progressBar.width(0);
+            uploaderService.progress && uploaderService.progress.text && uploaderService.progress.text('');
+            var totalPercent=uploaderService.completed*100/uploaderService.total;
+            uploaderService.totalProgressBar && uploaderService.totalProgressBar.width && uploaderService.totalProgressBar.width(totalPercent+'%');
+            uploaderService.totalProgress && uploaderService.totalProgress.text && uploaderService.totalProgress.text(Math.round(totalPercent)+'%');
+//            console.info('onCompleteItem', fileItem, response, status, headers);
+            uploader.isUploading=false;
+            if (fileItem.isSkip) {
+              $timeout(function(){
+                delete uploaderService.queued[fileItem._file.name+'-'+fileItem._file.size+'-'+fileItem._file.lastModified];
+                fileItem.remove();
+              });
+            }
           };
           uploader.onCompleteAll = function() {
-            console.info('onCompleteAll');
+//            console.info('onCompleteAll');
+            uploader.thumbStyle=null;
+            uploader.isPaused=true;
           };
 
-          console.info('uploader', uploader);
+//          console.info('uploader', uploader);
           return uploader;
 
         }, // initUploader
@@ -208,7 +322,30 @@ angular.module('doxelApp')
 
           return q.promise;
 
-        } // isHashUnique
+        }, // isHashUnique
+
+        startUpload: function() {
+          var uploader=uploaderService.uploader;
+          if (!uploader.isPaused) {
+            return;
+          }
+          uploader.isPaused=false;
+          uploader.uploadAll();
+          var items=uploader.getNotUploadedItems();
+          uploaderService.total=(items && items.length) || 0;
+          uploaderService.completed=0;
+        },
+        stopUpload: function(){
+          var uploader=uploaderService.uploader;
+          if (uploader.isPaused) {
+            return;
+          }
+          uploader.isPaused=true;
+          if (uploaderService.currentItem) {
+            var prop=uploader.isHTML5 ? '_xhr' : '_form';
+            uploaderService.currentItem[prop].abort();
+          }
+        }
 
       }); // extend uploaderService
 
