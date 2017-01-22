@@ -5,7 +5,7 @@
   </a>
 </span-->
 <span ng-repeat="(index, segment) in segments">
-  <a data-sid="{{segment.id}}" data-index="{{index}}" ng-click="click($event)">
+  <a class="loading" data-sid="{{segment.id}}" data-index="{{index}}" ng-click="click($event)">
     <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
     <div class="date">{{segment.timestamp | formatTimestamp}}</div>
     <div class="points"><i class="fa fa-cloud fa-fw"></i>{{segment.pointCloud.pointCount | humanize}}</div>
