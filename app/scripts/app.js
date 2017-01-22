@@ -57,14 +57,16 @@ var app=angular
     'ct.ui.router.extras.sticky',
     'ui.bootstrap',
     'ui-leaflet',
-    'ngTable',
     'btford.socket-io',
     'ngTagsInput',
     'ngScrollbars',
-    'FBAngular'
+    'FBAngular',
+    'angularFileUpload',
+    'ngNotify',
+    'smart-table'
 
   ])
-  .config(function ($httpProvider, $urlRouterProvider, $stateProvider,$locationProvider) {
+  .config(function ($httpProvider, $urlRouterProvider, $stateProvider, $locationProvider) {
 
     // enable getting query string object with $location.search()
     // (base href must be set in index.html)
@@ -78,9 +80,11 @@ var app=angular
     var params={
     }
 
+    /*
     var bLazy = new Blazy({
         src: 'data-blazy' // Default is data-src
     });
+    */
 
     // Inside app config block
     $httpProvider.interceptors.push(function($q, $location, LoopBackAuth) {
@@ -90,26 +94,23 @@ var app=angular
             //Now clearing the loopback values from client browser for safe logout...
             LoopBackAuth.clearUser();
             LoopBackAuth.clearStorage();
-            if ($scope.$state.current.name!='logout' && $scope.$state.current.name!='login') {
-               $scope.$state.stateAfterSignin = $scope.$state.current.name;
-            }
-            $scope.$state.transitionTo('login');
+            this.$rootscope.$emit('unauthorized');
           }
           return $q.reject(rejection);
         }
       };
     });
 
-    $urlRouterProvider.otherwise('/doxel/home');
+    $urlRouterProvider.otherwise(function($injector){
+      $injector.invoke(['$state', function($state) {
+        $state.go('404', {}, { location: false } );
+      }]);
+    });
+
     $stateProvider
-/*
-      .state('home', {
-        url: '/home',
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl',
-        controllerAs: 'main'
+      .state('404',{
+        templateUrl: 'views/404.html'
       })
- */
       .state('login', {
         url: '/login',
         templateUrl: 'views/login.html',
@@ -122,7 +123,6 @@ var app=angular
         controller: 'LogoutCtrl',
         controllerAs: 'logout'
       })
-
   /*    .state('profile', {
         url: '/profile',
         templateUrl: 'views/profile.html',
@@ -136,7 +136,7 @@ var app=angular
         controllerAs: 'resetPassword'
       })
       .state('upload', {
-        url: '/upload/',
+        url: '/upload',
         templateUrl: 'views/upload.html',
         controller: 'UploadCtrl',
         controllerAs: 'upload'
@@ -230,13 +230,13 @@ var app=angular
         controller: 'TosCtrl',
         controllerAs: 'tos'
       })
-      /*
       .state('segments', {
         url: '/segments',
-        templateUrl: 'views/segments.html',
+        templateUrl: 'views/segments-tree.html',
         controller: 'SegmentsCtrl',
         controllerAs: 'segments',
       })
+      /*
       .state('map', {
         url: '/map',
         templateUrl: 'views/map.html',
@@ -263,9 +263,19 @@ var app=angular
       })
       */
   })
-  .run(function ($rootScope,$state,$location,$window,User,$cookies,LoopBackAuth,appConfig,$timeout,errorMessage) {
+  .run(function ($rootScope,$state,$location,$window,User,$cookies,LoopBackAuth,appConfig,$timeout,errorMessage,uploaderService) {
     $rootScope.$state=$state;
     $rootScope.params={};
+
+    $rootScope.$on('unauthorized',function() {
+      $state.transitionTo('login');
+    });
+
+    $rootScope.uploader=uploaderService.initUploader({
+      fileUploaderOptions: {
+        url: '/sendfile'
+      }
+    });
 
     $rootScope.toggleFullscreen=function(){
       $rootScope.isFullscreen=true;

@@ -30,6 +30,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!--link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.18.1/build/cssreset/cssreset-min.css"-->
+    <link rel="stylesheet" type="text/css" href="styles/reset.css">
 
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
@@ -37,14 +38,12 @@
     <link rel="stylesheet" href="bower_components/bootstrap3-dialog/dist/css/bootstrap-dialog.min.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-social/bootstrap-social.css" />
     <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.css" />
-    <link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.min.css" />
-    <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
-    <link rel="stylesheet" href="bower_components/angular-ui-layout/src/ui-layout.css" />
     <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css" />
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css" />
     <link rel="stylesheet" href="bower_components/flag-icon-css/css/flag-icon.min.css" />
+    <link rel="stylesheet" href="bower_components/ng-notify/src/styles/ng-notify.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -52,7 +51,7 @@
     <!-- endbuild -->
     <link rel="stylesheet" href="styles/theme.min.css">
   </head>
-  <body ng-app="doxelApp" ng-controller="MainCtrl" fullscreen="isFullscreem" ng-click="toggleFullscreen()">
+  <body ng-cloak ng-app="doxelApp" ng-controller="MainCtrl" fullscreen="isFullscreem" ng-click="toggleFullscreen()" class="my-drop-zone" nv-file-drop="" nv-file-over="" uploader="uploader">
     <div id="main" ng-class="getClass()" ng-cloak >
       <!--[if lte IE 8]>
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -60,7 +59,7 @@
 
         <!-- Add your site or application content here -->
         <div class="header">
-          <div class="navbar navbar-default navbar-fixed-top disable-selection" role="navigation" ng-controller="NavBarCtrl">
+          <div ng-cloak class="navbar navbar-default navbar-fixed-top disable-selection" role="navigation" ng-controller="NavBarCtrl">
             <div class="navbar-inner">
               <div class="container">
                 <div class="navbar-header">
@@ -107,7 +106,7 @@
         <div ui-view="gallery"></div>
 
         <div class="views">
-          <iframe class="upload" ng-show="view=='upload'"></iframe>
+          <!--iframe class="upload" ng-show="view=='upload'"></iframe-->
           <!--iframe ui-view="viewer" class="viewer" ng-show="view=='viewer'"></iframe-->
 
           <!--iframe class="earth" ng-show="view=='viewer'" src="about:blank"></iframe-->
@@ -159,26 +158,22 @@
           <script src="bower_components/ui-router-extras/release/ct-ui-router-extras.js"></script>
           <script src="bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
           <script src="bower_components/html5-sortable-angularjs/lib/html5-sortable.js"></script>
-          <script src="bower_components/ng-table/dist/ng-table.min.js"></script>
-          <script src="bower_components/bLazy/blazy.js"></script>
           <script src="bower_components/piexifjs/piexif.js"></script>
-          <script src="bower_components/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
-          <script src="bower_components/angular-nicescroll/angular-nicescroll.js"></script>
-          <script src="bower_components/angular-aria/angular-aria.js"></script>
-          <script src="bower_components/angular-material/angular-material.js"></script>
           <script src="bower_components/angular-live-set/dist/live-set.js"></script>
           <script src="bower_components/angular-socket-io/socket.js"></script>
           <script src="bower_components/socket-io-client/socket.io.js"></script>
-          <script src="bower_components/angular-ui-layout/src/ui-layout.js"></script>
           <script src="bower_components/ng-tags-input/ng-tags-input.js"></script>
           <script src="bower_components/angular-ui-router.stateHelper/statehelper.js"></script>
           <script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
           <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
           <script src="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
           <script src="bower_components/ng-scrollbars/src/scrollbars.js"></script>
-          <script src="bower_components/bootstrap-autohidingnavbar/src/jquery.bootstrap-autohidingnavbar.js"></script>
           <script src="bower_components/angular-fullscreen/src/angular-fullscreen.js"></script>
           <script src="bower_components/number-abbreviate/index.js"></script>
+          <script src="bower_components/angular-file-upload/dist/angular-file-upload.min.js"></script>
+          <script src="bower_components/asmcrypto/asmcrypto.js"></script>
+          <script src="bower_components/ng-notify/src/scripts/ng-notify.js"></script>
+          <script src="bower_components/angular-smart-table/dist/smart-table.js"></script>
           <!-- endbower -->
           <script src="scripts/webglearth2/api.js"></script>
           <!-- endbuild -->
@@ -221,6 +216,9 @@
           <script src="scripts/controllers/gallery-viewer.js"></script>
           <script src="scripts/directives/webglearth2.js"></script>
           <script src="scripts/filters/humanize.js"></script>
+          <script src="scripts/services/jpeg-file.js"></script>
+          <script src="scripts/services/uploader-service.js"></script>
+          <script src="scripts/services/segments-service.js"></script>
           <!-- endbuild -->
           <!--script src="scripts/directives/picture-details.js"></script>
           <script src="scripts/directives/segment-status.js"></script>
