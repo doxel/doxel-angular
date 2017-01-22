@@ -46,7 +46,12 @@ angular.module('doxelApp')
   .service('socketService', function ($rootScope,$cookies,errorMessage,socketFactory,LoopBackAuth) {
     var self=this;
 
+    this.enabled=false;
+
     this.init=function socketService_init(){
+      if (!self.enable) {
+        return;
+      }
       $rootScope.$watch('currentUserId',function(newValue){
         if (newValue) {
           self.connect();
@@ -62,12 +67,20 @@ angular.module('doxelApp')
     }
 
     this.connect=function socketService_connect(){
+      if (!self.enabled) {
+        return;
+      }
+
+      if (!self.configured) {
+        self.init();
+      }
+
       //Creating connection with server
       var socket = self.ioSocket = io.connect(location.origin,{
         upgrade: false,
         transports: ['websocket']
       });
-      console.log(socket);
+//      console.log(socket);
 
       //This part is only for login users for authenticated socket connection between client and server.
       //If you are not using login page in you website then you should remove rest piece of code..
@@ -93,11 +106,7 @@ angular.module('doxelApp')
 
     }
 
-    if (!this.configured) {
-//      this.init();
-    }
-
-    if (this.enabled && !this.connected) {
+    if (!this.connected) {
       this.connect();
     }
     return this;
