@@ -1,0 +1,131 @@
+
+#browser {
+  .search-results-container {
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  ui-layout-container {
+    overflow: hidden;
+  }
+
+  ui-layout-container.primary {
+      margin-bottom: 60px;
+      margin-top: 64px;
+
+  }
+
+  user-select: none;
+
+  textarea {
+    user-select: none;
+    margin-bottom: 13px;
+
+  }
+
+ ul {
+    list-style: none;
+    padding-left: 10px;
+  }
+
+  ul ul {
+      padding-left: 20px;
+  }
+
+  span.selected {
+    background: cyan;
+  }
+
+  a .fa-caret-right {
+    width: 8px;
+  }
+
+  a .fa-folder {
+    width: 15px;
+  }
+
+  div.details {
+    float: left;
+    padding: 10px;
+  }
+
+  .relatedSegments,
+  .segment-pictures,
+  .segment-details {
+    text-align: center;
+  }
+
+  .thumb {
+    background-size: cover;
+    background-position: center;
+    width: 192px;
+    height: 120px;
+
+    .selected {
+      border: 4px solid yellow;
+    }
+
+  }
+
+  .segment-details .thumb {
+    margin: auto;
+  }
+
+  picture {
+    width: 192px;
+    height: 120px;
+  }
+
+  .dndDragging {
+    opacity: 0.5;
+  }
+
+  .dndValidTarget .thumb {
+    border: 4px dashed rosybrown;
+  }
+
+  .dndDragover.dndValidTarget .thumb {
+    border: 4px dashed yellow;
+  }
+
+
+  li a div {
+    display: inline;
+  }
+
+  .tree .dndValidTarget > a {
+    box-shadow: 1px 0px 1px 1px rosybrown;
+  }
+
+  .tree .dndValidTarget > a .dndDragover {
+    background-color: #bad;
+  }
+
+  segment-map {
+    width: 256px;
+    height: 192px;
+  }
+
+
+  segment-preview {
+    height: 192px;
+  }
+
+  .tree ul {
+    white-space: nowrap;
+  }
+
+  .tags-input-container {
+    padding: 10px;
+  }
+
+  .togsgle {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    margin: 4px;
+    width: 1.5em;
+    height: 1.5em;
+    text-align: center;
+  }
+}
