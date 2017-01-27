@@ -207,6 +207,10 @@ angular.module('doxelApp')
                 // prepend segments
                 segments.reverse();
                 angular.forEach(segments,function(segment){
+                  if (!segment.pointCloud) {
+                    console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
+                    return;
+                  }
                   $scope.segments.some(function(_segment,i){
                     if ($scope.loaded[segment.id]) {
                       return false;
@@ -222,6 +226,10 @@ angular.module('doxelApp')
               } else { // direction==forward
                 // append segments
                 angular.forEach(segments,function(segment){
+                  if (!segment.pointCloud) {
+                    console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
+                    return;
+                  }
                   if (!$scope.loaded[segment.id]) {
                     $scope.segments.push(segment);
                     $scope.loaded[segment.id]=true;
