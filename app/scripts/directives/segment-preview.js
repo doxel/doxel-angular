@@ -74,7 +74,7 @@ angular.module('doxelApp')
       },
       link: function(scope, element, attrs) {
           scope.$on('segment.selection.change',function(){
-            if (scope.segment)
+            if (scope.segment && scope.segment.picture)
             scope.segment.picture.selected=scope.segment.selected;
 
           });
