@@ -73,12 +73,6 @@ angular.module('doxelApp')
         }; // updateSegment
       },
       link: function(scope, element, attrs) {
-          scope.$on('segment.selection.change',function(){
-            if (scope.segment && scope.segment.picture)
-            scope.segment.picture.selected=scope.segment.selected;
-
-          });
-
           scope.$watch('segment', function(newValue, oldValue) {
             if (newValue) {
               scope.updateSegment();
