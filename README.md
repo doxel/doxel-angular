@@ -41,7 +41,7 @@ version 0.15.1.
 
 ## Prerequisite
 
-sudo apt-get ruby-dev ruby-full
+sudo apt-get install ruby-dev ruby-full
 gem install compass
 
 ## installation
