@@ -75,22 +75,22 @@ angular.module('doxelApp')
           if (elem==el) {
             alreadySelected=true;
           } else {
-            el.selected=false;
+            self.remove(type,el);
           }
 
         });
 
         self.selection[type].splice(0,self.selection[type].length,elem);
         elem.selected=true;
-        $rootScope.$broadcast(type+'.selection.change');
+        $rootScope.$broadcast(type+'.selection.change',elem);
       },
 
       add: function(type,elem) {
-        self.init(type);
-        if (self.selection[type].indexOf(elem)<0) {
-          self.selection[type].push(elem);
+        var list=self.list(type);
+        if (list.indexOf(elem)<0) {
+          list.push(elem);
           elem.selected=true;
-          $rootScope.$broadcast(type+'.selection.change');
+          $rootScope.$broadcast(type+'.selection.change',elem);
         }
       },
 
@@ -98,11 +98,19 @@ angular.module('doxelApp')
         if (self.selection[type]===undefined) {
           return;
         }
-        elem.selected=false;
         var index=self.selection[type].indexOf(elem);
         if (index>=0) {
           self.selection[type].splice(index,1);
-          $rootScope.$broadcast(type+'.selection.change');
+        }
+        elem.selected=false;
+        $rootScope.$broadcast(type+'.selection.change',elem);
+      },
+
+      set: function(type,elem,selected){
+        if (selected) {
+          self.add(type,elem);
+        } else {
+          self.remove(type,elem);
         }
       }
 
