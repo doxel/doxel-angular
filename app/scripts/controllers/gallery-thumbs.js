@@ -221,8 +221,9 @@ angular.module('doxelApp')
                   if (nextPose!=curPose) {
                     Picture.findById({id: segment.poses[nextPose].pictureId},function(picture){
                       if ($scope.nextThumb_timeout && $scope.nextThumb_segmentId==segmentId) {
-                        picture.selected=segment.selected;
+                        elementSelection.remove('picture',segment.picture);
                         segment.picture=picture;
+                        elementSelection.set('picture',segment.picture,segment.selected);
                         $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,options);
                       }
                     });
@@ -325,6 +326,10 @@ angular.module('doxelApp')
             $('body').toggleClass('thumbs-hidden');
           });
 
+          $scope.$on('segment.selection.change',function(event,segment){
+            elementSelection.set('picture',segment.picture,segment.selected);
+          });
+
         }, // initEventHandlers
 
         init: function() {
@@ -403,18 +408,16 @@ angular.module('doxelApp')
                 return;
               }
               */
+            } else {
+              elementSelection.add('segment',segment);
             }
-
-            segment.selected=true;
             $scope.selected[segment.id]=segment;
 
           } else {
             var index;
-            for (var segmentId in $scope.selected) {
-              if (segmentId==segment.id) {
-                delete $scope.selected[segmentId].selected;
-                $scope.selected[segmentId].picture && delete $scope.selected[segmentId].picture.selected;
-                delete $scope.selected[segmentId];
+            for (var _segment in elementSelection.list('segment')) {
+              if (_segment.id==segment.id) {
+                elementSelection.remove('segment',_segment)
               }
             };
           }
@@ -426,13 +429,7 @@ angular.module('doxelApp')
         }, // select
 
         getSelection: function(){
-          var result=[];
-          for (var segmentId in $scope.selected) {
-            if ($scope.selected.hasOwnProperty(segmentId)) {
-              result.push(segmentId);
-            }
-          }
-          return result;
+          return elementSelection.list('segment');
         }, // getSelection
 
         updateButtons: function(){
@@ -586,20 +583,16 @@ angular.module('doxelApp')
           return $('#gallery-thumbs .mCSB_draggerContainer:visible').length>0;
         },
 
-        isSelected: function(segmentId){
-          return $scope.selected.segmentId!==undefined;
-        },
-
         updateSelection: function(segmentId){
           if ($scope.thumbs_visible) {
             // restore (single) thumb selection
             if (segmentId) {
-              if ($scope.isSelected(segmentId)) {
-                $timeout(function(){
-                  $scope.showThumb(segmentId);
-                },150);
-              } else {
-                $scope.getSegment(segmentId).then(function(segment){
+              $scope.getSegment(segmentId).then(function(segment){
+                if (elementSelection.isSelected(segment)) {
+                  $timeout(function(){
+                    $scope.showThumb(segmentId);
+                  },150);
+                } else {
                   $timeout(function(){
                     $scope.segmentClick({
                       segment: segment,
@@ -607,8 +600,8 @@ angular.module('doxelApp')
                       show: true
                     });
                   },1500);
-                });
-              }
+                }
+              });
             }
           }
         },
