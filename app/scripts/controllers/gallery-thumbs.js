@@ -221,9 +221,10 @@ angular.module('doxelApp')
                   if (nextPose!=curPose) {
                     Picture.findById({id: segment.poses[nextPose].pictureId},function(picture){
                       if ($scope.nextThumb_timeout && $scope.nextThumb_segmentId==segmentId) {
+                        var selected=segment.picture.selected;
                         elementSelection.remove('picture',segment.picture);
                         segment.picture=picture;
-                        elementSelection.set('picture',segment.picture,segment.selected);
+                        elementSelection.set('picture',segment.picture,selected);
                         $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,options);
                       }
                     });
@@ -325,11 +326,11 @@ angular.module('doxelApp')
           $('.thumbs-handle').on('click',function(){
             $('body').toggleClass('thumbs-hidden');
           });
-
+/*
           $scope.$on('segment.selection.change',function(event,segment){
             elementSelection.set('picture',segment.picture,segment.selected);
           });
-
+*/
         }, // initEventHandlers
 
         init: function() {
@@ -348,7 +349,9 @@ angular.module('doxelApp')
 
           // in map view, switch to cloud on second click
           if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('picture',segment.picture)) {
-            $scope.$state.transitionTo('gallery.view.cloud');
+            if (segment.pointCloud) {
+              $scope.$state.transitionTo('gallery.view.cloud');
+            }
             return;
           }
 
@@ -411,15 +414,10 @@ angular.module('doxelApp')
             } else {
               elementSelection.add('picture',segment.picture);
             }
-            $scope.selected[segment.id]=segment;
 
           } else {
             var index;
-            for (var picture in elementSelection.list('picture')) {
-              if (picture.segmentId==segment.id) {
-                elementSelection.remove('picture',picture)
-              }
-            };
+            elementSelection.remove('picture',segment.picture);
           }
 
           if (options.show) {

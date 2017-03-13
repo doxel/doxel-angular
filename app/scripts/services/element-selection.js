@@ -63,7 +63,7 @@ angular.module('doxelApp')
           return self.filter[type](elem);
 
         } else {
-          return self.selection[type] && (self.selection[type].indexOf(elem)>=0);
+          return self.selection[type] && (self.selection[type].some(function(_el){return _el.id==element.id}));
         }
       },
 
@@ -72,7 +72,7 @@ angular.module('doxelApp')
         var alreadySelected;
 
         self.list(type).forEach(function(el){
-          if (elem==el) {
+          if (elem.id==el.id) {
             alreadySelected=true;
           } else {
             self.remove(type,el);
@@ -87,7 +87,7 @@ angular.module('doxelApp')
 
       add: function(type,elem) {
         var list=self.list(type);
-        if (list.indexOf(elem)<0) {
+        if (!list.some(function(_el){return _el.id==element.id})){
           list.push(elem);
           elem.selected=true;
           $rootScope.$broadcast(type+'.selection.change',elem);
@@ -96,11 +96,19 @@ angular.module('doxelApp')
 
       remove: function(type,elem) {
         if (self.selection[type]===undefined) {
+          elem.selected=false;
           return;
         }
-        var index=self.selection[type].indexOf(elem);
+        var index=-1;
+        va list=self.selection[type];
+        list.some(function(_el,_index){
+          if (_el.id==element.id) {
+            index=_index;
+            return true;
+          }
+        })
         if (index>=0) {
-          self.selection[type].splice(index,1);
+          list.splice(index,1);
         }
         elem.selected=false;
         $rootScope.$broadcast(type+'.selection.change',elem);
