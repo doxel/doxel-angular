@@ -72,7 +72,7 @@ angular.module('doxelApp')
 
         alreadyQueued: function(file) {
           return uploaderService.uploader.queue.some(function(item){
-            return (item.file.name==file.name && item.file.size==file.size && item.file.lastModified==file.lastModified);
+            return (item.file.name==file.name && item.file.size==file.size && item.file.lastModifiedDate.getTime()==file.lastModified);
           });
         },
 
