@@ -136,7 +136,6 @@ angular.module('doxelApp')
               return $q.reject('paused');
             }
 
-
             uploaderService.currentItem=item;
 
             var promise;
@@ -188,10 +187,6 @@ angular.module('doxelApp')
                 if (!data.timestamp) {
                   var lastModified=String(blob.lastModified);
                   data.timestamp=lastModified.substr(0,10)+'_'+lastModified.substr(10,3)+'000';
-                }
-
-                if (uploader.isPaused) {
-                  return q.resolve();
                 }
 
                 item.headers.Authorization=LoopBackAuth.accessTokenId;
