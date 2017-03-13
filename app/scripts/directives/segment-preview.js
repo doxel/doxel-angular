@@ -80,6 +80,6 @@ angular.module('doxelApp')
           }, false);
       },
 
-      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected?\' selected\':\'\')}}"/>'
+      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.picture.selected?\' selected\':\'\')}}"/>'
     };
   });
