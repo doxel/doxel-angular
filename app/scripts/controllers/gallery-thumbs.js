@@ -347,7 +347,7 @@ angular.module('doxelApp')
   console.trace();
 
           // in map view, switch to cloud on second click
-          if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
+          if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('picture',segment.picture)) {
             $scope.$state.transitionTo('gallery.view.cloud');
             return;
           }
@@ -394,7 +394,7 @@ angular.module('doxelApp')
             if (options.unique) {
               var count=0;
               // unselect other tree paths
-              elementSelection.replace('segment',segment);
+              elementSelection.replace('picture',segment.picture);
               /*
               for (var segmentId in $scope.selected) {
                 if ($scope.selected.hasOwnProperty(segmentId) && segmentId!=segment.id){
@@ -409,15 +409,15 @@ angular.module('doxelApp')
               }
               */
             } else {
-              elementSelection.add('segment',segment);
+              elementSelection.add('picture',segment.picture);
             }
             $scope.selected[segment.id]=segment;
 
           } else {
             var index;
-            for (var _segment in elementSelection.list('segment')) {
-              if (_segment.id==segment.id) {
-                elementSelection.remove('segment',_segment)
+            for (var picture in elementSelection.list('picture')) {
+              if (picture.segmentId==segment.id) {
+                elementSelection.remove('picture',picture)
               }
             };
           }
@@ -429,7 +429,7 @@ angular.module('doxelApp')
         }, // select
 
         getSelection: function(){
-          return elementSelection.list('segment');
+          return elementSelection.list('picture');
         }, // getSelection
 
         updateButtons: function(){
@@ -588,7 +588,7 @@ angular.module('doxelApp')
             // restore (single) thumb selection
             if (segmentId) {
               $scope.getSegment(segmentId).then(function(segment){
-                if (elementSelection.isSelected(segment)) {
+                if (elementSelection.isSelected('picture',segment.picture)) {
                   $timeout(function(){
                     $scope.showThumb(segmentId);
                   },150);

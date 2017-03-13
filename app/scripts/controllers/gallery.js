@@ -207,7 +207,7 @@ angular.module('doxelApp')
                 // prepend segments
                 segments.reverse();
                 angular.forEach(segments,function(segment){
-                  if (!segment.pointCloud) {
+                  if (segment.pointCloudId && !segment.pointCloud) {
                     console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
                     return;
                   }
