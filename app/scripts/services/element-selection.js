@@ -63,7 +63,7 @@ angular.module('doxelApp')
           return self.filter[type](elem);
 
         } else {
-          return self.selection[type] && (self.selection[type].some(function(_el){return _el.id==element.id}));
+          return self.selection[type] && (self.selection[type].some(function(_el){return _el.id==elem.id}));
         }
       },
 
@@ -87,7 +87,7 @@ angular.module('doxelApp')
 
       add: function(type,elem) {
         var list=self.list(type);
-        if (!list.some(function(_el){return _el.id==element.id})){
+        if (!list.some(function(_el){return _el.id==elem.id})){
           list.push(elem);
           elem.selected=true;
           $rootScope.$broadcast(type+'.selection.change',elem);
@@ -100,9 +100,9 @@ angular.module('doxelApp')
           return;
         }
         var index=-1;
-        va list=self.selection[type];
+        var list=self.selection[type];
         list.some(function(_el,_index){
-          if (_el.id==element.id) {
+          if (_el.id==elem.id) {
             index=_index;
             return true;
           }
