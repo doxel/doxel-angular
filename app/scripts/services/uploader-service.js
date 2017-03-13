@@ -277,7 +277,8 @@ angular.module('doxelApp')
             uploader.isUploading=false;
             if (fileItem.isSkip) {
               $timeout(function(){
-                delete uploaderService.queued[fileItem._file.name+'-'+fileItem._file.size+'-'+fileItem._file.lastModified];
+                var file=fileItem._file||fileItem.file;
+                delete uploaderService.queued[file.name+'-'+file.size+'-'+file.lastModified];
                 fileItem.remove();
               });
             }
