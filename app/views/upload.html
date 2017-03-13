@@ -25,7 +25,7 @@
           <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
           </div>
           </div-->
-          <button type="button" class="btn btn-s btn-primary" ng-click="uploaderService.startUpload()" ng-disabled="!uploader.getNotUploadedItems().length">
+          <button type="button" class="btn btn-s btn-primary" ng-click="uploaderService.startUpload()" ng-disabled="!uploader.isPaused || !uploader.getNotUploadedItems().length">
             <span class="glyphicon glyphicon-upload"></span> Upload all
           </button>
           <!--button type="button" class="btn btn-s" ng-click="uploader.thumbStyle=null ; uploader.cancelAll()" ng-disabled="!uploader.isUploading">

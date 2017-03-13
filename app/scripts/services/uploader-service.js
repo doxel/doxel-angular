@@ -155,14 +155,14 @@ angular.module('doxelApp')
                   uploader.thumbStyle={
                     'background-image': 'url('+uploader.thumbDataURL+')'
                   };
-                } 
+                }
                 return $q.resolve(data);
               })
 
             } else {
               promise=$q.resolve(data);
             }
-        
+
             promise.finally(function(){
               jpegFile.getBinaryString(data)
               .then(jpegFile.getEXIF)
@@ -262,6 +262,7 @@ angular.module('doxelApp')
           uploader.onCompleteItem = function(fileItem, response, status, headers) {
             if (fileItem.isError) {
               fileItem.isUploaded=false;
+              fileItem.isError=false;
             }
             fileItem._xhr=null;
             fileItem._file=fileItem._file_orig;
@@ -270,7 +271,7 @@ angular.module('doxelApp')
             ++uploaderService.completed;
             uploaderService.progressBar && uploaderService.progressBar.width && uploaderService.progressBar.width(0);
             uploaderService.progress && uploaderService.progress.text && uploaderService.progress.text('');
-            var totalPercent=uploaderService.completed*100/uploaderService.total;
+            var totalPercent=Math.min(100,uploaderService.completed*100/uploaderService.total);
             uploaderService.totalProgressBar && uploaderService.totalProgressBar.width && uploaderService.totalProgressBar.width(totalPercent+'%');
             uploaderService.totalProgress && uploaderService.totalProgress.text && uploaderService.totalProgress.text(Math.round(totalPercent)+'%');
 //            console.info('onCompleteItem', fileItem, response, status, headers);
@@ -342,7 +343,7 @@ angular.module('doxelApp')
             return;
           }
           uploader.isPaused=true;
-          if (uploaderService.currentItem) {
+          if (uploaderService.currentItem && uploaderService.currentItem.isUploading) {
             var prop=uploader.isHTML5 ? '_xhr' : '_form';
             uploaderService.currentItem[prop].abort();
           }
