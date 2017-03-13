@@ -69,7 +69,13 @@ angular.module('doxelApp')
       angular.extend(uploaderService,{
         maxQueueLength: 10000,
         maxFileSize: 100*1024*1024,
-        queued: {},
+
+        alreadyQueued: function(file) {
+          return uploaderService.uploader.queue.some(function(item){
+            return (item.file.name==file.name && item.file.size==file.size && item.file.lastModified==file.lastModified);
+          });
+        },
+
         initUploader: function(options) {
           angular.extend(uploaderService,options);
           var uploader=uploaderService.uploader=new FileUploader(uploaderService.fileUploaderOptions);
@@ -105,11 +111,10 @@ angular.module('doxelApp')
                 }
                 return false;
               }
-              if (uploaderService.queued[item.name+'-'+item.size+'-'+item.lastModified]) {
+              if (uploaderService.alreadyQueued(item)) {
                 ngNotify.set('Already queued: '+item.name);
                 return false;
               }
-              uploaderService.queued[item.name+'-'+item.size+'-'+item.lastModified]=true;
               return true;
             }
           });
@@ -249,7 +254,6 @@ angular.module('doxelApp')
                 }
               }
             }
-            delete uploaderService.queued[fileItem._file.name+'-'+fileItem._file.size+'-'+fileItem._file.lastModified];
             fileItem.remove();
 //            console.info('onSuccessItem', fileItem, response, status, headers);
           };
@@ -279,7 +283,6 @@ angular.module('doxelApp')
             if (fileItem.isSkip) {
               $timeout(function(){
                 var file=fileItem._file||fileItem.file;
-                delete uploaderService.queued[file.name+'-'+file.size+'-'+file.lastModified];
                 fileItem.remove();
               });
             }
