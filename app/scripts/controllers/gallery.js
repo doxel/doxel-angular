@@ -120,7 +120,6 @@ angular.module('doxelApp')
         }, // init
 
         updateMetrics: function(state){
-  console.log('updateMetrics');
           $scope.thumbsH=Math.floor($('#gallery').width()/200);
           $scope.thumbsV=Math.round(($('#gallery .mCustomScrollbar').height()||$('body').height())/150);
           switch($scope.thumbsPosition) {
@@ -137,13 +136,13 @@ angular.module('doxelApp')
 
         loadSegments: function(direction,count) {
           $scope.updateMetrics();
-          console.trace('loadSegments');
           if ($scope._loadSegments) {
             return $scope._loadSegments;
           }
           $scope._loadSegments=$q.defer();
           $scope._loadSegments.promise.finally(function(){
             $scope._loadSegments=null;
+            $scope.$broadcast('segments-loaded');
           });
 
           direction=direction||'forward';
@@ -164,7 +163,7 @@ angular.module('doxelApp')
 
           filter.limit+=$scope.thumbsH-((($scope.segments.length + filter.limit) % $scope.thumbsH ));
 
-          console.log('limit',filter.limit)
+          //console.log('limit',filter.limit)
 
           if (direction=='forward') {
             // load chunk after last segment in $scope.segments
@@ -254,7 +253,6 @@ angular.module('doxelApp')
         }, // loadSegments
 
         getSegment: function(segmentId){
-          console.trace('getSegment');
             var q=$q.defer();
             var found;
             // search in loaded segments
@@ -295,7 +293,6 @@ angular.module('doxelApp')
         }, // getSegment
 
         loadSegmentsAround: function(segmentId,_then,_catch) {
-          console.trace('loadSegmentsAround');
           Segment.findById({
             id: segmentId,
             filter: {
