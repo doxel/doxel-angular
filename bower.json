@@ -15,7 +15,7 @@
     "angular-ui-router": "^0.3.2",
     "angular-bootstrap": "~2.4.0",
     "ui.bootstrap": "~2.4.0",
-    "ui-leaflet": "https://github.com/angular-ui/ui-leaflet.git",
+    "ui-leaflet": "^2.0.0",
     "bootstrap3-dialog": "bootstrap-dialog#~1.34.7",
     "font-awesome": "~4.7.0",
     "bootstrap-social": "~5.1.1",
@@ -32,7 +32,6 @@
     "ng-tags-input": "^3.0.0",
     "angular-ui-router.stateHelper": "https://github.com/marklagendijk/ui-router.stateHelper.git",
     "jquery-mousewheel": "^3.1.13",
-    "leaflet.markercluster": "^1.0.0",
     "ng-scrollbars": "https://github.com/iominh/ng-scrollbars.git",
     "angular-fullscreen": "^1.0.1",
     "flag-icon-css": "^2.7.0",
@@ -41,7 +40,9 @@
     "asmcrypto": "^0.0.11",
     "ng-notify": "^0.8.0",
     "install": "^1.0.4",
-    "angular-smart-table": "^2.1.8"
+    "angular-smart-table": "^2.1.8",
+    "leaflet.markercluster": "^1.0.4",
+    "leaflet": "^1.0.3"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
