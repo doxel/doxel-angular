@@ -50,6 +50,7 @@ angular.module('doxelApp')
       'Karma'
     ];
     angular.extend($scope,{
+      markers: {},
       defaults: {
           // display the markers again after scrolling n times 360 degrees laterally
           worldCopyJump: true,
@@ -79,6 +80,7 @@ angular.module('doxelApp')
               url: '//{s}.'+appConfig.tileServer+'/osm/{z}/{x}/{y}.png',
               type: 'xyz',
               layerOptions: {
+              opacity: 1,
               minZoom: 9,
               maxZoom: 19,
               "showOnSelector": false
@@ -94,6 +96,7 @@ angular.module('doxelApp')
             type: 'xyz',
             layerOptions: {
               maxZoom: 8,
+              opacity: 0.9,
               tms: true
             },
             layerParams: {
@@ -134,14 +137,14 @@ angular.module('doxelApp')
               type: 'xyz',
               layerOptions: {
                 maxZoom: 8,
-                opacity: 1
+                opacity: 0.9
               },
               layerParams: {
                 showOnSelector: false
 
               }
           },
-          markers: {
+          markercluster: {
             name: 'Markers',
             type: 'markercluster',
             visible: true
@@ -320,12 +323,6 @@ TODO: use geopoint and using the smallest map dimension
       }, // invalidateSize
 
 			watchOptions: {
-					markers: {
-							type: null,
-							individual: {
-									type: null
-							}
-					}
 			},
       events: {
         map: {
@@ -345,6 +342,7 @@ TODO: use geopoint and using the smallest map dimension
       // pan and zoom
       setView: function(segment){
        console.log('setView');
+       if (!segment.geo) return;
        $scope.getMap(function(map){
           map.setView({
             lat: segment.geo.lat,
@@ -354,57 +352,54 @@ TODO: use geopoint and using the smallest map dimension
             pan: {}
           });
 
-          if ($scope.currentMarker) {
+          if ($scope.markers.current) {
             // there is already a current marker
-            var m=$scope.currentMarker._latlng;
+            var m=$scope.markers.current;
             if (m.lat!=segment.geo.lat || m.lng!=segment.geo.lng) {
-              // current marker changed
-              if (map.hasLayer($scope.currentMarker)) {
-                // remove existing marker
-                map.removeLayer($scope.currentMarker)
-              }
-              // add new marker
-              $scope.currentMarker=L.marker([segment.geo.lat,segment.geo.lng],$scope.marker);
-              map.addLayer($scope.currentMarker);
-
-            } else {
-              if (!map.hasLayer($scope.currentMarker)) {
-                // marker was on another map instance, we must reinstantiate it
-                $scope.currentMarker=L.marker([segment.geo.lat,segment.geo.lng]);
-                map.addLayer($scope.currentMarker);
-              }
+              m.lat=segment.geo.lat;
+              m.lng=segment.geo.lng;
+              m.segmentId=segment.id;
             }
+
           } else {
-            $scope.currentMarker=L.marker([segment.geo.lat,segment.geo.lng]);
-            map.addLayer($scope.currentMarker);
+            $scope.markers.current={
+              lat: segment.geo.lat,
+              lng: segment.geo.lng,
+              zIndexOffset: 9999999999,
+              segmentId: segment.id
+
+            }
           }
-					$scope.currentMarker.setZIndexOffset(99999999999);
 
         });
       }, // setView
 
       updateMarkers: function(map){
-        var markers=[];
+        var cluster=$scope.cluster||L.markerClusterGroup();
+
         $scope.segments.some(function(segment,idx){
+          if (!segment.geo) return;
+
           if (!segment.marker) {
-//            segment.marker=L.CircleMarker([segment.geo.lat,segment.geo.lng]);
-//            markers.addLayer(segment.marker);
-              segment.marker={
-                layer: 'markers',
-                lng: segment.geo.lng,
-                lat: segment.geo.lat,
-                segmentId: segment.id
-              }
+              segment.marker=L.marker(
+                new L.LatLng( segment.geo.lat, segment.geo.lng, 0),
+                {
+                  layer: 'markercluster',
+                  segmentId: segment.id
+                }
+              );
           }
-          markers.push(segment.marker);
+
+          if (!cluster.hasLayer(segment.marker)) {
+            cluster.addLayer(segment.marker);
+          }
+
         });
-  //      if (!map.hasLayer(markers)) {
-   //       map.addLayer(markers);
-    //    }
-        leafletData.getDirectiveControls().then(function(controls) {
-          controls.markers.create(markers,$scope.markers);
-          $scope.markers=markers;
-        });
+
+        if (!map.hasLayer(cluster)) {
+          map.addLayer(cluster);
+        }
+
       } // updateMarkers
 
     });
