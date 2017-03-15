@@ -343,8 +343,6 @@ angular.module('doxelApp')
            var show=options.show;
            var setView=options.setView;
 
-  console.trace();
-
           // in map view, switch to cloud on second click
           if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
             if (segment.pointCloud) {
