@@ -134,15 +134,52 @@ angular.module('doxelApp')
           return Math.min(16,Math.round($scope.thumbsH*$scope.thumbsV*1.5)||12);
         },
 
+        _galleryFilter: {
+          default: function(){
+            return $q.when({
+              where: {
+                 pointCloudId: {exists: true}
+              },
+              include: 'pointCloud'
+            });
+          }
+        },
+
+        getGalleryFilter: function() {
+          var q=$q.defer();
+
+          // get default filter
+          $scope._galleryFilter.default().then(function(filter0){
+
+            // get current state filter
+            var stateFilter=$scope._galleryFilter[$state.current.name];
+            if (stateFilter) {
+              stateFilter().then(function(filter1){
+                var filter=angular.merge({},filter0,filter1);
+                q.resolve(filter);
+              });
+
+            } else {
+              // or return vanilla default filter
+              q.resolve(filter0);
+            }
+          });
+
+          return q.promise;
+        }, // getGalleryFilter
+
         loadSegments: function(direction,count) {
           $scope.updateMetrics();
           if ($scope._loadSegments) {
             return $scope._loadSegments;
           }
+          var segments;
           $scope._loadSegments=$q.defer();
-          $scope._loadSegments.promise.finally(function(){
+          $scope._loadSegments.promise.then(function(_segments){
+            segments=_segments;
+          }).finally(function(){
             $scope._loadSegments=null;
-            $scope.$broadcast('segments-loaded');
+            $scope.$broadcast('segments-loaded',segments);
           });
 
           direction=direction||'forward';
@@ -153,99 +190,102 @@ angular.module('doxelApp')
             return $scope._loadSegments;
           }
 
-          var filter={
-            where: {
-               pointCloudId: {exists: true}
-            },
-            include: 'pointCloud',
-            limit: count || $scope.getLimit()
-          }
+          $scope.getGalleryFilter().then(function(filter){
 
-          filter.limit+=$scope.thumbsH-((($scope.segments.length + filter.limit) % $scope.thumbsH ));
+            filter.limit=count||$scope.getLimit();
+            filter.limit+=$scope.thumbsH-((($scope.segments.length + filter.limit) % $scope.thumbsH ));
 
-          //console.log('limit',filter.limit)
+            //console.log('limit',filter.limit)
 
-          if (direction=='forward') {
-            // load chunk after last segment in $scope.segments
-            if ($scope.segments.length) {
-              var segment=$scope.segments[$scope.segments.length-1];
-              filter.where.timestamp={
-                lte: segment.timestamp
-              };
-              filter.where.id={
-                neq: segment.id
-              };
-            }
-            filter.order='timestamp DESC';
-
-          } else {
-            // load chunk before first segment in $scope.segments
-            if ($scope.segments.length) {
-              var segment=$scope.segments[0];
-              filter.where.timestamp={
-                gte: segment.timestamp
-              };
-              filter.where.id={
-                neq: segment.id
-              };
-            }
-            filter.order='timestamp ASC';
-          }
-
-          // do load segments
-          Segment.find({
-            filter: filter
-
-          }, function(segments){
-            if (!segments || !segments.length) {
-              // end reached
-              $scope.end[direction]=true;
+            if (direction=='forward') {
+              // load chunk after last segment in $scope.segments
+              if ($scope.segments.length) {
+                var segment=$scope.segments[$scope.segments.length-1];
+                filter.where.timestamp={
+                  lte: segment.timestamp
+                };
+                filter.where.id={
+                  neq: segment.id
+                };
+              }
+              filter.order='timestamp DESC';
 
             } else {
-              if (direction=='backward') {
-                // prepend segments
-                segments.reverse();
-                angular.forEach(segments,function(segment){
-                  if (segment.pointCloudId && !segment.pointCloud) {
-                    console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
-                    return;
-                  }
-                  $scope.segments.some(function(_segment,i){
-                    if ($scope.loaded[segment.id]) {
-                      return false;
+              // load chunk before first segment in $scope.segments
+              if ($scope.segments.length) {
+                var segment=$scope.segments[0];
+                filter.where.timestamp={
+                  gte: segment.timestamp
+                };
+                filter.where.id={
+                  neq: segment.id
+                };
+              }
+              filter.order='timestamp ASC';
+            }
+
+            // do load segments
+            Segment._find({
+              filter: filter
+
+            }, function(segments){
+              if (!segments || !segments.length) {
+                // end reached
+                $scope.end[direction]=true;
+
+              } else {
+                if (direction=='backward') {
+                  // prepend segments
+                  segments.reverse();
+                  angular.forEach(segments,function(segment){
+                    if (segment.pointCloudId && !segment.pointCloud) {
+                      console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
+                      return;
                     }
-                    if (segment.timestamp>_segment.timestamp) {
-                      $scope.segments.splice(i,0,segment);
-                      $scope.loaded[segment.id]=true;
-                      return false;
+                    var found;
+                    $scope.segments.some(function(_segment,i){
+                      return found=(_segment.id==segment.id);
+                    });
+                    if (!found) {
+                      $scope.segments.some(function(_segment,i){
+                        if (segment.timestamp>_segment.timestamp) {
+                          $scope.segments.splice(i,0,segment);
+                          $scope.loaded[segment.id]=segment;
+                          return true;
+                        }
+                      });
                     }
                   });
-                });
 
-              } else { // direction==forward
-                // append segments
-                angular.forEach(segments,function(segment){
-                  if (!segment.pointCloud) {
-                    console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
-                    return;
-                  }
-                  if (!$scope.loaded[segment.id]) {
-                    $scope.segments.push(segment);
-                    $scope.loaded[segment.id]=true;
-                  }
-                });
+                } else { // direction==forward
+                  // append segments
+                  angular.forEach(segments,function(segment){
+                    if (!segment.pointCloud) {
+                      console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
+                      return;
+                    }
+                    var found;
+                    $scope.segments.some(function(_segment,i){
+                      return found=(_segment.id==segment.id);
+                    });
+                    if (!found) {
+                      $scope.segments.push(segment);
+                      $scope.loaded[segment.id]=segment;
+                    }
+                  });
+                }
               }
-            }
-            $('#segments .mCustomScrollbar').mCustomScrollbar('update');
-            $scope._loadSegments.resolve(segments);
-  //          $scope._loadSegments.promise.then(function(segments){
-  //            $rootScope.$broadcast('segments-loaded',segments);
-  //          });
+              $('#segments .mCustomScrollbar').mCustomScrollbar('update');
+              $scope._loadSegments.resolve(segments);
+    //            $rootScope.$broadcast('segments-loaded',segments);
+    //          });
 
-          }, function(err){
-            console.log(err);
-            errorMessage.show('Could not load segments');
-            $scope._loadSegments.reject(err);
+            }, function(err){
+              console.log(err);
+              errorMessage.show('Could not load segments');
+              $scope._loadSegments.reject(err);
+            });
+
           });
 
           return $scope._loadSegments;
@@ -256,13 +296,13 @@ angular.module('doxelApp')
             var q=$q.defer();
             var found;
             // search in loaded segments
-            $scope.segments.some(function(segment){
-              if (segment.id==segmentId) {
+            for (var id in $scope.loaded) {
+              if (id==segmentId) {
                 found=true;
-                q.resolve(segment);
-                return true;
+                q.resolve($scope.loaded[id]);
+                return q.promise;
               }
-            });
+            }
             if (!found) {
               // currently loading segments ?
               if ($scope._loadSegments && $scope._loadSegments.promise.$$state.pending) {
@@ -300,6 +340,7 @@ angular.module('doxelApp')
             }
           }, function(segment){
             if (segment) {
+              $scope.loaded[segment.id]=segment;
               Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
               $scope.loadSegments('backward').promise.then(function(){
                 $timeout(function(){

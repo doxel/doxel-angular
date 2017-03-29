@@ -257,9 +257,13 @@ angular.module('doxelApp')
             updateMousePosition(e);
             $timeout.cancel($scope.nextThumb_timeout);
             $scope.nextThumb_segmentId=$(e.target).closest('a').data('sid');
-            $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,{
-              element: window.jQuery(e.target),
-              segmentId: $scope.nextThumb_segmentId
+            $scope.getSegment($scope.nextThumb_segmentId).then(function(segment){
+              if (elementSelection.isSelected('segment',segment)) {
+                $scope.nextThumb_timeout=$timeout($scope.showNextPreview,100,true,{
+                  element: window.jQuery(e.target),
+                  segmentId: $scope.nextThumb_segmentId
+                });
+              }
             });
           });
 

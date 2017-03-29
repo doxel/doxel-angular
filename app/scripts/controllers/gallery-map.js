@@ -233,9 +233,18 @@ angular.module('doxelApp')
 
         // update markers when more segments are loaded
         $scope.$on('segments-loaded',function(event,segments){
-          $scope.getMap($scope.updateMarkers);
-        });
+          $scope.updateShownSegments().then(function(){
+            $scope.getMap($scope.updateMarkers);
+            console.log('loaded', segments.length,$scope.loadedCount)
+            if (!$scope.prevLoadedCount) $scope.prevLoadedCount=0;
+            if ($scope.loadedCount>$scope.prevLoadedCount) {
+              console.log('loadmore');
+              $scope.prevLoadedCount=$scope.loadedCount;
+              $timeout($scope.loadSegments);
+            }
+          });
 
+        });
 
         // show location on segment.setview event
         $scope.$on('segment.setview',function($event,args){
@@ -271,29 +280,18 @@ angular.module('doxelApp')
         });
 
         $scope.$on('leafletDirectiveMap.moveend',function(){
-
-/*
-TODO: use geopoint and using the smallest map dimension
- compute distance from the center to the border,
- then filter according to center and radius
-        // update segments list on moveend
-          if (!$scope._map) return;
-          Segment.find({
-            filter: {
-              where: {
-              }
-            }
-          },
-          function(segments){
-            $scope.segments=segments;
-            $rootScope.$broadcast('segments',segments);
-          },
-          function(err) {
+          $scope.updateShownSegments().then(function(){
+//            $scope.skip=$scope.segments.length;
+            $scope.end.forward=$scope.end.backward=false;
+            $scope.loadSegments();
+          }).catch(function(err){
             console.log(err);
+          });
 
-          })
-*/
+
         });
+
+        $scope._galleryFilter['gallery.view.map']=$scope.galleryFilter;
 
         $scope.$on('window.resize',function(){
           $scope.invalidateSize();
@@ -312,6 +310,76 @@ TODO: use geopoint and using the smallest map dimension
         });
 
       }, // init
+
+      updateShownSegments: function() {
+        var q=$q.defer();
+        $scope.getMap(function(map){
+          var center=map.getCenter();
+          center=new L.latLng(((center.lat+90)%180-90), ((center.lng+180)%360-180));
+          var bounds=map.getBounds();
+          //var visible=[];
+          $scope.loadedCount=0;
+          for (var segmentId in $scope.loaded) {
+            if ($scope.loaded.hasOwnProperty(segmentId)) {
+              ++$scope.loadedCount;
+              var segment=$scope.loaded[segmentId];
+              if (segment.geo) {
+                var index;
+                var alreadyDisplayed;
+                alreadyDisplayed=false;
+                $scope.segments.some(function(_segment,i){
+                  if (_segment.id==segmentId) {
+                    index=i;
+                    return alreadyDisplayed=true;
+                  }
+                });
+                segment.latLng=new L.latLng(segment.geo.lat,segment.geo.lng);
+                if (bounds.contains(segment.latLng)) {
+                  segment.d=segment.latLng.distanceTo(center);
+                  if (!alreadyDisplayed) $scope.segments.push(segment);
+                  //visible.push(segment);
+                } else {
+                  // remove out of bounds segment from display
+                  if (alreadyDisplayed) {
+                    $scope.segments.splice(index,1);
+                  }
+                }
+              }
+            }
+          }
+     /*     if (loaded && visible.length) {
+            visible.sort(function(a,b){return a.d-b.d});
+            $scope.segments.splice.apply($scope.segments,[0,$scope.segments.length].concat(visible));
+          }
+          */
+          q.resolve();
+        });
+
+        return q.promise;
+
+      }, // updateShownSegments
+
+      galleryFilter: function() {
+        var q=$q.defer();
+
+        $scope.getMap(function(map){
+          var center=map.getCenter();
+          var bounds=map.getBounds();
+          var meters=center.distanceTo(bounds._northEast,{type: 'meters'});
+          q.resolve({
+            where: {
+              geo: {
+                near: [ ((center.lat+90)%180-90), ((center.lng+180)%360-180) ],
+                maxDistance: meters
+              }
+            },
+            limit: 10000
+          });
+        });
+        return q.promise;
+      },
+
+      skip: 0,
 
       invalidateSize: function(){
         $scope.getMap(function(map){
@@ -375,7 +443,7 @@ TODO: use geopoint and using the smallest map dimension
       }, // setView
 
       updateMarkers: function(map){
-        var cluster=$scope.cluster||L.markerClusterGroup();
+        var cluster=$scope.cluster||($scope.cluster=L.markerClusterGroup());
 
         $scope.segments.some(function(segment,idx){
           if (!segment.geo) return;

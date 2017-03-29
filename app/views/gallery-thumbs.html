@@ -1,9 +1,9 @@
 <div ng-show="thumbs_visible" id="gallery-thumbs">
   <div id="segments">
-    <div ng-if="!thumbsVerticalScroll" class="segments" ng-scrollbars ng-scroll-to="scrollTo" ng-scrollbars-config="horizontalScrollConfig">
+    <div ng-if="!thumbsVerticalScroll" class="segments horizontal" ng-scrollbars ng-scroll-to="scrollTo" ng-scrollbars-config="horizontalScrollConfig">
         <segment-set segments="segments"></segment-set>
     </div>
-    <div ng-if="thumbsVerticalScroll" class="segments" ng-scrollbars ng-scroll-to="scrollTo" ng-scrollbars-config="verticalScrollConfig">
+    <div ng-if="thumbsVerticalScroll" class="segments vertical" ng-scrollbars ng-scroll-to="scrollTo" ng-scrollbars-config="verticalScrollConfig">
         <segment-set segments="segments"></segment-set>
     </div>
   </div>

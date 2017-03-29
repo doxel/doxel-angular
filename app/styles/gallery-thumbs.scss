@@ -7,6 +7,15 @@
   height: 100%;
   //  z-index: 1000;
   #segments {
+
+    .vertical {
+      border-right: solid #444;
+    }
+
+    .horizontal {
+      border-top: 1px solid #444;
+    }
+
     transition-property: top;
     transition-duration: 0.5s;
     background-color: black;
