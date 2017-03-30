@@ -14,6 +14,9 @@
     width: 100%;
     bottom: 2px;
     z-index: 1;
+    .leaflet-marker-icon span {
+      color: black;
+    }
   }
 
 }

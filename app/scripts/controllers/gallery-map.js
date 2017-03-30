@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state,appConfig) {
+  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state,appConfig,errorMessage,$http) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -71,6 +71,16 @@ angular.module('doxelApp')
           lng: 1800000
         }
       },
+
+      bounds: leafletBoundsHelpers.createBoundsFromArray([
+         [45.817995,5.9559113], [47.8084648,10.4922941]
+      ]),
+
+      _center: {
+        lng: 0,
+        lat: 0
+      },
+
       markerURL: undefined,
 
       layers: {
@@ -235,7 +245,8 @@ angular.module('doxelApp')
         $scope.$on('segments-loaded',function(event,segments){
           $scope.updateShownSegments().then(function(){
             $scope.getMap($scope.updateMarkers);
-            console.log('loaded', segments.length,$scope.loadedCount)
+            console.log('loaded', $scope.skip,segments.length,$scope.loadedCount)
+            $scope.skip+=segments.length;
             if (!$scope.prevLoadedCount) $scope.prevLoadedCount=0;
             if ($scope.loadedCount>$scope.prevLoadedCount) {
               console.log('loadmore');
@@ -281,7 +292,10 @@ angular.module('doxelApp')
 
         $scope.$on('leafletDirectiveMap.moveend',function(){
           $scope.updateShownSegments().then(function(){
-//            $scope.skip=$scope.segments.length;
+            // if map center moved, reset filter.skip
+            if ($scope.center.lat-$scope._center.lat>0.001||$scope.center.lng-$scope._center.lng>0.001) {
+              $scope.skip=0;
+            }
             $scope.end.forward=$scope.end.backward=false;
             $scope.loadSegments();
           }).catch(function(err){
@@ -311,6 +325,8 @@ angular.module('doxelApp')
 
       }, // init
 
+      center: {},
+
       updateShownSegments: function() {
         var q=$q.defer();
         $scope.getMap(function(map){
@@ -323,16 +339,21 @@ angular.module('doxelApp')
             if ($scope.loaded.hasOwnProperty(segmentId)) {
               ++$scope.loadedCount;
               var segment=$scope.loaded[segmentId];
-              if (segment.geo) {
-                var index;
-                var alreadyDisplayed;
-                alreadyDisplayed=false;
-                $scope.segments.some(function(_segment,i){
-                  if (_segment.id==segmentId) {
-                    index=i;
-                    return alreadyDisplayed=true;
-                  }
-                });
+              var index;
+              var alreadyDisplayed;
+              alreadyDisplayed=false;
+              $scope.segments.some(function(_segment,i){
+                if (_segment.id==segmentId) {
+                  index=i;
+                  return alreadyDisplayed=true;
+                }
+              });
+              if (!segment.geo) {
+                if (alreadyDisplayed) {
+                  $scope.segments.splice(index,1);
+                  if (segment.marker) $scope.cluster.removeLayer(segment.marker);
+                }
+              } else {
                 segment.latLng=new L.latLng(segment.geo.lat,segment.geo.lng);
                 if (bounds.contains(segment.latLng)) {
                   segment.d=segment.latLng.distanceTo(center);
@@ -342,6 +363,7 @@ angular.module('doxelApp')
                   // remove out of bounds segment from display
                   if (alreadyDisplayed) {
                     $scope.segments.splice(index,1);
+                    if (segment.marker) $scope.cluster.removeLayer(segment.marker);
                   }
                 }
               }
@@ -373,7 +395,8 @@ angular.module('doxelApp')
                 maxDistance: meters
               }
             },
-            limit: 10000
+            limit: 10000,
+            skip: $scope.skip
           });
         });
         return q.promise;
@@ -390,8 +413,8 @@ angular.module('doxelApp')
         });
       }, // invalidateSize
 
-			watchOptions: {
-			},
+      watchOptions: {
+      },
       events: {
         map: {
           enable:  ['moveend', 'click'],
@@ -468,10 +491,86 @@ angular.module('doxelApp')
           map.addLayer(cluster);
         }
 
-      } // updateMarkers
+      }, // updateMarkers
+
+      getCurrentPosition: function(){
+        if (navigator && navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+          var q=$q.defer();
+
+          try {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              console.log(position);
+              q.resolve(position);
+
+            });
+
+          } catch(e) {
+            console.log(e);
+            q.reject(e);
+          }
+
+          return q.promise
+
+        } else {
+          return $q.reject();
+        }
+
+      }, // getCurrentPosition
+
+      getCountryCode: function(position){
+        return $http({
+          method: 'GET',
+          cache: true,
+          responseType: 'json',
+          url: 'https://nominatim.openstreetmap.org/reverse?osm_type=N&format=json&lat='+position.coords.latitude+'&lon='+position.coords.longitude
+
+        })/*.then(function success(response){
+          console.log(response);
+
+        }, function error(response){
+          console.log(response);
+          if (response.data.type.split('/')[0]=='text') {
+            errorMessage.show(response.data);
+
+          }
+        });
+
+        */
+      }, // getCountryCode
+
+      getCountryBBox: function(response){
+        var countryCode=response.data.address.country_code;
+        return $http({
+          method: 'GET',
+          cache: true,
+          responseType: 'json',
+          url: 'https://raw.githubusercontent.com/doxel/country-bounding-boxes/master/dataset/'+countryCode+'.json'
+
+        });
+/*
+.then(function success(response){
+          console.log(response);
+
+        }, function error(response){
+          console.log(response);
+          if (response.data.type.split('/')[0]=='text') {
+            errorMessage.show(response.data);
+
+          }
+        });*/
+
+      }, // getCountryBBox
+
+      setBounds: function(response){
+        var bbox=response.data.bbox[0]
+        $scope.bounds.southWest.lat=bbox[1];
+        $scope.bounds.southWest.lng=bbox[0];
+        $scope.bounds.northEast.lat=bbox[3];
+        $scope.bounds.northEast.lng=bbox[2];
+      } // setBounds;
 
     });
 
-    $scope.init();
+    $scope.getCurrentPosition().then($scope.getCountryCode).then($scope.getCountryBBox).then($scope.setBounds).finally($scope.init);;
 
   });

@@ -64,9 +64,8 @@ angular.module('doxelApp')
 
       angular.extend($scope,{
         end: {},
-        loaded: {},
+        loaded: segmentsService.loaded,
         segments: segmentsService.segments,
-        selected: {},  // unloaded segment could be selected because of paging or page reload. TODO: restore selection on load
         center: [0,0],
         init: function(){
 
