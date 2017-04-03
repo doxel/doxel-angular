@@ -61,6 +61,7 @@ angular.module('doxelApp')
       }
 
       $scope.$on('$stateChangeSuccess', function (event, toState) { 
+        $('#main').removeClass('hidden');
         $scope.home_visible=(toState.name=='gallery.view.home');
       });
 

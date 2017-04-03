@@ -59,7 +59,7 @@
     <link rel="stylesheet" href="styles/theme.min.css">
   </head>
   <body ng-cloak ng-app="doxelApp" ng-controller="MainCtrl" fullscreen="isFullscreem" ng-click="toggleFullscreen()" class="my-drop-zone" nv-file-drop="" nv-file-over="" uploader="uploader">
-    <div id="main" ng-class="getClass()" ng-cloak >
+    <div id="main" class="hidden" ng-class="getClass()" ng-cloak >
       <!--[if lte IE 8]>
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -123,7 +123,7 @@
 
         <div class="footer">
           <div class="container">
-            <p>&copy; 2015-2016<a href="https://doxel.org/wordpress/" title="DOXEL.org – Dynamic Volumetric Pixel">
+            <p>&copy; 2015-2017<a href="https://doxel.org" title="DOXEL.org – Dynamic Volumetric Pixel">
               DOXEL.org – Dynamic Volumetric Pixel      </a></p>
           </div>
         </div>
