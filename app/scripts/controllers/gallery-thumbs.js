@@ -367,6 +367,7 @@ angular.module('doxelApp')
             // user clicked ?
             if (!justRestoringSelection) {
               // update query string
+              delete $rootScope.params.pose;
               $location.search($rootScope.params);
               // open viewer
               if ($scope.$state.current.name=='gallery.view.thumbs' || $scope.$state.current.name=='gallery.view.home') {

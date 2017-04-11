@@ -100,8 +100,13 @@ angular.module('doxelApp')
         },q.reject);
 
         q.promise.then(function(segment){
+          // set viewer parameters
+          var params=[];
+          ($location.$$search.pose!==undefined) && params.push('pose='+$location.$$search.pose);
+          var search=(params.length)?'?'+params.join('&'):'';
+
           var src=$('iframe.viewer').attr('src');
-          var toSrc='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html';
+          var toSrc='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html'+search;
           if (src!=toSrc) {
             $http.head(toSrc,{
               headers: {
