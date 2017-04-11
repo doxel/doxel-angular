@@ -54,7 +54,7 @@ angular.module('doxelApp')
 
         $scope.click=function($event,index){
           var picture=$scope.pictures[index]
-          $scope.$parent.showPictureDetails(picture);
+          $scope.$root.$broadcast('picture.click',picture);
 
         }
 /*        $scope.resize=function(){

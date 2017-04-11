@@ -43,7 +43,7 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state,appConfig,errorMessage,$http) {
+  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state,appConfig,errorMessage,$http,elementSelection) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -278,17 +278,26 @@ angular.module('doxelApp')
           $location.search($rootScope.params).replace();
         });
 
+        $scope.cluster.on('click',function(a){
+          console.log('marker',a.layer);
+          $scope.markerClick(a.layer.options.segmentId);
+        });
+
         $scope.$on('leafletDirectiveMarker.click', function(event, args){
-          console.log(args.model.segmentId);
-          $scope.getSegment(args.model.segmentId).then(function(segment){
-            if ($scope.selected[segment.id]) {
+            console.log(args.model.segmentId);
+            $scope.markerClick(args.model.segmentId);
+        });
+
+       $scope.markerClick=function(segmentId){
+          $scope.getSegment(segmentId).then(function(segment){
+            if (elementSelection.isSelected('segment',segment)) {
               $scope.$state.transitionTo('gallery.view.cloud');
             } else {
               $rootScope.$broadcast('segment.click',segment,{show:true});
             }
 
           });
-        });
+        }
 
         $scope.$on('leafletDirectiveMap.moveend',function(){
           $scope.updateShownSegments().then(function(){
@@ -465,8 +474,10 @@ angular.module('doxelApp')
         });
       }, // setView
 
+      cluster: L.markerClusterGroup(),
+
       updateMarkers: function(map){
-        var cluster=$scope.cluster||($scope.cluster=L.markerClusterGroup());
+        var cluster=$scope.cluster;
 
         $scope.segments.some(function(segment,idx){
           if (!segment.geo) return;

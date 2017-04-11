@@ -111,6 +111,12 @@ var app=angular
       .state('404',{
         templateUrl: 'views/404.html'
       })
+      .state('classifiers', {
+        url: '/classifiers',
+        templateUrl: 'views/classifiers.html',
+        controller: 'ClassifiersCtrl',
+        controllerAs: 'classifiers'
+      }) 
       .state('login', {
         url: '/login',
         templateUrl: 'views/login.html',
