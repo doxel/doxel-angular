@@ -72,8 +72,9 @@ angular.module('doxelApp')
           }
           var pictureClass=$scope.pictureClass;
           thumb.addClass('loading');
+          console.log(pictureClass);
           picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
-          getPictureBlobAndExif(picture,((pictureClass=='thumb')?'thumb':undefined)).then(function(picture){
+          getPictureBlobAndExif(picture,((pictureClass.search('thumb')>=0)?'thumb':undefined)).then(function(picture){
             $scope.pictureClass=pictureClass;
 
             var img=new Image();
