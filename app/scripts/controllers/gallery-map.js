@@ -534,7 +534,6 @@ angular.module('doxelApp')
             });
 
           } catch(e) {
-            console.log(e);
             q.reject(e);
           }
 
@@ -547,9 +546,7 @@ angular.module('doxelApp')
       }, // getCurrentPosition
 
       getGeoIp: function(args){
-        var q=$q.defer();
-
-        $http({
+        return $http({
           method: 'GET',
           cache: true,
           responseType: 'json',
@@ -565,11 +562,9 @@ angular.module('doxelApp')
               latitude: response.data.lat
             }
           };
-          q.resolve(args);
-        })
-        .catch(q.reject);
+          return args;
 
-        return q.promise;
+        })
 
       }, // getGeoIp
 
@@ -577,23 +572,14 @@ angular.module('doxelApp')
         if (args.country_code) return $q.resolve(args);
         if (!args.position) return $q.reject(new Error('could not get country code'));
 
-        var q=$q.defer();
-        $scope.getReverseGeoRef(args)
-        .then(function(args){
-          args.country_code=args.nominatim.address.country_code;
-          q.resolve(args);
-        })
-        .catch(q.reject);
-
-        return q.promise;
+        return $scope.getReverseGeoRef(args);
 
       }, // getCountryCode
 
       getReverseGeoRef: function(args){
-        var q=$.defer();
         var position=args.position;
 
-        $http({
+        return $http({
           method: 'GET',
           cache: true,
           responseType: 'json',
@@ -601,13 +587,10 @@ angular.module('doxelApp')
 
         })
         .then(function(response){
+          args.nominatim=response.data;
           args.country_code=response.data.address.country_code;
-          q.resolve(args);
-
+          return args;
         })
-        .catch(q.reject);
-
-        return q.promise;
 
       }, // getReverseGeoRef
 
@@ -638,6 +621,7 @@ angular.module('doxelApp')
     .then($scope.getCountryCode)
     .then($scope.getCountryBBox)
     .then($scope.setBounds)
+    .catch(console.log)
     .finally($scope.init);;
 
   });
