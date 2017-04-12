@@ -505,14 +505,32 @@ angular.module('doxelApp')
       }, // updateMarkers
 
       getCurrentPosition: function(){
+        // try to get geolocation from navigator
         if (navigator && navigator.geolocation && navigator.geolocation.getCurrentPosition) {
           var q=$q.defer();
 
           try {
             navigator.geolocation.getCurrentPosition(function(position) {
               console.log(position);
-              q.resolve(position);
+              q.resolve({position: position});
 
+            },function(){
+              // on error, try to get ip location
+              $scope.getGeoIp()
+              .then(function(args){
+                console.log(args.geoIp);
+                if (args.geoIp && args.geoIp.country_code) {
+                  args.country_code=args.geoip.country_code;
+                }
+                if (args.geoIp && args.geoIp.longitude!==undefined) {
+                  args.position={
+                    longitude: args.geoIp.longitude,
+                    latitude: args.geoIp.latitude
+                  }
+                }
+                q.resolve(args);
+              })
+              .catch(q.reject);
             });
 
           } catch(e) {
@@ -528,47 +546,81 @@ angular.module('doxelApp')
 
       }, // getCurrentPosition
 
-      getCountryCode: function(position){
-        return $http({
+      getGeoIp: function(args){
+        var q=$q.defer();
+
+        $http({
           method: 'GET',
           cache: true,
           responseType: 'json',
-          url: 'https://nominatim.openstreetmap.org/reverse?osm_type=N&format=json&lat='+position.coords.latitude+'&lon='+position.coords.longitude
+          url: '/geoip'
+        })
+        .then(function(response){
+          args=args||{};
+          args.geoIp=response.data;
+          args.country_code=response.data.countryCode;
+          args.position={
+            coords: {
+              longitude: response.data.lon,
+              latitude: response.data.lat
+            }
+          };
+          q.resolve(args);
+        })
+        .catch(q.reject);
 
-        })/*.then(function success(response){
-          console.log(response);
+        return q.promise;
 
-        }, function error(response){
-          console.log(response);
-          if (response.data.type.split('/')[0]=='text') {
-            errorMessage.show(response.data);
+      }, // getGeoIp
 
-          }
-        });
+      getCountryCode: function(args){
+        if (args.country_code) return $q.resolve(args);
+        if (!args.position) return $q.reject(new Error('could not get country code'));
 
-        */
+        var q=$q.defer();
+        $scope.getReverseGeoRef(args)
+        .then(function(args){
+          args.country_code=args.nominatim.address.country_code;
+          q.resolve(args);
+        })
+        .catch(q.reject);
+
+        return q.promise;
+
       }, // getCountryCode
 
-      getCountryBBox: function(response){
-        var countryCode=response.data.address.country_code;
+      getReverseGeoRef: function(args){
+        var q=$.defer();
+        var position=args.position;
+
+        $http({
+          method: 'GET',
+          cache: true,
+          responseType: 'json',
+          url: '//nominatim.openstreetmap.org/reverse?osm_type=N&format=json&lat='+position.coords.latitude+'&lon='+position.coords.longitude
+
+        })
+        .then(function(response){
+          args.country_code=response.data.address.country_code;
+          q.resolve(args);
+
+        })
+        .catch(q.reject);
+
+        return q.promise;
+
+      }, // getReverseGeoRef
+
+      getCountryBBox: function(args){
+        var countryCode=args.country_code.toLowerCase();
+
         return $http({
           method: 'GET',
           cache: true,
           responseType: 'json',
-          url: 'https://raw.githubusercontent.com/doxel/country-bounding-boxes/master/dataset/'+countryCode+'.json'
+          url: '//raw.githubusercontent.com/doxel/country-bounding-boxes/master/dataset/'+countryCode+'.json'
 
         });
-/*
-.then(function success(response){
-          console.log(response);
-
-        }, function error(response){
-          console.log(response);
-          if (response.data.type.split('/')[0]=='text') {
-            errorMessage.show(response.data);
-
-          }
-        });*/
 
       }, // getCountryBBox
 
@@ -582,6 +634,10 @@ angular.module('doxelApp')
 
     });
 
-    $scope.getCurrentPosition().then($scope.getCountryCode).then($scope.getCountryBBox).then($scope.setBounds).finally($scope.init);;
+    $scope.getCurrentPosition()
+    .then($scope.getCountryCode)
+    .then($scope.getCountryBBox)
+    .then($scope.setBounds)
+    .finally($scope.init);;
 
   });
