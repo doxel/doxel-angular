@@ -332,26 +332,51 @@ angular.module('doxelApp')
         }, // getSegment
 
         loadSegmentsAround: function(segmentId,_then,_catch) {
-          Segment.findById({
-            id: segmentId,
-            filter: {
-              include: 'pointCloud'
-            }
-          }, function(segment){
-            if (segment) {
-              $scope.loaded[segment.id]=segment;
-              Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
-              $scope.loadSegments('backward').promise.then(function(){
-                $timeout(function(){
-                  $scope.loadSegments('forward').promise.then(function(){
-                    _then(segment);
-                  },_catch);
-                });
-              },_catch);
-            } else {
-              _catch(new Error('Segment not found !'));
-            }
-          },_catch);
+          _then=_then||function(){};
+          _catch=_catch||function(){};
+
+          var q=$q.defer();
+
+          if ($scope.loaded[segmentId]) {
+            // dont reload segment (preserve attributes)
+            q.resolve();
+
+          } else {
+            Segment.findById({
+              id: segmentId,
+              filter: {
+                include: 'pointCloud'
+              }
+            }, function(segment){
+              if (segment) {
+                $scope.loaded[segment.id]=segment;
+                q.resolve();
+
+              } else {
+                _catch(new Error('Segment not found !'));
+              }
+
+            },_catch);
+          }
+
+          q.promise.then(function(){
+            var segment=$scope.loaded[segmentId];
+
+            // reduce segments displayed to loaded segment
+            Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
+
+            // load segments backward
+            $scope.loadSegments('backward').promise.then(function(){
+
+              // load segments forward
+              $timeout(function(){
+                $scope.loadSegments('forward').promise.then(function(){
+                  _then(segment);
+                },_catch);
+              });
+
+            },_catch);
+          });
 
         } // loadSegmentsAround
 
