@@ -78,51 +78,42 @@ angular.module('doxelApp')
       ];
 
       angular.extend($scope,{
-        whileScrolling: function whileScrolling(side){
-          console.log('whilescrolling');
+        whileScrolling: function whileScrolling(data){
+          var delta=data.delta;
+
           if ($scope._loadSegments) {
             return;
           }
           var count=$scope.segments.length;
-          var pos=$scope.scrollPos;
 
-          // store scrollpos in thumbs unit
-          pos.push(((count||1)-1)*this.mcs[side+'Pct']/100);
+          // get scrollpos in thumbs unit
+          var side={x: 'left', y: 'top'};
+          var pos=((count||1)-1)*this.mcs[side[this.mcs.direction]+'Pct']/100;
 
-          // the second time we can determine the direction
-          if (pos.length==2) {
-            var remain;
-            var direction;
+          var remain;
+          var direction;
 
-            if (pos[0]<pos[1]) {
-              direction='forward';
-              // how many thumbs remain after scrollpos
-              remain=Math.abs(count-pos[1]);
+          if (delta>0) {
+            direction='forward';
+            // how many thumbs remain after scrollpos
+            remain=Math.floor(count-pos);
 
-            } else if (pos[0]>pos[1]) {
-              direction='backward';
-              // how many thumbs remain before scrollpos
-              remain=Math.abs(pos[1]);
-            }
-
-            // scrollbar moving and thumbs remaining is less than threshold
-            if (direction && remain<$scope.maxThumbs/2) {
-              console.log('remain',count,pos,remain,$scope.maxThumbs/2)
-              $scope.loadSegments(direction).promise.then(function(){
-                $timeout(function(){
-                  $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
-                });
-              });
-            }
-
-            // discard oldest scrollpos
-            $scope.scrollPos.shift();
+          } else if (delta<0) {
+            direction='backward';
+            // how many thumbs remain before scrollpos
+            remain=Math.floor(pos);
           }
-        }
-      });
 
-      angular.extend($scope,{
-        scrollPos: [],
+          // scrollbar moving and thumbs remaining is less than threshold
+          if (direction && remain<$scope.maxThumbs/2) {
+            console.log('remain',count,pos,remain,$scope.maxThumbs/2)
+            $scope.loadSegments(direction).promise.then(function(){
+              $timeout(function(){
+                $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
+              });
+            });
+          }
+        },
         verticalScrollConfig: {
           axis: 'y',
           theme: 'light',
@@ -148,10 +139,10 @@ angular.module('doxelApp')
               console.log(arguments);
             },
             */
-            whileScrolling: function(){
+            whileScrolling: function(data){
               var that=this;
               $timeout(function(){
-                $scope.whileScrolling.apply(that,['top']);
+                $scope.whileScrolling.apply(that,[data]);
               });
             }
           }
@@ -183,10 +174,10 @@ angular.module('doxelApp')
               console.log(arguments);
             },
             */
-            whileScrolling: function(){
+            whileScrolling: function(data){
               var that=this;
               $timeout(function(){
-                $scope.whileScrolling.apply(that,['left']);
+                $scope.whileScrolling.apply(that,[data]);
               });
             }
           }
@@ -242,6 +233,10 @@ angular.module('doxelApp')
         }, // showNextPreview
 
         initEventHandlers: function() {
+
+          window.jQuery('#segments').on('mcswheel','.mCustomScrollbar',function(e,delta){
+            $scope.whileScrolling.apply(this,[{delta: -delta}]);
+          });
 
           window.jQuery('body').on('mousemove','.thumb',updateMousePosition);
           function updateMousePosition(e){
