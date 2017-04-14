@@ -202,6 +202,7 @@ angular.module('doxelApp')
           if (!$scope.map_visible) {
             console.log('map was not visible');
             $scope.map_visible=true;
+
             $scope.getMap(function(map){
               map.options.inertia=false;
               // select and show current segment
@@ -214,8 +215,43 @@ angular.module('doxelApp')
               console.log('updateMarkers');
             });
           }
+
         } else {
-          $scope.map_visible=false;
+          if ($scope.map_visible) {
+            $scope.map_visible=false;
+            $rootScope.map_wasvisible=true;
+
+          }
+          if ($rootScope.map_wasvisible) {
+            if (state.name=='gallery.view.thumbs' || state.name=='gallery.view.home') {
+              var segmentId;
+              $rootScope.map_wasvisible=false;
+
+              // unset scroll limits
+              $scope.end.forward=$scope.end.backward=false;
+
+              // get selected segmentId or TODO: top-screen segment id
+              segmentId=$rootScope.params.s;
+              if (segmentId===undefined && $scope.segments.length) {
+                segmentId=$scope.segments[$scope.segments.length>>1];
+              }
+
+              // clear thumbs list
+              $scope.segments.splice(0,$scope.segments.length-1);
+
+              // rebuild thumbs list
+              if (segmentId) {
+                $scope.loadSegmentsAround(segmentId);
+
+              } else {
+                $scope.loadSegments();
+              }
+
+            } else {
+              $scope.end.forward=$scope.end.backward=true;
+            }
+          }
+
           $rootScope.map_promise=null;
         }
 
