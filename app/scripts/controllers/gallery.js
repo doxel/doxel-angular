@@ -231,34 +231,41 @@ angular.module('doxelApp')
               if (!segments || !segments.length) {
                 // end reached
                 $scope.end[direction]=true;
-
               } else {
+
                 if (direction=='backward') {
                   // prepend segments
                   segments.reverse();
                   angular.forEach(segments,function(segment){
+                    if (!$scope.loaded[segment.id]) {
+                      $scope.loaded[segment.id]=segment;
+                    }
                     if (segment.pointCloudId && !segment.pointCloud) {
                       console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
                       return;
                     }
-                    var found;
+                    var alreadyDisplayed=false;
                     $scope.segments.some(function(_segment,i){
-                      return found=(_segment.id==segment.id);
+                      return alreadyDisplayed=(_segment.id==segment.id);
                     });
-                    if (!found) {
-                      $scope.segments.some(function(_segment,i){
-                        if (segment.timestamp>_segment.timestamp) {
-                          $scope.segments.splice(i,0,segment);
-                          $scope.loaded[segment.id]=segment;
-                          return true;
-                        }
-                      });
+                    if (!alreadyDisplayed) {
+                      if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
+                        $scope.segments.some(function(_segment,i){
+                          if (segment.timestamp>_segment.timestamp) {
+                            $scope.segments.splice(i,0,segment);
+                            return true;
+                          }
+                        });
+                      }
                     }
                   });
 
                 } else { // direction==forward
                   // append segments
                   angular.forEach(segments,function(segment){
+                    if (!$scope.loaded[segment.id]) {
+                      $scope.loaded[segment.id]=segment;
+                    }
                     if (!segment.pointCloud) {
                       console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
                       return;
@@ -268,8 +275,9 @@ angular.module('doxelApp')
                       return found=(_segment.id==segment.id);
                     });
                     if (!found) {
-                      $scope.segments.push(segment);
-                      $scope.loaded[segment.id]=segment;
+                      if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
+                        $scope.segments.push(segment);
+                      }
                     }
                   });
                 }
