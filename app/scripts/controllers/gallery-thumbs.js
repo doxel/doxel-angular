@@ -331,6 +331,7 @@ angular.module('doxelApp')
         }, // initEventHandlers
 
         init: function() {
+          $scope.$parent.scrollBufferFull=$scope.scrollBufferFull;
           $scope.initEventHandlers();
           $scope.thumbs_visible=false;
         }, // init
@@ -523,7 +524,7 @@ angular.module('doxelApp')
             }
           }
 
-          if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBarVisible()) {
+          if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBufferFull(direction||'forward')) {
             console.log('more');
             $scope.loadSegments(direction||'forward',$scope.thumbsH).promise.then(function(segments){
               if(segments.length){
@@ -573,8 +574,47 @@ angular.module('doxelApp')
           return $('#gallery-thumbs:visible').length;
         },
 
-        scrollBarVisible: function(){
-          return $('#gallery-thumbs .mCSB_draggerContainer:visible').length>0;
+        scrollBufferFull: function(direction){
+          var mcsElem=$('#gallery-thumbs .mCustomScrollbar');
+          var mcs=mcsElem[0].mcs;
+          if (!mcs) return false;
+          var spanlist=mcs.content[0].children[0].children;
+          if (!spanlist.length) {
+            return false;
+          }
+
+          var offset;
+          var multiplier=1;
+          if (spanlist.length==$scope.segments.length) {
+            offset=$(spanlist[spanlist.length-1]).offset();
+
+          } else {
+            // compute last thumb offsets when display is out of sync with $scope.segments
+            if (spanlist.length<1) {
+              return false;
+            }
+            offset=$(spanlist[0]).offset();
+            var offset1=$(spanlist[1]).offset();
+            offset.top+=(offset1.top-offset.top)*$scope.segments.length;
+            offset.left+=(offset1.left-offset.left)*$scope.segments.length;
+
+          }
+
+          if (direction=='forward') {
+            if (mcs.direction=='x') {
+                return (offset.left > mcsElem.offset().left+(mcsElem.width()*1.5)); 
+            }
+            if (mcs.direction=='y') {
+                return (offset.top > mcsElem.offset().top+(mcsElem.height()*1.5)); 
+            }
+          } else {
+            if (mcs.direction=='x') {
+                return (offset.left < mcsElem.offset().left-(mcsElem.width()*1.5)); 
+            }
+            if (mcs.direction=='y') {
+                return (offset.top < mcsElem.offset().top-(mcsElem.height()*1.5)); 
+            }
+          }
         },
 
         updateSelection: function(segmentId){
