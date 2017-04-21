@@ -193,6 +193,8 @@ angular.module('doxelApp')
                 item.formData.push({
                   sha256: data.sha256,
                   timestamp: data.timestamp,
+                  lat: data.lat,
+                  lon: data.lon,
                   chunks: 1,
                   chunk: 0,
                   name: blob.name
