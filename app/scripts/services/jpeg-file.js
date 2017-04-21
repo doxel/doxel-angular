@@ -273,7 +273,7 @@ angular.module('doxelApp')
           var dms=[
             parseInt(rawdms[0][0])/parseInt(rawdms[0][1]),
             parseInt(rawdms[1][0])/parseInt(rawdms[1][1]),
-            parseInt(rawdms[1][0])/parseInt(rawdms[1][1])
+            parseInt(rawdms[2][0])/parseInt(rawdms[2][1])
           ];
 
           // convert to decimal
@@ -297,7 +297,7 @@ angular.module('doxelApp')
           var dms=[
             parseInt(rawdms[0][0])/parseInt(rawdms[0][1]),
             parseInt(rawdms[1][0])/parseInt(rawdms[1][1]),
-            parseInt(rawdms[1][0])/parseInt(rawdms[1][1])
+            parseInt(rawdms[2][0])/parseInt(rawdms[2][1])
           ];
 
           // convert to signed decimal
