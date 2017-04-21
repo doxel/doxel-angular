@@ -43,7 +43,7 @@
     "leaflet.markercluster": "^1.0.4",
     "leaflet": "^1.0.3",
     "ng-tags-input": "^3.1.2",
-    "malihu-custom-scrollbar-plugin": "git://github.com/doxel/malihu-custom-scrollbar-plugin.git#9ef2a891b903b74a122193074f3d91de6cb9713a"
+    "malihu-custom-scrollbar-plugin": "git://github.com/doxel/malihu-custom-scrollbar-plugin.git"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
