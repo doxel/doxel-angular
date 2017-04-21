@@ -1,0 +1,312 @@
+#classifiers {
+  margin-top: 64px;
+  height: 100%;
+  margin-bottom: -64px;
+  position: absolute;
+  width: 100%;
+  left:0;
+  padding: 10px;
+  text-align: center;
+  
+
+  tags-input {
+    max-width: 700px;
+    margin: auto;
+		color: black;
+   }
+
+    picture {
+      width: 192px;
+      height: 120px;
+     
+      .thumb.loaded {
+        background-size: cover;
+        background-position: center;
+      }
+     
+      .thumb {
+        background-repeat: no-repeat;
+        width: 192px;
+        height: 120px;
+        box-shadow: 4px 4px 4px rgba(0,0,0,0.3);
+      }
+     
+      .thumb:hover {
+        transform: scale(0.995);
+        box-shadow: 3.5px 3.5px 4px rgba(0,0,0,0.4);
+      }
+     
+      .thumb:active {
+        transform: scale(0.98);
+        box-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+      }
+      .thumb.selected {
+        border: 4px solid yellow;
+      }
+     
+    }
+	  .content {
+			width: 100%;
+      text-align: middle;
+	  }
+
+}
+
+/*
+
+#classifiers picture .thumb {
+  opacity: 0;
+  transition: opacity 1000ms;
+}
+
+#classifiers picture .thumb.loaded {
+  opacity: 1;
+}
+
+#classifiers picture .thumb.loading:after {
+  content: "\f110"; // fa-spinner 
+
+  font-family: FontAwesome;
+  font-size:20px;
+  line-height: 120px;
+  position: absolute;
+  top: 0; 
+  margin-left: -10px;
+
+  animation: fa-spin 2s infinite linear;
+
+}
+
+#classifiers picture .thumb.load-error {
+  background-image: url(/images/ajax-load-error.gif);
+  background-position: center;
+  background-size: inherit;
+  background-repeat: no-repeat;
+}
+
+#classifiers {
+
+  position: relative;
+  height: 100%;
+  //  z-index: 1000;
+  .content  {
+
+    .vertical {
+      border-right: solid #444;
+    }
+
+    .horizontal {
+      border-top: 1px solid #444;
+    }
+
+    transition-property: top;
+    transition-duration: 0.5s;
+    background-color: black;
+
+    picture-set > span,
+    segment-set > span {
+      background-color: black;
+    }
+
+    position: fixed;
+    top: 55px;
+    left: 0;
+    bottom: 2px;
+    z-index: 1001;
+
+
+    padding-right: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    padding-bottom: 57px;
+    text-align: center;
+
+    .pictures {
+      text-align: center;
+      width: 100%;
+      overflow-y: auto;
+      height: 100%;
+      //  padding-bottom: 104px;
+    }
+
+    picture {
+      width: 192px;
+      height: 120px;
+
+      .thumb.loaded {
+        background-size: cover;
+        background-position: center;
+      }
+
+      .thumb {
+        background-repeat: no-repeat;
+        width: 192px;
+        height: 120px;
+        box-shadow: 4px 4px 4px rgba(0,0,0,0.3);
+      }
+
+      .thumb:hover {
+        transform: scale(0.995);
+        box-shadow: 3.5px 3.5px 4px rgba(0,0,0,0.4);
+      }
+
+      .thumb:active {
+        transform: scale(0.98);
+        box-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+      }
+      .thumb.selected {
+        border: 4px solid yellow;
+      }
+
+    }
+
+    .segment-details .thumb {
+      margin: auto;
+    }
+
+    a {
+      opacity: 1;
+      transition: opacity 1000ms;
+
+      width: 192px;
+      height: 140px;
+      background-color: black;
+      border: 1px solid gray;
+
+      segment-preview {
+        background-color: #111;
+      }
+
+      .date {
+        display: none;
+      }
+
+      .points {
+        color: rgba(255,255,255,0.8);
+        float: left;
+        margin-top: 2px;
+        margin-left: 4px;
+      }
+
+      .poses {
+        color: rgba(255,255,255,0.8);
+        float: right;
+        margin-top: 2px;
+        margin-right:4px;
+        
+      }
+      i {
+        margin-right: 2px;
+      }
+      margin-bottom: 4px;
+    }
+
+    a.loading {
+      opacity: 0;
+    }
+
+
+
+  }
+
+}
+
+.navbar-hidden #classivfiers {
+  top: 0px;
+  padding-bottom: 2px;
+}
+
+
+.thumbs-handle {
+  display: none;
+  position: fixed;
+  z-index: 99999999;
+}
+
+.thumbs-left,
+.thumbs-bottom {
+
+  #gallery-thumbs {
+    display: none;
+  }
+
+}
+
+@media screen and (min-height: 768px) {
+  .thumbs-bottom #gallery-thumbs {
+    display: block;
+
+    .mCSB_scrollTools{bottom: 130px;}
+
+    #classifiers {
+      height: auto;
+      width: 100%;
+      left: 0;
+      margin: 0;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 0 2px 0 2px;
+      top: auto;
+
+      .pictures {
+        height: 140px;
+      }
+
+      a {
+        margin-bottom: 0;
+      }
+
+
+    }
+  }
+
+  .thumbs-bottom .thumbs-handle {
+    transition-property: margin-top;
+    transition-duration: 0.5s;
+    display: block;
+    left: 50%;
+    margin-left: -2em;
+    transform: none;
+  //  transform: translateX(-2em);
+    border-bottom: 0px;
+    border-radius: 4px 4px 0px 0px;
+    bottom: 144px;
+  }
+
+  .thumbs-hidden .thumbs-bottom #gallery-thumbs #segments {
+    bottom: -144px;
+  }
+
+}
+
+.thumbs-left .navbar-hidden {
+  .thumbs-handle {
+    margin-top: -26px;
+  }
+}
+
+.thumbs-hidden {
+
+// no animation, just hide
+  #gallery-thumbs #segments {
+    visibility: hidden;
+  }
+
+  .thumbs-left {
+    #gallery-thumbs #segments {
+      left: -200px;
+    }
+    .thumbs-handle {
+      left: 0px;
+    }
+  }
+  .thumbs-bottom {
+    .thumbs-handle {
+      bottom: 0px;
+    }
+
+  }
+}
+
+*/
