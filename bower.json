@@ -81,7 +81,8 @@
     "leaflet": ">= 1.0.0",
     "bootstrap": ">=2.0.0",
     "angular-ui-router": "^0.3.2",
-    "ng-tags-input": "^3.1.2"
+    "ng-tags-input": "^3.1.2",
+    "malihu-custom-scrollbar-plugin": "9ef2a891b903b74a122193074f3d91de6cb9713a"
   },
   "homepage": "https://github.com/doxel/doxel-angular",
   "authors": [
