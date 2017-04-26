@@ -73,6 +73,7 @@ angular.module('doxelApp')
 
           //// on state change success
           $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+            console.log(toState)
             // scope is visible when beginning with 'gallery'
             $scope.visible=(toState.name.substr(0,7)=='gallery');
             if (!$scope.visible) return;

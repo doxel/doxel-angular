@@ -61,6 +61,7 @@ angular.module('doxelApp')
 
       init: function() {
         $scope.$on('$stateChangeSuccess',function(e, toState){
+          console.log(toState)
           $scope.update(toState);
         });
 

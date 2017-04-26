@@ -303,6 +303,7 @@ angular.module('doxelApp')
 
         // update
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+          console.log(toState);
           $scope.updateVisibility(toState);
         });
         $scope.updateVisibility($rootScope.$state.current);

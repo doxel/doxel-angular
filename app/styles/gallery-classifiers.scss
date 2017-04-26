@@ -1,8 +1,7 @@
 #classifiers {
+  z-index: 99999999;
   margin-top: 64px;
-  height: 100%;
-  margin-bottom: -64px;
-  position: absolute;
+  position: fixed;
   width: 100%;
   left:0;
   padding: 10px;
@@ -10,6 +9,8 @@
   
 
   tags-input {
+    position: fixed;
+    z-index: 99999999;
     max-width: 700px;
     margin: auto;
 		color: black;

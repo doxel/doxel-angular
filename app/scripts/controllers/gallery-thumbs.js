@@ -291,6 +291,7 @@ angular.module('doxelApp')
           });
 
           $scope.$on('$stateChangeSuccess', function (event, toState) {
+            console.log(toState)
             $scope.update(toState);
           });
 
@@ -553,9 +554,12 @@ angular.module('doxelApp')
         },
 
         updateThumbsStyle: function(state){
-          if (state.name=="gallery.view.thumbs") {
-            // full window for thumbs view
-
+          if (
+            // full window for thumbs view 
+            state.name=="gallery.view.thumbs" 
+            // full window for classifiers view 
+            || state.name=="gallery.view.classifiers" 
+          ) {
             $scope.thumbsVerticalScroll=true;
             $timeout(function(){
               $rootScope.thumbsPosition='';

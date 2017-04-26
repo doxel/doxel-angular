@@ -111,12 +111,13 @@ var app=angular
       .state('404',{
         templateUrl: 'views/404.html'
       })
-      .state('classifiers', {
+/*      .state('classifiers', {
         url: '/classifiers',
         templateUrl: 'views/classifiers.html',
         controller: 'ClassifiersCtrl',
         controllerAs: 'classifiers'
       }) 
+      */
       .state('login', {
         url: '/login',
         templateUrl: 'views/login.html',
@@ -191,6 +192,11 @@ var app=angular
             controller: 'MainCtrl',
             controllerAs: 'main'
           },
+          'gallery-classifiers': {
+            templateUrl: 'views/gallery-classifiers.html',
+            controller: 'ClassifiersCtrl',
+            controllerAs: 'classifiers'
+          },
           // must be the last one (z-index)
           'gallery-thumbs': {
             templateUrl: 'views/gallery-thumbs.html',
@@ -228,6 +234,11 @@ var app=angular
       .state('gallery.view.cloud', {
         url: '/viewer',
         controller: 'GalleryViewerCtrl'
+      })
+
+      .state('gallery.view.classifiers', {
+        url: '/classifiers',
+        controller: 'GalleryClassifiersCtrl'
       })
 
       .state('tos', {

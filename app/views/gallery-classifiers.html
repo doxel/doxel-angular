@@ -1,0 +1,11 @@
+<div ng-controller="GalleryClassifiersCtrl" id="classifiers" ng-show="classifiers_visible">
+  <tags-input ng-model="tags" add-on-paste="true" ng-show="classifiers_visible">
+    <auto-complete source="loadTags($query)"
+                   min-length="0"
+                   max-results-to-show="100"
+                   add-from-autocomplete-only="true"
+                   on-tag-added="tagAdded($tag)"
+                   on-tag-removed="tagremoved($tag)"></auto-complete>
+  </tags-input>
+</div>
+

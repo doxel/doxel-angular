@@ -73,6 +73,7 @@ angular.module('doxelApp')
         $scope.updateViewerVisibility($state.current.name);
 
         $rootScope.$on('$stateChangeSuccess',function(event,toState){
+          console.log(toState)
           $scope.updateViewerVisibility(toState.name);
         });
 
