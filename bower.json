@@ -12,7 +12,7 @@
     "angular-sanitize": "^1.4.0",
     "angular-touch": "^1.4.0",
     "angular-ui-scroll": "~1.5.2",
-    "angular-ui-router": "^0.3.2",
+    "angular-ui-router": "^0.4.2",
     "angular-bootstrap": "~2.4.0",
     "ui.bootstrap": "~2.4.0",
     "ui-leaflet": "^2.0.0",
@@ -22,14 +22,14 @@
     "fingerprintjs2": "~1.4.4",
     "jquery-ui": "~1.12.1",
     "ng-scrollbar": "~0.0.8",
-    "ui-router-extras": "^0.1.0",
+    "ui-router-extras": "^0.1.3",
     "remarkable-bootstrap-notify": "~3.1.3",
     "html5-sortable-angularjs": "*",
     "piexifjs": "https://github.com/doxel/piexifjs.git#a898b1837c304199209e478eb6e96137fc9dbce4",
     "angular-live-set": "*",
     "angular-socket-io": "^0.7.0",
     "socket-io-client": "^1.4.5",
-    "angular-ui-router.stateHelper": "https://github.com/marklagendijk/ui-router.stateHelper.git",
+    "angular-ui-router.stateHelper": "^1.3.1",
     "jquery-mousewheel": "^3.1.13",
     "ng-scrollbars": "https://github.com/iominh/ng-scrollbars.git",
     "angular-fullscreen": "^1.0.1",
@@ -43,7 +43,7 @@
     "leaflet.markercluster": "^1.0.4",
     "leaflet": "^1.0.3",
     "ng-tags-input": "^3.1.2",
-    "malihu-custom-scrollbar-plugin": "git://github.com/doxel/malihu-custom-scrollbar-plugin.git"
+    "malihu-custom-scrollbar-plugin": "git://github.com/doxel/malihu-custom-scrollbar-plugin.git#8efb2a6651d731fef9fa4c12876d988f6b431f51"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
@@ -80,9 +80,9 @@
     "angular-messages": "^1.4.8",
     "leaflet": ">= 1.0.0",
     "bootstrap": ">=2.0.0",
-    "angular-ui-router": "^0.3.2",
+    "angular-ui-router": "^0.4.2",
     "ng-tags-input": "^3.1.2",
-    "malihu-custom-scrollbar-plugin": "9ef2a891b903b74a122193074f3d91de6cb9713a"
+    "malihu-custom-scrollbar-plugin": "8efb2a6651d731fef9fa4c12876d988f6b431f51"
   },
   "homepage": "https://github.com/doxel/doxel-angular",
   "authors": [
