@@ -31,8 +31,7 @@ angular.module('doxelApp')
       tags: [],
       // loaded tags
       tagPool: [],
-      // loaded tags ids
-      inPool: [],
+      skip: 0,
 
       getSegmentTags: function(){
         if (!$scope.getSegmentTags_promise) {
@@ -49,29 +48,38 @@ angular.module('doxelApp')
 
       }, // getSegmentTags
 
+      loadTags: function(query){
+        return $scope.tagPool.filter(function(tag){
+          return tag.value.match(query);
+        });
+      },
+
+      tagLoaded: [],
+
       updateTags: function(){
         $scope.getSegmentTags()
         .then(function(segmentTags){
           console.log('segment tags:',segmentTags.length);
 
-          var pool=$scope.tagPool;
+          var tags=$scope.tagPool;
+          if (tags.length) return;
 
-          // create tagPool
           angular.forEach(segmentTags,function(t){
-            if ($scope.inPool.indexOf(t.tagId)<0) {
-              $scope.inPool.push(t.tagId);
+            // copy value in text field for tag input
+            if (!$scope.tagLoaded[t.tag.id]) {
               t.tag.text=t.tag.value;
-              pool.push(t.tag);
+              tags.push(t.tag);
+              $scope.tagLoaded[t.tag.id]=true;
             }
           });
 
           // sort by tag text
-          pool.sort(function(a,b){
+          tags.sort(function(a,b){
             var v1=a.value.toLowerCase();
             var v2=b.value.toLowerCase();
             return v2>v1?-1:v1>v2?1:0;
           })
-          console.log('tag pool: ',pool.length);
+          console.log('tag pool: ',tags.length);
 
         }).catch(function(err){
           console.log(err);
@@ -79,66 +87,102 @@ angular.module('doxelApp')
 
       }, // updateTags
 
-      loadTags: function(query){
-        return $scope.tagPool.filter(function(tag){
-          return tag.value.match(query);
-        });
-      },
-
       tagAdded: function(tag){
-        console.log($scope.tags);
-        var segmentsToShow=[];
-        var tagsProcessed=[];
+        $scope.loadSegments();
 
-        $scope.tags.reduce(function(promise,tag){
-          var q=$q.defer();
-
-          promise.then(function(){
-            var where={
-              id: tag.id,
-              filter: $scope.filter
-
-            }
-            return Tag.segments(where).$promise.then(function(segments){
-              console.log('tag: '+tag.value,'segments: ',segments.length)
-              var result=[];
-              // logical and
-              if (segmentsToShow.length) {
-                segmentsToShow.forEach(function(segment,i){
-                  var found=segments.some(function(_segment){
-                    return segment.id==_segment.id;
-                  });
-                  if (found) {
-                    result.push(segment);
-                  }
-                });
-                segmentsToShow=result
-
-              } else {
-                segmentsToShow=segments;
-              }
-            });
-          }).then(q.resolve)
-          .catch(q.reject);
-
-          return q.promise;
-
-        },$scope.setFilter())
-        .catch(function(err){
-          console.log(err);
-        })
-        .then(function(){
-          $scope.segments.splice(0,$scope.segments.length);
-          $rootScope.$broadcast('segments-loaded',segmentsToShow);
-        });
-      
       }, // tagAdded
 
-      setFilter: function() {
-        return $scope.getGalleryFilter().then(function(filter){
-          $scope.filter=filter;
+      updateShownSegments: function(){
+        console.log('updateShownSegments');
+        $scope.skip=0;
+
+        // Why zero ?...
+        if (false && !$scope.tags.length) {
+          $scope.segments.splice(0,$scope.segments.length);
+          return;
+        }
+
+        var segpool=Object.keys($scope.loaded);
+        $scope.loadedCount=segpool.length;
+
+        // for each segment loaded
+        segpool.reduce(function(promise,segmentId){
+          return promise.then(function(){
+            var segment=$scope.loaded[segmentId];
+            var index;
+            var alreadyDisplayed;
+            alreadyDisplayed=false;
+
+            // is the segment already displayed ?
+            $scope.segments.some(function(_segment,i){
+              if (_segment.id==segmentId) {
+                index=i;
+                return alreadyDisplayed=true;
+              }
+            });
+
+            if (segment.tag && segment.tag.length) {
+              // check if the segment has all the tags
+              var count=0;
+              var hasAll=$scope.tags.some(function(tag){
+                var found=segment.tag.some(function(_tag){
+                  return (tag.id==_tag.tagId);
+                });
+                if (found) {
+                  ++count;
+                  return (count==$scope.tags.length);
+                }
+              });
+              if (alreadyDisplayed && !hasAll) {
+                // remove from display
+                $scope.segments.splice(index,1);
+
+              } else if (!alreadyDisplayed && hasAll) {
+                // add to display
+                $scope.segments.push(segment);
+              }
+
+            } else {
+              if (alreadyDisplayed) {
+                $scope.segments.splice(index,1);
+              }
+            }
+
+            $scope.skip=$scope.segments.length;
+            return $q.resolve();
+
+          });
+        },$q.resolve())
+        .catch(console.log);
+
+      },
+
+      operator: 'and',
+
+      galleryFilter: function(){
+        /// {"tag": {"elemMatch":  {"tagId": "58e40dc0a15b4e3907a1717e"}}, "tag.score": {"gte" : 0.9}}
+//{"where":{"tag":{"elemMatch":{"score":{"$gt":0.6},"tagId":{"$eq":"58e40dbea15b4e3907a16e2c"}}}}}
+        var where={};
+        var tagCond=[];
+        $scope.tags.forEach(function(tag){
+          if (tag.id) {
+            var elemMatch={
+              tagId: {'$eq': tag.id},
+              score: {'$gt': $scope.minScore}
+            };
+            tagCond.push({tag:{elemMatch: elemMatch}});
+          }
         });
-      }, // setFilter
+        if (tagCond.length>1) where[$scope.operator]=tagCond;
+        else if (tagCond.length==1) {
+          where=tagCond[0];
+        }
+        return $q.resolve({
+          skip: $scope.skip,
+          where: where
+        });
+
+      }, // galleryFilter
 
       init: function(){
         $scope.$on('$stateChangeStart', function (event, next, current) {
@@ -149,6 +193,11 @@ angular.module('doxelApp')
           $scope.update(toState);
         });
 
+        $scope._galleryFilter['gallery.view.classifiers']=$scope.galleryFilter;
+
+        $scope.$on('segments-loaded',function(event,segments){
+          if ($scope.classifiers_visible) $scope.updateShownSegments()
+        });
 
         $scope.$watch(function(){return $scope.tags.length},function(after,before){
           if (after>before) {
@@ -159,35 +208,6 @@ angular.module('doxelApp')
 
         });
 
-        $scope.$on('picture.click',function($event,picture){
-         
-          Pose.find({
-            filter: {
-              where: {
-                pictureId: picture.id
-              },
-              limit: 1
-            }
-
-          }, function(pose){
-            if (pose.length) {
-              $rootScope.params.pose=pose[0].index;
-
-            } else {
-              $rootScope.params.pose=0;
-            }
-
-            $rootScope.params.s=picture.segmentId;
-            $scope.$state.transitionTo('gallery.view.cloud');
-
-          }, function(err){
-            console.log(err);
-          });
-
-        });
-
-        $scope.updateTags();
-
         $scope.update($scope.$state.current);
 
       }, // init
@@ -195,6 +215,9 @@ angular.module('doxelApp')
       update: function(toState){
         console.log(toState.name);
         $scope.classifiers_visible=(toState.name.split('.').pop()=='classifiers');
+        if ($scope.classifiers_visible) {
+          $scope.updateTags();
+        }
       },
 
     });

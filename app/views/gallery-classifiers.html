@@ -1,5 +1,5 @@
-<div ng-controller="GalleryClassifiersCtrl" id="classifiers" ng-show="classifiers_visible">
-  <tags-input ng-model="tags" add-on-paste="true" ng-show="classifiers_visible">
+<div ng-controller="GalleryClassifiersCtrl" id="classifiers" ng-if="classifiers_visible" ng-cloak>
+  <tags-input ng-model="tags" add-on-paste="true">
     <auto-complete source="loadTags($query)"
                    min-length="0"
                    max-results-to-show="100"

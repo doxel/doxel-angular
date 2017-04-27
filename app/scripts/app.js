@@ -194,7 +194,7 @@ var app=angular
           },
           'gallery-classifiers': {
             templateUrl: 'views/gallery-classifiers.html',
-            controller: 'ClassifiersCtrl',
+            controller: 'GalleryClassifiersCtrl',
             controllerAs: 'classifiers'
           },
           // must be the last one (z-index)
