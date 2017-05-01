@@ -1,4 +1,5 @@
-<div ng-controller="GalleryClassifiersCtrl" id="classifiers" ng-if="classifiers_visible" ng-cloak>
+<div ng-controller="GalleryClassifiersCtrl" id="classifiers" ng-cloak>
+  <div ng-if="classifiers_visible">
   <tags-input ng-model="tags" add-on-paste="true">
     <auto-complete source="loadTags($query)"
                    min-length="0"
@@ -7,5 +8,6 @@
                    on-tag-added="tagAdded($tag)"
                    on-tag-removed="tagremoved($tag)"></auto-complete>
   </tags-input>
+  </div>
 </div>
 

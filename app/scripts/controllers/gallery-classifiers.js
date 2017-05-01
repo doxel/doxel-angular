@@ -18,7 +18,8 @@ angular.module('doxelApp')
   'Pose',
   '$q',
   '$state',
-  function ($scope,$rootScope,Tag,SegmentTag,Segment,PictureTag,Pose,$q,$state) {
+  '$timeout',
+  function ($scope,$rootScope,Tag,SegmentTag,Segment,PictureTag,Pose,$q,$state,$timeout) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -88,6 +89,8 @@ angular.module('doxelApp')
       }, // updateTags
 
       tagAdded: function(tag){
+        $scope.end.forward=false;
+        $scope.skip=0;
         $scope.loadSegments();
 
       }, // tagAdded
@@ -99,15 +102,19 @@ angular.module('doxelApp')
         // Why zero ?...
         if (false && !$scope.tags.length) {
           $scope.segments.splice(0,$scope.segments.length);
-          return;
+          return $q.resolve();
         }
 
         var segpool=Object.keys($scope.loaded);
+        // TODO: sort segpool according to filter
         $scope.loadedCount=segpool.length;
 
+        var _c=0;
+
         // for each segment loaded
-        segpool.reduce(function(promise,segmentId){
+        return segpool.reduce(function(promise,segmentId){
           return promise.then(function(){
+            ++_c;
             var segment=$scope.loaded[segmentId];
             var index;
             var alreadyDisplayed;
@@ -124,22 +131,31 @@ angular.module('doxelApp')
             if (segment.tag && segment.tag.length) {
               // check if the segment has all the tags
               var count=0;
-              var hasAll=$scope.tags.some(function(tag){
-                var found=segment.tag.some(function(_tag){
-                  return (tag.id==_tag.tagId);
+              var hasAll;
+
+              if ($scope.tags.length) {
+                hasAll=$scope.tags.some(function(tag){
+                  var found=segment.tag.some(function(_tag){
+                    return (tag.id==_tag.tagId && _tag.score>=$scope.minScore);
+                  });
+                  if (found) {
+                    ++count;
+                    return (count==$scope.tags.length);
+                  }
                 });
-                if (found) {
-                  ++count;
-                  return (count==$scope.tags.length);
-                }
-              });
+
+              } else {
+                hasAll=true;
+              }
               if (alreadyDisplayed && !hasAll) {
                 // remove from display
                 $scope.segments.splice(index,1);
 
               } else if (!alreadyDisplayed && hasAll) {
                 // add to display
-                $scope.segments.push(segment);
+                if (!$scope.scrollBufferFull('forward')) {
+                  $scope.segments.push(segment);
+                }
               }
 
             } else {
@@ -148,16 +164,17 @@ angular.module('doxelApp')
               }
             }
 
-            $scope.skip=$scope.segments.length;
-            return $q.resolve();
+            $scope.skip=_c;
+            return $q.resolve('done '+_c+'/'+$scope.loadedCount);
 
           });
         },$q.resolve())
-        .catch(console.log);
+        .then(console.log)
+        .catch(console.log)
 
       },
 
-      operator: 'and',
+      operator: 'or',
 
       galleryFilter: function(){
         /// {"tag": {"elemMatch":  {"tagId": "58e40dc0a15b4e3907a1717e"}}, "tag.score": {"gte" : 0.9}}
@@ -168,15 +185,20 @@ angular.module('doxelApp')
           if (tag.id) {
             var elemMatch={
               tagId: {'$eq': tag.id},
-              score: {'$gt': $scope.minScore}
+              score: {'$gte': $scope.minScore}
             };
             tagCond.push({tag:{elemMatch: elemMatch}});
           }
         });
-        if (tagCond.length>1) where[$scope.operator]=tagCond;
-        else if (tagCond.length==1) {
-          where=tagCond[0];
+        switch(tagCond.length) {
+          case 0: where={'tag.score': {'gte': $scope.minScore}};
+                  break;
+          case 1: where=tagCond[0];
+                  break;
+          default: where[$scope.operator]=tagCond;
+                   break;
         }
+
         return $q.resolve({
           skip: $scope.skip,
           where: where
@@ -196,7 +218,15 @@ angular.module('doxelApp')
         $scope._galleryFilter['gallery.view.classifiers']=$scope.galleryFilter;
 
         $scope.$on('segments-loaded',function(event,segments){
-          if ($scope.classifiers_visible) $scope.updateShownSegments()
+          if ($scope.classifiers_visible) {
+            var length=$scope.segments.length;
+            $scope.updateShownSegments().finally(function(){
+              if (segments.length && $scope.segments.length!=length && !$scope.scrollBufferFull('forward')) {
+                $scope.end.forward=false;
+                $timeout($scope.loadSegments);
+              }
+            })
+          }
         });
 
         $scope.$watch(function(){return $scope.tags.length},function(after,before){
