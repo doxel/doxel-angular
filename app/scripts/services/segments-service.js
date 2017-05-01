@@ -13,7 +13,15 @@ angular.module('doxelApp')
     var segmentsService=this;
     angular.extend(segmentsService,{
       segments: [],
-      loaded: {}
+      loaded: []
+    });
+
+    Object.defineProperty(segmentsService.loaded,'has',{
+      value: function(segmentId){
+        return this.find(function(segment){
+          return segment.id==segmentId;
+        });
+      }
     });
 
   });

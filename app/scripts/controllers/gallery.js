@@ -238,8 +238,8 @@ angular.module('doxelApp')
                   // prepend segments
                   segments.reverse();
                   angular.forEach(segments,function(segment){
-                    if (!$scope.loaded[segment.id]) {
-                      $scope.loaded[segment.id]=segment;
+                    if (!$scope.loaded.has(segment.id)) {
+                      $scope.loaded.push(segment);
                     }
                     if (segment.pointCloudId && !segment.pointCloud) {
                       console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
@@ -264,8 +264,8 @@ angular.module('doxelApp')
                 } else { // direction==forward
                   // append segments
                   angular.forEach(segments,function(segment){
-                    if (!$scope.loaded[segment.id]) {
-                      $scope.loaded[segment.id]=segment;
+                    if (!$scope.loaded.has(segment.id)) {
+                      $scope.loaded.push(segment);
                     }
                     if (!segment.pointCloud) {
                       console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
@@ -301,16 +301,13 @@ angular.module('doxelApp')
         }, // loadSegments
 
         getSegment: function(segmentId){
-            var q=$q.defer();
             var found;
             // search in loaded segments
-            for (var id in $scope.loaded) {
-              if (id==segmentId) {
-                found=true;
-                q.resolve($scope.loaded[id]);
-                return q.promise;
-              }
+            var segment=$scope.loaded.has(segmentId);
+            if (segment) {
+              return $q.resolve(segment);
             }
+            var q=$q.defer();
             if (!found) {
               // currently loading segments ?
               if ($scope._loadSegments && $scope._loadSegments.promise.$$state.pending) {
@@ -346,9 +343,10 @@ angular.module('doxelApp')
 
           var q=$q.defer();
 
-          if ($scope.loaded[segmentId]) {
+          var segment=$scope.loaded.has(segmentId);
+          if (segment) {
             // dont reload segment (preserve attributes)
-            q.resolve();
+            q.resolve(segment);
 
           } else {
             Segment.findById({
@@ -358,8 +356,8 @@ angular.module('doxelApp')
               }
             }, function(segment){
               if (segment) {
-                $scope.loaded[segment.id]=segment;
-                q.resolve();
+                $scope.loaded.push(segment);
+                q.resolve(segment);
 
               } else {
                 _catch(new Error('Segment not found !'));
@@ -368,9 +366,7 @@ angular.module('doxelApp')
             },_catch);
           }
 
-          q.promise.then(function(){
-            var segment=$scope.loaded[segmentId];
-
+          q.promise.then(function(segment){
             // reduce segments displayed to loaded segment
             Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
 

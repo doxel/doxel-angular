@@ -388,20 +388,19 @@ angular.module('doxelApp')
 
           $scope.skip=0;
 
-          var segpool=Object.keys($scope.loaded);
+          var segpool=$scope.loaded
           $scope.loadedCount=segpool.length;
 
           // for each segment loaded
-          segpool.reduce(function(promise,segmentId){
+          segpool.reduce(function(promise,segment){
             return promise.then(function(){
-              var segment=$scope.loaded[segmentId];
               var index;
               var alreadyDisplayed;
               alreadyDisplayed=false;
 
               // is the segment already displayed ?
               $scope.segments.some(function(_segment,i){
-                if (_segment.id==segmentId) {
+                if (_segment.id==segment.id) {
                   index=i;
                   return alreadyDisplayed=true;
                 }
@@ -538,8 +537,8 @@ angular.module('doxelApp')
       updateMarkers: function(map){
         var cluster=$scope.cluster;
 
-        for(var segmentId in $scope.loaded) {
-          var segment=$scope.loaded[segmentId];
+        for(var i in $scope.loaded) {
+          var segment=$scope.loaded[i];
           if (!segment.geo || !segment.showMarker) continue;
 
           if (!segment.marker) {
