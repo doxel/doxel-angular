@@ -33,6 +33,10 @@ module.exports = function (grunt) {
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
+      browserify: {
+        files: ['browserify/*'],
+        tasks: ['browserify']
+      },
       bower: {
         files: ['bower.json'],
         tasks: ['wiredep']
@@ -68,6 +72,13 @@ module.exports = function (grunt) {
     },
 
     // The actual grunt server settings
+    browserify: {
+      browserifyFolder: {
+        src: ['browserify/*'],
+        dest: 'app/scripts/browserified.js'
+      }
+    },
+
     connect: {
       options: {
         port: 9000,
