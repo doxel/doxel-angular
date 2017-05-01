@@ -45,6 +45,7 @@
  */
 var app=angular
   .module('doxelApp', [
+    'ngHttpCache',
     'ngAnimate',
     'ngCookies',
     'ngMessages',
@@ -66,7 +67,9 @@ var app=angular
     'smart-table'
 
   ])
-  .config(function ($httpProvider, $urlRouterProvider, $stateProvider, $locationProvider) {
+  .config(function ($httpProvider, $urlRouterProvider, $stateProvider, $locationProvider, ngHttpCacheConfigProvider) {
+
+    ngHttpCacheConfigProvider.urls = ['/api'];
 
     // enable getting query string object with $location.search()
     // (base href must be set in index.html)
@@ -237,8 +240,7 @@ var app=angular
       })
 
       .state('gallery.view.classifiers', {
-        url: '/classifiers',
-        controller: 'GalleryClassifiersCtrl'
+        url: '/classifiers'
       })
 
       .state('tos', {
