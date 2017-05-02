@@ -16,6 +16,14 @@ angular.module('doxelApp')
       loaded: []
     });
 
+    Object.defineProperty(segmentsService.segments,'has',{
+      value: function(segmentId){
+        return this.find(function(segment){
+          return segment.id==segmentId;
+        });
+      }
+    });
+
     Object.defineProperty(segmentsService.loaded,'has',{
       value: function(segmentId){
         return this.find(function(segment){

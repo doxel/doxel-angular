@@ -468,7 +468,7 @@ angular.module('doxelApp')
         fillScrollableContainer: function(direction) {
 
           $timeout.cancel($scope.fillTimeout);
-          if (!$scope.end[direction||'forward'])
+          if (!$scope.end(direction||'forward'))
           $scope.fillTimeout=$timeout(function(){
   /*
           // check if the last row is complete
@@ -500,6 +500,7 @@ angular.module('doxelApp')
           }
           */
 
+            /*
      if (false)     if ($scope.segments && $scope.segments.length > $scope.maxThumbs) {
             console.log($scope.segments.length,$scope.maxThumbs);
             if (direction == undefined || direction=='forward') {
@@ -524,6 +525,7 @@ angular.module('doxelApp')
               $scope.segments.splice($scope.maxThumbs,$scope.segments.length - $scope.maxThumbs);
             }
           }
+     */
 
           if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBufferFull(direction||'forward')) {
             console.log('more');
@@ -546,6 +548,10 @@ angular.module('doxelApp')
             */
           }
           },1000);
+        },
+
+        clearThumbsList: function(){
+           $scope.segments.splice(0,$scope.segments.length-1);
         },
 
         updateVisibility: function(state){

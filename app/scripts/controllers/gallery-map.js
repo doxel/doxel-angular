@@ -227,9 +227,6 @@ angular.module('doxelApp')
               var segmentId;
               $scope.gallery.map_wasvisible=false;
 
-              // unset scroll limits
-              $scope.end.forward=$scope.end.backward=false;
-
               // get selected segmentId or TODO: top-screen segment id
               segmentId=$rootScope.params.s;
               if (segmentId===undefined && $scope.segments.length) {
@@ -237,7 +234,7 @@ angular.module('doxelApp')
               }
 
               // clear thumbs list
-              $scope.segments.splice(0,$scope.segments.length-1);
+              $scope.clearThumbList();
 
               // rebuild thumbs list
               if (segmentId) {
@@ -246,9 +243,9 @@ angular.module('doxelApp')
               } else {
                 $scope.loadSegments();
               }
-
             } else {
-              $scope.end.forward=$scope.end.backward=true;
+              // lock thumbs when leaving map for viewer
+              $scope._end[state.name]=angular.merge({},$scope._end['gallery.view.map']);
             }
           }
 
@@ -341,7 +338,8 @@ angular.module('doxelApp')
             if ($scope.center.lat-$scope._center.lat>0.001||$scope.center.lng-$scope._center.lng>0.001) {
               $scope.skip=0;
             }
-            $scope.end.forward=$scope.end.backward=false;
+            $scope.end('forward',false);
+            $scope.end('backward',false);
             $scope.loadSegments();
           }).catch(function(err){
             console.log(err);

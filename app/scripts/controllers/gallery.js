@@ -63,10 +63,23 @@ angular.module('doxelApp')
       this.thumbsWidth=200;
 
       angular.extend($scope,{
-        end: {},
+        _end: {},
         loaded: segmentsService.loaded,
         segments: segmentsService.segments,
         center: [0,0],
+        end: function(direction,value){
+          var state=$state.current.name;
+          if (value===undefined) {
+            return $scope._end[state] && $scope._end[state][direction];
+          } else {
+             var end=$scope._end[state];
+             if (!end) {
+               end=$scope._end[state]={};
+            }
+            end[direction]=value;
+          }
+        },
+
         init: function(){
 
           $scope.updateMetrics();
@@ -119,6 +132,8 @@ angular.module('doxelApp')
 
         }, // init
 
+        // compute thumb dimensions and number of thumbs displayed (>=8) used as
+        // threshold for infinite scroll
         updateMetrics: function(state){
           $scope.thumbsH=Math.floor($('#gallery').width()/200);
           $scope.thumbsV=Math.round(($('#gallery .mCustomScrollbar').height()||$('body').height())/150);
@@ -130,11 +145,16 @@ angular.module('doxelApp')
           while($scope.maxThumbs<8) $scope.maxThumbs*=2;
         },
 
+       // return number of segments to fetch from database at once,
+       // max 16, default 12
         getLimit: function(){
           return Math.min(16,Math.round($scope.thumbsH*$scope.thumbsV*1.5)||12);
         },
 
+        // storage for gallery views filters functions
+        // (returning the filter a promise)
         _galleryFilter: {
+          // the default filter
           default: function(){
             return $q.when({
               where: {
@@ -145,6 +165,7 @@ angular.module('doxelApp')
           }
         },
 
+        // get the current filter as a promise (_galleryFilter.default + current state).
         getGalleryFilter: function() {
           var q=$q.defer();
 
@@ -184,7 +205,7 @@ angular.module('doxelApp')
 
           direction=direction||'forward';
 
-          if ($scope.end[direction]) {
+          if ($scope.end(direction)) {
             // end reached
             $scope._loadSegments.resolve([]);
             return $scope._loadSegments;
@@ -231,7 +252,7 @@ angular.module('doxelApp')
             }, function(segments){
               if (!segments || !segments.length) {
                 // end reached
-                $scope.end[direction]=true;
+                $scope.end(direction,true);
               } else {
 
                 if (direction=='backward') {
@@ -245,12 +266,12 @@ angular.module('doxelApp')
                       console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
                       return;
                     }
-                    var alreadyDisplayed=false;
-                    $scope.segments.some(function(_segment,i){
-                      return alreadyDisplayed=(_segment.id==segment.id);
-                    });
+                    var alreadyDisplayed=$scope.segments.has(segment);
                     if (!alreadyDisplayed) {
+                      // if we are not on a view after having clicked on a thum in the map view
+                      // and the current view is not the map view
                       if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
+                        // then add the segment according to filter
                         $scope.segments.some(function(_segment,i){
                           if (segment.timestamp>_segment.timestamp) {
                             $scope.segments.splice(i,0,segment);
