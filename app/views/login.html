@@ -32,7 +32,7 @@
 
       <div style="text-align:center;">
         <button class="btn btn-primary raise login" title="Connect using the above credentials" ng-click="signin($event)" ng-disabled="!username.trim().length || !password.trim().length">Login</button>
-        <button class="btn btn-success raise register" title="Register a new account" ng-click="signup($event)" ng-disabled="!(username.trim().length) || !password.trim().length || !email.trim().length">Register</button>
+        <button class="btn btn-success raise register" title="Register a new account using the above credentials" ng-click="signup($event)" ng-disabled="!(username.trim().length) || !password.trim().length || !email.trim().length">Register</button>
       </div>
 
       <div class="anonymous" style="text-align:center;">
