@@ -217,7 +217,8 @@ angular.module('doxelApp')
 
         $scope._galleryFilter['gallery.view.classifiers']=$scope.galleryFilter;
 
-        $scope.$on('segments-loaded',function(event,segments){
+        $scope.$on('segments-loaded',function(event,args){
+          var segments=args.segments;
           if ($scope.classifiers_visible) {
             var length=$scope.segments.length;
             $scope.updateShownSegments().finally(function(){

@@ -233,10 +233,8 @@ angular.module('doxelApp')
                 segmentId=$scope.segments[$scope.segments.length>>1];
               }
 
-              // clear thumbs list
-              $scope.clearThumbList();
-
               // rebuild thumbs list
+              $scope.clearThumbsList();
               if (segmentId) {
                 $scope.loadSegmentsAround(segmentId);
 
@@ -275,7 +273,8 @@ angular.module('doxelApp')
         },1);
 
         // update markers when more segments are loaded
-        $scope.$on('segments-loaded',function(event,segments){
+        $scope.$on('segments-loaded',function(event,args){
+          var segments=args.segments;
           $scope.updateShownSegments().then(function(){
             $scope.getMap($scope.updateMarkers);
             console.log('loaded', $scope.skip,segments.length,$scope.loadedCount)

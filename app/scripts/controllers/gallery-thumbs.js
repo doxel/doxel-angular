@@ -185,6 +185,68 @@ angular.module('doxelApp')
 
         }, // horizontalScrollConfig
 
+        galleryFilter: function(direction) {
+          var filter={where:{}};
+          // load chunk after last segment in $scope.segments
+          if (direction=='forward'){
+            if ($scope.segments.length) {
+              var segment=$scope.segments[$scope.segments.length-1];
+              filter.where.timestamp={
+                lte: segment.timestamp
+              };
+              filter.where.id={
+                neq: segment.id
+              };
+            }
+            filter.order='timestamp DESC';
+
+          } else {
+              // load chunk before first segment in $scope.segments
+            if ($scope.segments.length) {
+              var segment=$scope.segments[0];
+              filter.where.timestamp={
+                gte: segment.timestamp
+              };
+              filter.where.id={
+                neq: segment.id
+              };
+            }
+            filter.order='timestamp ASC';
+          }
+
+          return $q.resolve(filter);
+        }, // galleryFilter
+
+        updateShownSegments: function(args){
+          var segments=args.segments;
+          var direction=args.direction;
+          var filter=args.filter;
+
+          if (direction=='backwards') {
+            angular.forEach($scope.loaded,function(segment){
+              if (segment.pointCloudId && !segment.pointCloud) {
+                console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
+                return;
+              }
+              var alreadyDisplayed=$scope.segments.has(segment);
+              if (!alreadyDisplayed) {
+                // if we are not on a view after having clicked on a thum in the map view
+                // and the current view is not the map view
+                if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
+                  // then add the segment according to filter
+                  $scope.segments.some(function(_segment,i){
+                    if (segment.timestamp>_segment.timestamp) {
+                      $scope.segments.splice(i,0,segment);
+                      return true;
+                    }
+                  });
+                }
+              }
+            });
+          }
+
+        }, // updateShownSegments
+
         showNextPreview: function(options) {
           var segmentId=options.segmentId;
           var element=options.element;
@@ -303,20 +365,21 @@ angular.module('doxelApp')
             }
           });
 
-          $scope.$on('segments-loaded',function(event,segments){
+          $scope.$on('segments-loaded',function(event,args){
+            $scope.updateShownSegments(args);
             $scope.fillScrollableContainer();
           });
 
           $scope.$on('window.resize',function(){
             $scope.updateThumbsStyle($rootScope.$state.current);
-            $scope.updateMetrics($rootScope.$state.current);
+            $scope.updateMetrics();
             // allow loading more thumbs
             $scope.updateVisibility($rootScope.$state.current);
           });
 
           $scope.$on('orientationchange',function(){
             $scope.updateThumbsStyle($rootScope.$state.current);
-            $scope.updateMetrics($rootScope.$state.current);
+            $scope.updateMetrics();
             // allow loading more thumbs
             $scope.updateVisibility($rootScope.$state.current);
           });
@@ -332,7 +395,11 @@ angular.module('doxelApp')
         }, // initEventHandlers
 
         init: function() {
-          $scope.$parent.scrollBufferFull=$scope.scrollBufferFull;
+          angular.extend($scope.$parent,{
+            scrollBufferFull: $scope.scrollBufferFull,
+            clearThumbsList: $scope.clearThumbsList
+          });
+          $scope._galleryFilter['gallery.view.thumbs']=$scope.galleryFilter;
           $scope.initEventHandlers();
           $scope.thumbs_visible=false;
         }, // init
@@ -344,7 +411,7 @@ angular.module('doxelApp')
            var show=options.show;
            var setView=options.setView;
 
-          // in map view, switch to cloud on second click
+          // in map view, switch to cloud on second click TODO: put it in gallery-map
           if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
             if (segment.pointCloud) {
               $scope.$state.transitionTo('gallery.view.cloud');
@@ -556,15 +623,16 @@ angular.module('doxelApp')
 
         updateVisibility: function(state){
           $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
+          $scope.updateGalleryType(state);
           $scope.fillScrollableContainer();
         },
 
         updateThumbsStyle: function(state){
           if (
-            // full window for thumbs view 
-            state.name=="gallery.view.thumbs" 
-            // full window for classifiers view 
-            || state.name=="gallery.view.classifiers" 
+            // full window for thumbs view
+            state.name=="gallery.view.thumbs"
+            // full window for classifiers view
+            || state.name=="gallery.view.classifiers"
           ) {
             $scope.thumbsVerticalScroll=true;
             $timeout(function(){
@@ -612,17 +680,17 @@ angular.module('doxelApp')
 
           if (direction=='forward') {
             if (mcs.direction=='x') {
-                return (offset.left > mcsElem.offset().left+(mcsElem.width()*1.5)); 
+                return (offset.left > mcsElem.offset().left+(mcsElem.width()*1.5));
             }
             if (mcs.direction=='y') {
-                return (offset.top > mcsElem.offset().top+(mcsElem.height()*1.5)); 
+                return (offset.top > mcsElem.offset().top+(mcsElem.height()*1.5));
             }
           } else {
             if (mcs.direction=='x') {
-                return (offset.left < mcsElem.offset().left-(mcsElem.width()*1.5)); 
+                return (offset.left < mcsElem.offset().left-(mcsElem.width()*1.5));
             }
             if (mcs.direction=='y') {
-                return (offset.top < mcsElem.offset().top-(mcsElem.height()*1.5)); 
+                return (offset.top < mcsElem.offset().top-(mcsElem.height()*1.5));
             }
           }
         },
@@ -653,7 +721,7 @@ angular.module('doxelApp')
         update: function(state){
           $scope.updateVisibility(state);
           $scope.updateThumbsStyle(state);
-          $scope.updateMetrics($state);
+          $scope.updateMetrics();
           $scope.updateSelection($rootScope.params.s);
         },
 
