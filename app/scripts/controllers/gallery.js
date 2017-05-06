@@ -64,7 +64,7 @@ angular.module('doxelApp')
 
       angular.extend($scope,{
         _end: {},
-        galleryType: null,
+        galleryMode: null,
         loaded: segmentsService.loaded,
         segments: segmentsService.segments,
         center: [0,0],
@@ -74,7 +74,6 @@ angular.module('doxelApp')
             return $scope._end[state] && $scope._end[state][direction];
           } else {
              var end=$scope._end[state];
-             jklj
              if (!end) {
                end=$scope._end[state]={};
             }
@@ -134,21 +133,23 @@ angular.module('doxelApp')
 
         }, // init
 
-        _galleryType: {
+        _galleryMode: {
           'gallery.view.thumbs': 'segment-thumbs',
           'gallery.view.map': 'segment-thumbs-onmap',
           'gallery.view.classifiers': 'segment-thumbs-tagged'
         },
 
-        getGalleryType: function(state){
-          return $scope._galleryType[state.name]||$scope.galleryType;
+        galleryMode: 'segment-thumbs',
+
+        getGalleryMode: function(state){
+          return $scope._galleryMode[state.name]||$scope.galleryMode;
         },
 
-        updateGalleryType: function(state) {
-          var galleryType=$scope.getGalleryType(state);
-          if ($scope.galleryType!=galleryType) {
-            $scope.galleryType=galleryType;
-            $scope.$broadcast('gallery-type-change',galleryType);
+        updateGalleryMode: function(state) {
+          var galleryMode=$scope.getGalleryMode(state);
+          if ($scope.galleryMode!=galleryMode) {
+            $scope.galleryMode=galleryMode;
+            $scope.$broadcast('gallery-mode-change',galleryMode);
           }
         },
 
@@ -193,7 +194,7 @@ angular.module('doxelApp')
           $scope._galleryFilter.default(direction).then(function(filter0){
 
             // get current state filter
-            var stateFilter=$scope._galleryFilter[$state.current.name];
+            var stateFilter=$scope._galleryFilter[$scope.galleryMode];
             if (stateFilter) {
               stateFilter(direction).then(function(filter1){
                 var filter=angular.merge({},filter0,filter1);
@@ -210,6 +211,7 @@ angular.module('doxelApp')
         }, // getGalleryFilter
 
         loadSegments: function(direction,count) {
+          console.trace('loadSegments');
           $scope.updateMetrics();
           if ($scope._loadSegments) {
             return $scope._loadSegments;
@@ -219,13 +221,13 @@ angular.module('doxelApp')
           $scope._loadSegments=$q.defer();
           $scope._loadSegments.promise.then(function(_segments){
             segments=_segments;
-          }).finally(function(){
-            $scope._loadSegments=null;
             $scope.$broadcast('segments-loaded',{
               segments: segments,
               direction: direction,
               filter: _filter
             });
+          }).finally(function(){
+            $scope._loadSegments=null;
           });
 
           direction=direction||'forward';
@@ -237,6 +239,7 @@ angular.module('doxelApp')
           }
 
           $scope.getGalleryFilter(direction).then(function(filter){
+            console.log(filter);
             _filter=filter;
 
             filter.limit=count||$scope.getLimit();
@@ -252,59 +255,15 @@ angular.module('doxelApp')
                 $scope.end(direction,true);
               } else {
 
-                if (direction=='backward') {
-                  // prepend segments
-                  segments.reverse();
-                  angular.forEach(segments,function(segment, si){
-                    var _segment=$scope.loaded.has(segment.id);
-                    if (!_segment) {
-                      $scope.loaded.push(segment);
-                    } else {
-                      segments[si]=_segment;
-                      segment=_segment;
-                    }
-                    if (segment.pointCloudId && !segment.pointCloud) {
-                      console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
-                      return;
-                    }
-                    var alreadyDisplayed=$scope.segments.has(segment);
-                    if (!alreadyDisplayed) {
-                      // if we are not on a view after having clicked on a thum in the map view
-                      // and the current view is not the map view
-                      if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
-                        // then add the segment according to filter
-                        $scope.segments.some(function(_segment,i){
-                          if (segment.timestamp>_segment.timestamp) {
-                            $scope.segments.splice(i,0,segment);
-                            return true;
-                          }
-                        });
-                      }
-                    }
-                  });
-
-                } else { // direction==forward
-                  // append segments
-                  angular.forEach(segments,function(segment){
-                    var _segment=$scope.loaded.has(segment.id);
-                    if (!_segment) {
-                      $scope.loaded.push(segment);
-                    } else {
-                      segments[si]=_segment;
-                      segment=_segment;
-                    }
-                    if (!segment.pointCloud) {
-                      console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
-                      return;
-                    }
-                    var alreadyDisplayed=$scope.segments.has(segment);
-                    if (!alreadyDisplayed) {
-                      if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
-                        $scope.segments.push(segment);
-                      }
-                    }
-                  });
-                }
+                angular.forEach(segments,function(segment, si){
+                  var _segment=$scope.loaded.has(segment.id);
+                  if (!_segment) {
+                    $scope.loaded.push(segment);
+                  } else {
+                    segments[si]=_segment;
+                    segment=_segment;
+                  }
+                });
               }
 
               $('#segments .mCustomScrollbar').mCustomScrollbar('update');
@@ -322,41 +281,46 @@ angular.module('doxelApp')
 
         }, // loadSegments
 
-        getSegment: function(segmentId){
-            var found;
+        getSegment: function getSegment(segmentId){
             // search in loaded segments
             var segment=$scope.loaded.has(segmentId);
             if (segment) {
               return $q.resolve(segment);
             }
+            if (getSegment[segmentId]) {
+              return getSegment[segmentId];
+            }
+
             var q=$q.defer();
-            if (!found) {
-              // currently loading segments ?
-              if ($scope._loadSegments && $scope._loadSegments.promise.$$state.pending) {
-                // search in segment being loaded
-                $scope._loadSegments.promise.then(function(_segments){
-                  _segments.some(function(segment){
-                    if (segment.id==segmentId) {
-                      found=true;
-                      q.resolve(segment);
-                      return true;
-                    }
-                  });
-                  if (!found) {
-                    // or finally load the required segment
-                    $scope.loadSegmentsAround(segmentId,function(segment){
-                      q.resolve(segment);
-                    },q.reject);
+            getSegment[segmentId]=q.promise;
+
+            // currently loading segments ?
+            if ($scope._loadSegments && $scope._loadSegments.promise.$$state.pending) {
+              // search in segment being loaded
+              $scope._loadSegments.promise.then(function(_segments){
+                _segments.some(function(segment){
+                  if (segment.id==segmentId) {
+                    found=true;
+                    q.resolve(segment);
+                    return true;
                   }
                 });
-              } else {
-                // or finally load the required segment
-                $scope.loadSegmentsAround(segmentId,function(segment){
-                  q.resolve(segment);
-                },q.reject);
-              }
+                if (!found) {
+                  // or finally load the required segment
+                  $scope.loadSegmentsAround(segmentId,function(segment){
+                    q.resolve(segment);
+                  },q.reject);
+                }
+              });
+            } else {
+              // or finally load the required segment
+              $scope.loadSegmentsAround(segmentId,function(segment){
+                q.resolve(segment);
+              },q.reject);
             }
-            return q.promise;
+            return q.promise.finally(function(){
+              delete getSegment[segmentId];
+            });
         }, // getSegment
 
         loadSegmentsAround: function(segmentId,_then,_catch) {

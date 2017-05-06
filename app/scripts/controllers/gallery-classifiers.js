@@ -219,7 +219,7 @@ angular.module('doxelApp')
 
         $scope.$on('segments-loaded',function(event,args){
           var segments=args.segments;
-          if ($scope.classifiers_visible) {
+          if ($scope.galleryMode=='segment-thumbs-tagged') {
             var length=$scope.segments.length;
             $scope.updateShownSegments().finally(function(){
               if (segments.length && $scope.segments.length!=length && !$scope.scrollBufferFull('forward')) {
@@ -233,7 +233,7 @@ angular.module('doxelApp')
         $scope.$watch(function(){return $scope.tags.length},function(after,before){
           if (after>before) {
             $scope.tagAdded($scope.tags[$scope.tags.length-1]);
-          } else {
+          } else if (after<before) {
             $scope.tagAdded();
           }
 

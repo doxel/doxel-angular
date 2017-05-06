@@ -106,12 +106,14 @@ angular.module('doxelApp')
 
           // scrollbar moving and thumbs remaining is less than threshold
           if (direction && remain<$scope.maxThumbs/2) {
-            console.log('remain',count,pos,remain,$scope.maxThumbs/2)
-            $scope.loadSegments(direction).promise.then(function(){
-              $timeout(function(){
-                $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
+            if (!$scope.end(direction) && !$scope._loadSegments) {
+              console.log('remain',count,pos,remain,$scope.maxThumbs/2)
+              $scope.loadSegments(direction).promise.then(function(){
+                $timeout(function(){
+                  $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
+                });
               });
-            });
+            }
           }
         },
         verticalScrollConfig: {
@@ -218,31 +220,40 @@ angular.module('doxelApp')
         }, // galleryFilter
 
         updateShownSegments: function(args){
+          if ($scope.galleryMode!='segment-thumbs') {
+            return;
+          }
           var segments=args.segments;
           var direction=args.direction;
           var filter=args.filter;
 
-          if (direction=='backwards') {
-            angular.forEach($scope.loaded,function(segment){
-              if (segment.pointCloudId && !segment.pointCloud) {
-                console.log('no pointcloud '+segment.pointCloudId+' for segment '+segment.id);
-                return;
-              }
-              var alreadyDisplayed=$scope.segments.has(segment);
-              if (!alreadyDisplayed) {
-                // if we are not on a view after having clicked on a thum in the map view
-                // and the current view is not the map view
-                if (!$scope.gallery.map_wasvisible && $state.current.name!='gallery.view.map') {
-                  // then add the segment according to filter
-                  $scope.segments.some(function(_segment,i){
-                    if (segment.timestamp>_segment.timestamp) {
-                      $scope.segments.splice(i,0,segment);
-                      return true;
-                    }
-                  });
-                }
-              }
+          if (direction=='backward') {
+            // prepend segments
+            segments.reverse();
+              $scope.segments.splice.apply($scope.segments,[0,0].concat(segments));
             });
+if (false) // TODO: make it work without flickering -> dig into malihu
+            if ($scope.segments.length>segments.length+1) {
+              // update scrollbar
+              if ($scope.thumbsVerticalScroll) {
+                var offset=Math.round(segments.length/$scope.thumbsH)*150;
+              } else {
+                var offset=segments.length*200;
+              }
+              var container=$('#gallery .mCustomScrollbar');
+              var scrollOptions={scrollInertia: 0};
+
+              // get scrollpos
+              var side={x: 'left', y: 'top'};
+              var mcs=container[0].mcs;
+              var pos=mcs[side[mcs.direction]];
+              container.mCustomScrollbar('scrollTo',pos-offset,scrollOptions);
+            }
+
+          } else {
+            // append segments
+            $scope.segments.splice.apply($scope.segments,[$scope.segments.length,0].concat(segments));
+
           }
 
         }, // updateShownSegments
@@ -399,7 +410,7 @@ angular.module('doxelApp')
             scrollBufferFull: $scope.scrollBufferFull,
             clearThumbsList: $scope.clearThumbsList
           });
-          $scope._galleryFilter['gallery.view.thumbs']=$scope.galleryFilter;
+          $scope._galleryFilter['segment-thumbs']=$scope.galleryFilter;
           $scope.initEventHandlers();
           $scope.thumbs_visible=false;
         }, // init
@@ -623,7 +634,7 @@ angular.module('doxelApp')
 
         updateVisibility: function(state){
           $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
-          $scope.updateGalleryType(state);
+          $scope.updateGalleryMode(state);
           $scope.fillScrollableContainer();
         },
 
