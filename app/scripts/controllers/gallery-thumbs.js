@@ -106,12 +106,14 @@ angular.module('doxelApp')
 
           // scrollbar moving and thumbs remaining is less than threshold
           if (direction && remain<$scope.maxThumbs/2) {
-            console.log('remain',count,pos,remain,$scope.maxThumbs/2)
-            $scope.loadSegments(direction).promise.then(function(){
-              $timeout(function(){
-                $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
+            if (!$scope.end(direction) && !$scope._loadSegments) {
+              console.log('remain',count,pos,remain,$scope.maxThumbs/2)
+              $scope.loadSegments(direction).promise.then(function(){
+                $timeout(function(){
+                  $scope.fillScrollableContainer(direction,$scope.maxThumbs/2);
+                });
               });
-            });
+            }
           }
         },
         verticalScrollConfig: {
@@ -185,6 +187,78 @@ angular.module('doxelApp')
 
         }, // horizontalScrollConfig
 
+        galleryFilter: function(direction) {
+          var filter={where:{
+            pointCloudId: {exists: true}
+          }};
+          // load chunk after last segment in $scope.segments
+          if (direction=='forward'){
+            if ($scope.segments.length) {
+              var segment=$scope.segments[$scope.segments.length-1];
+              filter.where.timestamp={
+                lte: segment.timestamp
+              };
+              filter.where.id={
+                neq: segment.id
+              };
+            }
+            filter.order='timestamp DESC';
+
+          } else {
+              // load chunk before first segment in $scope.segments
+            if ($scope.segments.length) {
+              var segment=$scope.segments[0];
+              filter.where.timestamp={
+                gte: segment.timestamp
+              };
+              filter.where.id={
+                neq: segment.id
+              };
+            }
+            filter.order='timestamp ASC';
+          }
+
+          return $q.resolve(filter);
+        }, // galleryFilter
+
+        updateShownSegments: function(args){
+          if ($scope.galleryMode!='segment-thumbs') {
+            return;
+          }
+          var segments=args.segments;
+          var direction=args.direction;
+          var filter=args.filter;
+
+          if (direction=='backward') {
+            // prepend segments
+            segments.reverse();
+            $scope.segments.splice.apply($scope.segments,[0,0].concat(segments));
+if (false) // TODO: make it work without flickering -> dig into malihu
+            if ($scope.segments.length>segments.length+1) {
+              // update scrollbar
+              if ($scope.thumbsVerticalScroll) {
+                var offset=Math.round(segments.length/$scope.thumbsH)*150;
+              } else {
+                var offset=segments.length*200;
+              }
+              var container=$('#gallery .mCustomScrollbar');
+              var scrollOptions={scrollInertia: 0};
+
+              // get scrollpos
+              var side={x: 'left', y: 'top'};
+              var mcs=container[0].mcs;
+              var pos=mcs[side[mcs.direction]];
+              container.mCustomScrollbar('scrollTo',pos-offset,scrollOptions);
+            }
+
+          } else {
+            // append segments
+            $scope.segments.splice.apply($scope.segments,[$scope.segments.length,0].concat(segments));
+
+          }
+
+        }, // updateShownSegments
+
         showNextPreview: function(options) {
           var segmentId=options.segmentId;
           var element=options.element;
@@ -209,6 +283,7 @@ angular.module('doxelApp')
                   //var nextPose=(curPose+1)%segment.poses.length;
 
                   var nextPose=Math.round(segment.poses.length*element.data('mouse').x/element.width());
+                  nextPose=Math.min(segment.poses.length-1,nextPose);
                   if (nextPose!=curPose) {
                     Picture.findById({id: segment.poses[nextPose].pictureId},function(picture){
                       if ($scope.nextThumb_timeout && $scope.nextThumb_segmentId==segmentId) {
@@ -303,20 +378,23 @@ angular.module('doxelApp')
             }
           });
 
-          $scope.$on('segments-loaded',function(event,segments){
-            $scope.fillScrollableContainer();
+          $scope.$on('segments-loaded',function(event,args){
+            if ($scope.galleryMode=='segment-thumbs') {
+              $scope.updateShownSegments(args);
+              $scope.fillScrollableContainer();
+            }
           });
 
           $scope.$on('window.resize',function(){
             $scope.updateThumbsStyle($rootScope.$state.current);
-            $scope.updateMetrics($rootScope.$state.current);
+            $scope.updateMetrics();
             // allow loading more thumbs
             $scope.updateVisibility($rootScope.$state.current);
           });
 
           $scope.$on('orientationchange',function(){
             $scope.updateThumbsStyle($rootScope.$state.current);
-            $scope.updateMetrics($rootScope.$state.current);
+            $scope.updateMetrics();
             // allow loading more thumbs
             $scope.updateVisibility($rootScope.$state.current);
           });
@@ -326,13 +404,19 @@ angular.module('doxelApp')
           });
 
           $scope.$on('segment.selection.change',function(event,segment){
-            segment.picture.selected=segment.selected;
+            if (segment && segment.picture) {
+              segment.picture.selected=segment.selected;
+            }
           });
 
         }, // initEventHandlers
 
         init: function() {
-          $scope.$parent.scrollBufferFull=$scope.scrollBufferFull;
+          angular.extend($scope.$parent,{
+            scrollBufferFull: $scope.scrollBufferFull,
+            clearThumbsList: $scope.clearThumbsList
+          });
+          $scope._galleryFilter['segment-thumbs']=$scope.galleryFilter;
           $scope.initEventHandlers();
           $scope.thumbs_visible=false;
         }, // init
@@ -344,7 +428,7 @@ angular.module('doxelApp')
            var show=options.show;
            var setView=options.setView;
 
-          // in map view, switch to cloud on second click
+          // in map view, switch to cloud on second click TODO: put it in gallery-map
           if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
             if (segment.pointCloud) {
               $scope.$state.transitionTo('gallery.view.cloud');
@@ -530,7 +614,7 @@ angular.module('doxelApp')
           if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBufferFull(direction||'forward')) {
             console.log('more');
             $scope.loadSegments(direction||'forward',$scope.thumbsH).promise.then(function(segments){
-              if(segments.length){
+if (false)              if(segments.length){
                 $timeout(function(){
                   $scope.fillScrollableContainer();
                 });
@@ -556,15 +640,16 @@ angular.module('doxelApp')
 
         updateVisibility: function(state){
           $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
+          $scope.updateGalleryMode(state);
           $scope.fillScrollableContainer();
         },
 
         updateThumbsStyle: function(state){
           if (
-            // full window for thumbs view 
-            state.name=="gallery.view.thumbs" 
-            // full window for classifiers view 
-            || state.name=="gallery.view.classifiers" 
+            // full window for thumbs view
+            state.name=="gallery.view.thumbs"
+            // full window for classifiers view
+            || state.name=="gallery.view.classifiers"
           ) {
             $scope.thumbsVerticalScroll=true;
             $timeout(function(){
@@ -612,17 +697,17 @@ angular.module('doxelApp')
 
           if (direction=='forward') {
             if (mcs.direction=='x') {
-                return (offset.left > mcsElem.offset().left+(mcsElem.width()*1.5)); 
+                return (offset.left > mcsElem.offset().left+(mcsElem.width()*1.5));
             }
             if (mcs.direction=='y') {
-                return (offset.top > mcsElem.offset().top+(mcsElem.height()*1.5)); 
+                return (offset.top > mcsElem.offset().top+(mcsElem.height()*1.5));
             }
           } else {
             if (mcs.direction=='x') {
-                return (offset.left < mcsElem.offset().left-(mcsElem.width()*1.5)); 
+                return (offset.left < mcsElem.offset().left-(mcsElem.width()*1.5));
             }
             if (mcs.direction=='y') {
-                return (offset.top < mcsElem.offset().top-(mcsElem.height()*1.5)); 
+                return (offset.top < mcsElem.offset().top-(mcsElem.height()*1.5));
             }
           }
         },
@@ -653,7 +738,7 @@ angular.module('doxelApp')
         update: function(state){
           $scope.updateVisibility(state);
           $scope.updateThumbsStyle(state);
-          $scope.updateMetrics($state);
+          $scope.updateMetrics();
           $scope.updateSelection($rootScope.params.s);
         },
 

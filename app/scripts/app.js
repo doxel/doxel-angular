@@ -74,11 +74,9 @@ var app=angular
     // enable getting query string object with $location.search()
     // (base href must be set in index.html)
     $locationProvider.html5Mode({
-      enabled: true,
-      // TODO: in production requireBase must be set to true and base href must be set in index.html
+      enabled: false,
       requireBase: true
     });
-
 
     var params={
     }
@@ -106,7 +104,7 @@ var app=angular
 
     $urlRouterProvider.otherwise(function($injector){
       $injector.invoke(['$state', function($state) {
-        $state.go('404', {}, { location: false } );
+        $state.go('gallery.view.home', {}, { location: false } );
       }]);
     });
 

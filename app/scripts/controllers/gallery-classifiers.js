@@ -89,35 +89,39 @@ angular.module('doxelApp')
       }, // updateTags
 
       tagAdded: function(tag){
-        $scope.end.forward=false;
+        $scope.end('forward',false);
         $scope.skip=0;
         $scope.loadSegments();
 
       }, // tagAdded
 
-      updateShownSegments: function(){
-        console.log('updateShownSegments');
-        $scope.skip=0;
+      updateShownSegments: function(args){
+        if (!args) {
+          $scope.skip=0;
+          var segments=$scope.loaded;
 
-        // Why zero ?...
-        if (false && !$scope.tags.length) {
-          $scope.segments.splice(0,$scope.segments.length);
-          return $q.resolve();
+        } else {
+          var segments=args.segments;
         }
 
-        var segpool=Object.keys($scope.loaded);
-        // TODO: sort segpool according to filter
-        $scope.loadedCount=segpool.length;
-
-        var _c=0;
+        if (!$scope.tags.length || $scope.skip==0) {
+          $scope.segments.splice(0,$scope.segments.length);
+          if (!$scope.tags.length) {
+            return $q.resolve();
+          }
+        }
 
         // for each segment loaded
-        return segpool.reduce(function(promise,segmentId){
+        return Object.keys(segments).reduce(function(promise,segmentId){
           return promise.then(function(){
-            ++_c;
-            var segment=$scope.loaded[segmentId];
+            var segment=segments[segmentId];
             var index;
             var alreadyDisplayed;
+
+            if (!segment.id) {
+              return;
+            }
+
             alreadyDisplayed=false;
 
             // is the segment already displayed ?
@@ -129,32 +133,62 @@ angular.module('doxelApp')
             });
 
             if (segment.tag && segment.tag.length) {
-              // check if the segment has all the tags
               var count=0;
-              var hasAll;
+              var show;
 
-              if ($scope.tags.length) {
-                hasAll=$scope.tags.some(function(tag){
-                  var found=segment.tag.some(function(_tag){
-                    return (tag.id==_tag.tagId && _tag.score>=$scope.minScore);
+              switch ($scope.operator) {
+              case 'and':
+                var hasAll=false;
+                if ($scope.tags.length) {
+                  hasAll=$scope.tags.some(function(tag){
+                    var found=segment.tag.some(function(_tag){
+                      return (tag.id==_tag.tagId && _tag.score>=$scope.minScore);
+                    });
+                    if (found) {
+                      ++count;
+                      return (count==$scope.tags.length);
+                    }
                   });
-                  if (found) {
-                    ++count;
-                    return (count==$scope.tags.length);
-                  }
-                });
 
-              } else {
-                hasAll=true;
+                } else {
+                  hasAll=true;
+                }
+                show=hasAll;
+                break;
+
+              case 'or':
+                var hasOne=false;
+                if ($scope.tags.length) {
+                  hasOne=$scope.tags.some(function(tag){
+                    return segment.tag.some(function(_tag){
+                      return (tag.id==_tag.tagId && _tag.score>=$scope.minScore);
+                    });
+                  });
+
+                } else {
+                  hasOne=true;
+                }
+                show=hasOne;
+                break;
               }
-              if (alreadyDisplayed && !hasAll) {
+
+              if (alreadyDisplayed && !show) {
                 // remove from display
                 $scope.segments.splice(index,1);
 
-              } else if (!alreadyDisplayed && hasAll) {
+              } else if (!alreadyDisplayed && show) {
                 // add to display
                 if (!$scope.scrollBufferFull('forward')) {
                   $scope.segments.push(segment);
+                  // get image count
+                  if (!segment.picturesCount) {
+                    Segment.pictures.count({id: segment.id},function(res){
+                      segment.picturesCount=res.count;
+
+                    },function(err){
+                      console.log(err);
+                    });
+                  }
                 }
               }
 
@@ -163,16 +197,16 @@ angular.module('doxelApp')
                 $scope.segments.splice(index,1);
               }
             }
-
-            $scope.skip=_c;
-            return $q.resolve('done '+_c+'/'+$scope.loadedCount);
-
           });
         },$q.resolve())
-        .then(console.log)
+        .then(function(){
+          if (args) {
+            $scope.skip+=args.segments.length;
+          }
+        })
         .catch(console.log)
 
-      },
+      }, // updateShownSegments
 
       operator: 'or',
 
@@ -191,7 +225,8 @@ angular.module('doxelApp')
           }
         });
         switch(tagCond.length) {
-          case 0: where={'tag.score': {'gte': $scope.minScore}};
+          case 0: //where={'tag.score': {'gte': $scope.minScore}};
+                  return $q.reject('cancel');
                   break;
           case 1: where=tagCond[0];
                   break;
@@ -207,22 +242,24 @@ angular.module('doxelApp')
       }, // galleryFilter
 
       init: function(){
+        $scope._galleryFilter['segment-thumbs-tagged']=$scope.galleryFilter;
+
         $scope.$on('$stateChangeStart', function (event, next, current) {
           console.log('next',next.name);
           $scope.update(next);
         });
+
         $scope.$on('$stateChangeSuccess', function (event, toState) {
           $scope.update(toState);
         });
 
-        $scope._galleryFilter['gallery.view.classifiers']=$scope.galleryFilter;
-
-        $scope.$on('segments-loaded',function(event,segments){
-          if ($scope.classifiers_visible) {
+        $scope.$on('segments-loaded',function(event,args){
+          if ($scope.galleryMode=='segment-thumbs-tagged') {
+            var segments=args.segments;
             var length=$scope.segments.length;
-            $scope.updateShownSegments().finally(function(){
-              if (segments.length && $scope.segments.length!=length && !$scope.scrollBufferFull('forward')) {
-                $scope.end.forward=false;
+            $scope.updateShownSegments(args).finally(function(){
+              if (segments.length && !$scope.scrollBufferFull('forward')) {
+                $scope.end('forward',false);
                 $timeout($scope.loadSegments);
               }
             })
@@ -232,10 +269,9 @@ angular.module('doxelApp')
         $scope.$watch(function(){return $scope.tags.length},function(after,before){
           if (after>before) {
             $scope.tagAdded($scope.tags[$scope.tags.length-1]);
-          } else {
+          } else if (after<before) {
             $scope.tagAdded();
           }
-
         });
 
         $scope.update($scope.$state.current);

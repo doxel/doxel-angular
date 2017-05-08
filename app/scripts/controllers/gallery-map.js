@@ -233,10 +233,8 @@ angular.module('doxelApp')
                 segmentId=$scope.segments[$scope.segments.length>>1];
               }
 
-              // clear thumbs list
-              $scope.clearThumbList();
-
               // rebuild thumbs list
+              $scope.clearThumbsList();
               if (segmentId) {
                 $scope.loadSegmentsAround(segmentId);
 
@@ -275,10 +273,14 @@ angular.module('doxelApp')
         },1);
 
         // update markers when more segments are loaded
-        $scope.$on('segments-loaded',function(event,segments){
-          $scope.updateShownSegments().then(function(){
+        $scope.$on('segments-loaded',function(event,args){
+          if ($scope.galleryMode!='segment-thumbs-onmap') {
+            return;
+          }
+          var segments=args.segments;
+          $scope.updateShownSegments(args).then(function(){
             $scope.getMap($scope.updateMarkers);
-            console.log('loaded', $scope.skip,segments.length,$scope.loadedCount)
+            console.log('skip',$scope.skip,'loaded', segments.length, 'inpool',$scope.loadedCount)
             if (!$scope.prevLoadedCount) $scope.prevLoadedCount=0;
             if ($scope.loadedCount>$scope.prevLoadedCount) {
               console.log('loadmore');
@@ -348,7 +350,7 @@ angular.module('doxelApp')
 
         });
 
-        $scope._galleryFilter['gallery.view.map']=$scope.galleryFilter;
+        $scope._galleryFilter['segment-thumbs-onmap']=$scope.galleryFilter;
 
         $scope.$on('window.resize',function(){
           $scope.invalidateSize();
@@ -372,9 +374,12 @@ angular.module('doxelApp')
 
       /**
        * Add or remove segment thumbs given the map bounds and the scroll position
+       * args comes from segment-loaded and is missing on leaflet moveend
        */
-      updateShownSegments: function() {
+      updateShownSegments: function(args) {
         var q=$q.defer();
+        var filter=args && args.filter;
+
         $scope.getMap(function(map){
 
           // get map center
@@ -416,9 +421,11 @@ angular.module('doxelApp')
               } else {
                 // segment location in map bounds ?
                 segment.latLng=new L.latLng(segment.geo.lat,segment.geo.lng);
+                if (filter && center.distanceTo(segment.latLng)<=filter.where.geo.maxDistance) {
+                  ++$scope.skip;
+                }
                 segment.showMarker=bounds.contains(segment.latLng);
                 if (segment.showMarker) {
-                  ++$scope.skip;
                   // display in bound segment unless limit is not reached
                   if (!alreadyDisplayed) {
                     if (!$scope.scrollBufferFull('forward')) {
@@ -452,7 +459,13 @@ angular.module('doxelApp')
         $scope.getMap(function(map){
           var center=map.getCenter();
           var bounds=map.getBounds();
+/*          // maxDistance must be in bounds (
+          var d1=center.distanceTo(L.latLng(center.lat,bounds._northEast.lng),{type:'meters'});
+          var d2=center.distanceTo(L.latLng(bounds._northEast.lat,center.lng),{type:'meters'});
+          var meters=Math.min(d1,d2);
+  */
           var meters=center.distanceTo(bounds._northEast,{type: 'meters'});
+
           q.resolve({
             where: {
               geo: {
@@ -460,7 +473,6 @@ angular.module('doxelApp')
                 maxDistance: meters
               }
             },
-            limit: 10000,
             skip: $scope.skip
           });
         });
