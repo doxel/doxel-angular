@@ -69,13 +69,13 @@ angular.module('doxelApp')
         segments: segmentsService.segments,
         center: [0,0],
         end: function(direction,value){
-          var state=$state.current.name;
+          var mode=$scope.galleryMode;
           if (value===undefined) {
-            return $scope._end[state] && $scope._end[state][direction];
+            return $scope._end[mode] && $scope._end[mode][direction];
           } else {
-             var end=$scope._end[state];
+             var end=$scope._end[mode];
              if (!end) {
-               end=$scope._end[state]={};
+               end=$scope._end[mode]={};
             }
             end[direction]=value;
           }
@@ -119,6 +119,7 @@ angular.module('doxelApp')
           }
 
           var segmentId=$rootScope.params.s||$location.search().s;
+          $scope.updateGalleryMode($state.current);
           if (segmentId) {
           /*  $scope.getSegment(segmentId).then(function(segment){
               $timeout(function(){
@@ -128,7 +129,7 @@ angular.module('doxelApp')
             });
   */
           } else {
-            $scope.loadSegments();
+            if ($state.current.name=='gallery.view.thumbs') $scope.loadSegments();
           }
 
         }, // init
@@ -179,11 +180,10 @@ angular.module('doxelApp')
           default: function(){
             return $q.when({
               where: {
-                 pointCloudId: {exists: true}
               },
               include: 'pointCloud'
             });
-          }
+          },
         },
 
         // get the current filter as a promise (_galleryFilter.default + current state).
@@ -199,7 +199,8 @@ angular.module('doxelApp')
               stateFilter(direction).then(function(filter1){
                 var filter=angular.merge({},filter0,filter1);
                 q.resolve(filter);
-              });
+              })
+              .catch(q.reject);
 
             } else {
               // or return vanilla default filter
@@ -226,7 +227,9 @@ angular.module('doxelApp')
               direction: direction,
               filter: _filter
             });
-          }).finally(function(){
+          })
+          .catch(console.log)
+          .finally(function(){
             $scope._loadSegments=null;
           });
 
@@ -250,11 +253,12 @@ angular.module('doxelApp')
               filter: filter
 
             }, function(segments){
-              if (!segments || !segments.length) {
+              if (!segments || !segments.length || (filter.limit && segments.length!=filter.limit)) {
                 // end reached
                 $scope.end(direction,true);
-              } else {
+              }
 
+              if (segments && segments.length) {
                 angular.forEach(segments,function(segment, si){
                   var _segment=$scope.loaded.has(segment.id);
                   if (!_segment) {
@@ -275,6 +279,12 @@ angular.module('doxelApp')
               $scope._loadSegments.reject(err);
             });
 
+          })
+          .catch(function(err){
+            console.log(err);
+            if (err=='cancel') {
+              $scope._loadSegments.resolve([]);
+            }
           });
 
           return $scope._loadSegments;
@@ -356,11 +366,14 @@ angular.module('doxelApp')
             // reduce segments displayed to loaded segment
             Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
 
+console.log('back');
             // load segments backward
             $scope.loadSegments('backward').promise.then(function(){
 
               // load segments forward
               $timeout(function(){
+
+                console.log('forw');
                 $scope.loadSegments('forward').promise.then(function(){
                   _then(segment);
                 },_catch);

@@ -188,7 +188,9 @@ angular.module('doxelApp')
         }, // horizontalScrollConfig
 
         galleryFilter: function(direction) {
-          var filter={where:{}};
+          var filter={where:{
+            pointCloudId: {exists: true}
+          }};
           // load chunk after last segment in $scope.segments
           if (direction=='forward'){
             if ($scope.segments.length) {
@@ -230,8 +232,8 @@ angular.module('doxelApp')
           if (direction=='backward') {
             // prepend segments
             segments.reverse();
-              $scope.segments.splice.apply($scope.segments,[0,0].concat(segments));
-            });
+            $scope.segments.splice.apply($scope.segments,[0,0].concat(segments));
+
 if (false) // TODO: make it work without flickering -> dig into malihu
             if ($scope.segments.length>segments.length+1) {
               // update scrollbar
@@ -282,6 +284,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
                   //var nextPose=(curPose+1)%segment.poses.length;
 
                   var nextPose=Math.round(segment.poses.length*element.data('mouse').x/element.width());
+                  nextPose=Math.min(segment.poses.length-1,nextPose);
                   if (nextPose!=curPose) {
                     Picture.findById({id: segment.poses[nextPose].pictureId},function(picture){
                       if ($scope.nextThumb_timeout && $scope.nextThumb_segmentId==segmentId) {
@@ -377,8 +380,10 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           });
 
           $scope.$on('segments-loaded',function(event,args){
-            $scope.updateShownSegments(args);
-            $scope.fillScrollableContainer();
+            if ($scope.galleryMode=='segment-thumbs') {
+              $scope.updateShownSegments(args);
+              $scope.fillScrollableContainer();
+            }
           });
 
           $scope.$on('window.resize',function(){
@@ -400,7 +405,9 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           });
 
           $scope.$on('segment.selection.change',function(event,segment){
-            segment.picture.selected=segment.selected;
+            if (segment && segment.picture) {
+              segment.picture.selected=segment.selected;
+            }
           });
 
         }, // initEventHandlers
@@ -608,7 +615,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           if ($scope.thumbs_visible && $scope.galleryShown() && !$scope.scrollBufferFull(direction||'forward')) {
             console.log('more');
             $scope.loadSegments(direction||'forward',$scope.thumbsH).promise.then(function(segments){
-              if(segments.length){
+if (false)              if(segments.length){
                 $timeout(function(){
                   $scope.fillScrollableContainer();
                 });
