@@ -187,16 +187,16 @@ angular.module('doxelApp')
         },
 
         // get the current filter as a promise (_galleryFilter.default + current state).
-        getGalleryFilter: function(direction) {
+        getGalleryFilter: function(direction,from) {
           var q=$q.defer();
 
           // get default filter
-          $scope._galleryFilter.default(direction).then(function(filter0){
+          $scope._galleryFilter.default(direction,from).then(function(filter0){
 
             // get current state filter
             var stateFilter=$scope._galleryFilter[$scope.galleryMode];
             if (stateFilter) {
-              stateFilter(direction).then(function(filter1){
+              stateFilter(direction,from).then(function(filter1){
                 var filter=angular.merge({},filter0,filter1);
                 q.resolve(filter);
               })
@@ -211,7 +211,14 @@ angular.module('doxelApp')
           return q.promise;
         }, // getGalleryFilter
 
-        loadSegments: function(direction,count) {
+        loadSegments: function(direction,from,count) {
+          if (typeof(from)=='number') {
+            if (count!=undefined) {
+             throw new Error('wrong parameters');
+            }
+            count=from;
+            from=undefined;
+          }
           console.trace('loadSegments');
           $scope.updateMetrics();
           if ($scope._loadSegments) {
@@ -241,7 +248,7 @@ angular.module('doxelApp')
             return $scope._loadSegments;
           }
 
-          $scope.getGalleryFilter(direction).then(function(filter){
+          $scope.getGalleryFilter(direction,from).then(function(filter){
             console.log(filter);
             _filter=filter;
 
@@ -258,8 +265,21 @@ angular.module('doxelApp')
                 $scope.end(direction,true);
               }
 
+              if (from) {
+                 if (!segments) {
+                   segments=[];
+                 }
+//                 if (direction=='backward') {
+//                   segments.push(from);
+//                 } else {
+/* always unshift since array is reversed afterhand
+ in updateShownSegments when direction=="backward" !!
+*/
+                   segments.unshift(from);
+//                 }
+              }
               if (segments && segments.length) {
-                angular.forEach(segments,function(segment, si){
+                segments.forEach(function(segment, si){
                   var _segment=$scope.loaded.has(segment.id);
                   if (!_segment) {
                     $scope.loaded.push(segment);
@@ -364,20 +384,18 @@ angular.module('doxelApp')
 
           q.promise.then(function(segment){
             // reduce segments displayed to loaded segment
-            Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
+  //          Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length,segment]);
 
 console.log('back');
             // load segments backward
-            $scope.loadSegments('backward').promise.then(function(){
-
+            $scope.loadSegments('backward',segment).promise.then(function(){
               // load segments forward
               $timeout(function(){
-
                 console.log('forw');
                 $scope.loadSegments('forward').promise.then(function(){
                   _then(segment);
                 },_catch);
-              });
+              },150);
 
             },_catch);
           });
