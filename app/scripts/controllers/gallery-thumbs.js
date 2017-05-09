@@ -187,14 +187,17 @@ angular.module('doxelApp')
 
         }, // horizontalScrollConfig
 
-        galleryFilter: function(direction) {
+        galleryFilter: function(direction,segment) {
           var filter={where:{
             pointCloudId: {exists: true}
           }};
-          // load chunk after last segment in $scope.segments
+          // load chunk after specified segment or, by default,
+          // after last segment in $scope.segments
           if (direction=='forward'){
-            if ($scope.segments.length) {
-              var segment=$scope.segments[$scope.segments.length-1];
+            if (segment || $scope.segments.length) {
+              if (!segment) {
+                segment=$scope.segments[$scope.segments.length-1];
+              }
               filter.where.timestamp={
                 lte: segment.timestamp
               };
@@ -205,9 +208,12 @@ angular.module('doxelApp')
             filter.order='timestamp DESC';
 
           } else {
-              // load chunk before first segment in $scope.segments
-            if ($scope.segments.length) {
-              var segment=$scope.segments[0];
+              // load chunk before specified segment or, by default,
+              // before first segment in $scope.segments
+            if (segment || $scope.segments.length) {
+              if (!segment) {
+                segment=$scope.segments[0];
+              }
               filter.where.timestamp={
                 gte: segment.timestamp
               };
@@ -233,7 +239,6 @@ angular.module('doxelApp')
             // prepend segments
             segments.reverse();
             $scope.segments.splice.apply($scope.segments,[0,0].concat(segments));
-
 if (false) // TODO: make it work without flickering -> dig into malihu
             if ($scope.segments.length>segments.length+1) {
               // update scrollbar
@@ -551,6 +556,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
         },
 
         fillScrollableContainer: function(direction) {
+          console.log('fillScrollableContainer');
 
           $timeout.cancel($scope.fillTimeout);
           if (!$scope.end(direction||'forward'))
