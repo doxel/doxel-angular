@@ -391,6 +391,13 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             }
           });
 
+
+          $scope.$on('gallery-mode-change',function(event,from,to){
+            if (to=='segment-thumbs') {
+              $scope.clearThumbsList();
+            }
+          });
+
           $scope.$on('window.resize',function(){
             $scope.updateThumbsStyle($rootScope.$state.current);
             $scope.updateMetrics();
@@ -642,7 +649,7 @@ if (false)              if(segments.length){
         },
 
         clearThumbsList: function(){
-           $scope.segments.splice(0,$scope.segments.length-1);
+           $scope.segments.splice(0,$scope.segments.length);
         },
 
         updateVisibility: function(state){
