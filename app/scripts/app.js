@@ -117,7 +117,7 @@ var app=angular
         templateUrl: 'views/classifiers.html',
         controller: 'ClassifiersCtrl',
         controllerAs: 'classifiers'
-      }) 
+      })
       */
       .state('login', {
         url: '/login',
@@ -409,14 +409,6 @@ var app=angular
 
     // syncronize rootScope.params and location.search()
     $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-      // close navbar
-      var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
-      if (expanded) {
-        setTimeout(function(){
-          $('.navbar .menu-handle').click();
-        });
-      }
-
       var search=$location.search();
       var params=$rootScope.params;
 

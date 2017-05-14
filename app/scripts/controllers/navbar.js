@@ -74,8 +74,23 @@ angular.module('doxelApp')
         },3000);
       },
 
+      isNavbarExpandedVertically: function(){
+        return !$('#js-navbar-collapse').hasClass('collapsed') && $('#js-navbar-collapse').position().top > $('#main-navbar').position().top
+      },
+
       init: function() {
 
+        $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+          if ($scope.autoHide_enabled || $scope.isNavbarExpandedVertically()){
+            // close navbar
+            var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
+            if (expanded) {
+              setTimeout(function(){
+                $('.navbar .menu-handle').click();
+              });
+            }
+          }
+        });
 
         $('.header').on('mouseenter',function(){
           clearTimeout($scope.timeout);
