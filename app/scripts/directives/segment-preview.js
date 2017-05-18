@@ -68,7 +68,9 @@ angular.module('doxelApp')
           });
           Picture.findById({id: segment.previewId},function(picture){
             segment.picture=picture;
-          }, errorMessage.show);
+          }, function(err){
+            console.log(segment,err);
+          });
 
         }; // updateSegment
       },
@@ -80,6 +82,6 @@ angular.module('doxelApp')
           }, false);
       },
 
-      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.picture.selected?\' selected\':\'\')}}"/>'
+      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected||segment.picture.selected?\' selected\':\'\')}}"/>'
     };
   });
