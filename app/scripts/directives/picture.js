@@ -88,8 +88,18 @@ angular.module('doxelApp')
             img.src=picture.blob;
 
           }, function(err) {
-            thumb.addClass('load-error').removeClass('loading');
-            $rootScope.$broadcast('picture.onerror',picture);
+  //          thumb.addClass('load-error').removeClass('loading');
+  //          $rootScope.$broadcast('picture.onerror',picture);
+            var img=new Image();
+            $(img).on('load',function(e){
+              $scope.style="background-image: url("+img.src+");";
+              picture.loaded=true;
+              thumb.addClass('loaded').removeClass('loading');
+              $rootScope.$broadcast('picture.onload',picture);
+              img=null;
+            });
+            img.src='/images/img-placeholder-dark.jpg';
+
           });
         };
       },
