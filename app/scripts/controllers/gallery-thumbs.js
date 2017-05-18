@@ -187,10 +187,14 @@ angular.module('doxelApp')
 
         }, // horizontalScrollConfig
 
+        sortField: 'created',
+
         galleryFilter: function(direction,segment) {
-          var filter={where:{
-            pointCloudId: {exists: true}
-          }};
+          var filter={
+            where:{
+            }
+          };
+
           // load chunk after specified segment or, by default,
           // after last segment in $scope.segments
           if (direction=='forward'){
@@ -198,14 +202,14 @@ angular.module('doxelApp')
               if (!segment) {
                 segment=$scope.segments[$scope.segments.length-1];
               }
-              filter.where.timestamp={
-                lte: segment.timestamp
+              filter.where[$scope.sortField]={
+                lte: segment[$scope.sortField]
               };
               filter.where.id={
                 neq: segment.id
               };
             }
-            filter.order='timestamp DESC';
+            filter.order=$scope.sortField+' DESC';
 
           } else {
               // load chunk before specified segment or, by default,
@@ -214,14 +218,14 @@ angular.module('doxelApp')
               if (!segment) {
                 segment=$scope.segments[0];
               }
-              filter.where.timestamp={
-                gte: segment.timestamp
+              filter.where[$scope.sortField]={
+                gte: segment[$scope.sortField]
               };
               filter.where.id={
                 neq: segment.id
               };
             }
-            filter.order='timestamp ASC';
+            filter.order=$scope.sortField+' ASC';
           }
 
           return $q.resolve(filter);
@@ -262,6 +266,8 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             $scope.segments.splice.apply($scope.segments,[$scope.segments.length,0].concat(segments));
 
           }
+
+          $scope.getPicturesCount(segments);
 
         }, // updateShownSegments
 
@@ -391,7 +397,6 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             }
           });
 
-
           $scope.$on('gallery-mode-change',function(event,from,to){
             if (to=='segment-thumbs') {
               $scope.clearThumbsList();
@@ -419,7 +424,22 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           $scope.$on('segment.selection.change',function(event,segment){
             if (segment && segment.picture) {
               segment.picture.selected=segment.selected;
+              $timeout(function(){segment.picture.selected=segment.selected},1000);
             }
+          });
+
+          $scope.$on('options.gallery.my-segments',function(event){
+            $scope.clearThumbsList().finally(function(){
+              $scope.update($scope.$state.current);
+            });
+
+          });
+
+          $scope.$on('options.gallery.all-segments',function(event){
+            $scope.clearThumbsList().finally(function(){
+              $scope.update($scope.$state.current);
+            });
+
           });
 
         }, // initEventHandlers
@@ -465,7 +485,9 @@ if (false) // TODO: make it work without flickering -> dig into malihu
               $location.search($rootScope.params);
               // open viewer
               if ($scope.$state.current.name=='gallery.view.thumbs' || $scope.$state.current.name=='gallery.view.home') {
-                $scope.$state.transitionTo('gallery.view.cloud');
+                if (segment.pointCloud) {
+                  $scope.$state.transitionTo('gallery.view.cloud');
+                }
                 return;
               }
             }
@@ -550,7 +572,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
 
             container.mCustomScrollbar('scrollTo',Math.max(0,pos-(offset>0?offset:0)),scrollOptions);
           }
-        },
+        }, // showThumb
 
         isWide: function(){
           var w=$(window).width();
@@ -646,11 +668,31 @@ if (false)              if(segments.length){
             */
           }
           },1000);
-        },
 
-        clearThumbsList: function(){
-           $scope.segments.splice(0,$scope.segments.length);
-        },
+        }, // fillScrollableContainer
+
+        clearThumbsList: function clearThumbsList(){
+          var q=$q.defer();
+
+          // maybe we are loading content already
+          if ($scope._loadSegments) {
+            $scope._loadSegments.promise.catch(function(){
+              console.log('catch');
+                clearThumbsList().then(q.resolve);
+            });
+            $scope._loadSegments.reject('abort');
+
+          } else {
+            q.resolve();
+          }
+
+          return q.promise.then(function(){
+            $scope.segments.splice(0,$scope.segments.length);
+            $scope.end('forward',false);
+            $scope.end('backward',false);
+          }).catch(console.log);
+
+        }, // clearThumbsList
 
         updateVisibility: function(state){
           $scope.thumbs_visible=(state.name.substr(0,7)=='gallery');
@@ -677,7 +719,7 @@ if (false)              if(segments.length){
               $scope.thumbsVerticalScroll=($rootScope.thumbsPosition!='thumbs-bottom');
             });
           }
-        },
+        }, // updateThumbsStyle
 
         galleryShown: function(){
           return $('#gallery-thumbs:visible').length;
@@ -724,7 +766,7 @@ if (false)              if(segments.length){
                 return (offset.top < mcsElem.offset().top-(mcsElem.height()*1.5));
             }
           }
-        },
+        }, // scrollBufferFull
 
         updateSelection: function(segmentId){
           if ($scope.thumbs_visible) {
@@ -747,7 +789,7 @@ if (false)              if(segments.length){
               });
             }
           }
-        },
+        }, // updateSelection
 
         update: function(state){
           $scope.updateVisibility(state);
