@@ -1,1 +1,15 @@
-<div>The requested resource does not exists</div>
+  <div class="content" style="margin-top: 80px;">
+    <p>
+      <a ui-sref="gallery.view.home">
+        <img src="/logo-200x200.png" alt="DOXEL">
+      </a>
+    </p>
+    <div>
+      <h1>This doxel.org page can’t be found</h1>
+      <h2>No webpage was found for the web address: <span id="url"></span></h2>
+      <p>HTTP ERROR 404</p>
+    </div>
+  </div>
+  <script>
+    document.getElementById('url').innerHTML=document.location.href;
+  </script>
