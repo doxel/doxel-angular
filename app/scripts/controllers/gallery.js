@@ -81,9 +81,59 @@ angular.module('doxelApp')
           }
         },
 
+        dropdownInit: function(){
+          var options=$scope.params;
+          // based on code shared by bseth99 https://codepen.io/bseth99/pen/fboKH
+          $('#gallery-dropdown').parent().on('click.dropdown', 'a', function(event) {
+            var target=$(event.currentTarget);
+            var name=target.attr('data-name');
+            var input=target.find('input');
+
+            if (name) {
+              options[name]=!options[name];
+              if (!options[name]) {
+                delete options[name];
+              }
+              setTimeout(function(){
+                input.prop('checked', options[name]);
+              });
+              $scope.$broadcast('options.gallery.'+name);
+              console.log(options);
+              $timeout(function(){
+                $location.search($rootScope.params).replace();
+              },1);
+
+            }
+            $(event.target).blur();
+            return false;
+          });
+
+        }, // dropdownInit
+
+        getPicturesCount: function(segments) {
+          return segments.reduce(function(promise,segment){
+            return promise.then(function(){
+              if (segment.id && !segment.pointCloud) {
+                // get image count
+                if (!segment.picturesCount) {
+                  return Segment.pictures.count({id: segment.id},function(res){
+                    segment.picturesCount=res.count;
+
+                  },function(err){
+                    console.log(err);
+                  });
+                }
+              }
+            });
+          },$q.resolve())
+          .catch(console.log)
+
+        }, // getPicturesCount
+
         init: function(){
 
           $scope.updateMetrics();
+          $scope.dropdownInit()
 
           //// on state change success
           $rootScope.$on('$stateChangeSuccess', function (event, toState) {
@@ -105,8 +155,8 @@ angular.module('doxelApp')
               $state.go('gallery.view.thumbs',{},{
                 location: 'replace'
               });
-            },1)
-
+            },1);
+            $scope.updateGalleryMode(toState);
           });
 
           //// onload
@@ -149,8 +199,9 @@ angular.module('doxelApp')
         updateGalleryMode: function(state) {
           var galleryMode=$scope.getGalleryMode(state);
           if ($scope.galleryMode!=galleryMode) {
+            var from=$scope.galleryMode;
             $scope.galleryMode=galleryMode;
-            $scope.$broadcast('gallery-mode-change',galleryMode);
+            $scope.$broadcast('gallery-mode-change',from,galleryMode);
           }
         },
 
@@ -178,11 +229,19 @@ angular.module('doxelApp')
         _galleryFilter: {
           // the default filter
           default: function(){
-            return $q.when({
+            var filter={
               where: {
               },
               include: 'pointCloud'
-            });
+            };
+
+              if ($scope.params['my-segments'] && localStorage.$LoopBack$currentUserId) {
+                filter.where.userId=localStorage.$LoopBack$currentUserId;
+              }
+              if (!$scope.params['all-segments'])  {
+                filter.where.pointCloudId={exists: true};
+              }
+            return $q.resolve(filter);
           },
         },
 
