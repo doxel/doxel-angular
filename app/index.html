@@ -66,7 +66,7 @@
 
         <!-- Add your site or application content here -->
         <div class="header">
-          <div ng-cloak class="navbar navbar-default navbar-fixed-top disable-selection" role="navigation" ng-controller="NavBarCtrl">
+          <div ng-cloak id="main-navbar" class="navbar navbar-default navbar-fixed-top disable-selection" role="navigation" ng-controller="NavBarCtrl">
             <div class="navbar-inner">
               <div class="container">
                 <div class="navbar-header">
@@ -85,7 +85,30 @@
 
                   <ul class="nav navbar-nav">
                     <!--li ng-class="getClass('home')"><a ui-sref="home" class="home fa fa-home"><span>Home</span></a></li-->
-                    <li ng-class="getClass('gallery.view.thumbs')"><a ui-sref="gallery.view.thumbs" class="gallery fa fa-photo"><span>Gallery</span></a></li>
+                    <li ng-class="getClass('gallery.view.thumbs')">
+                      <a ui-sref="gallery.view.thumbs" class="gallery fa fa-photo"><span>Gallery</span></a>
+                      <!--a ng-show="authenticated" ui-sref="gallery.view.thumbs" class="gallery fa fa-photo" data-toggle="dropdown"><span>Gallery</span></a-->
+                    </li>
+                    <li ng-show="params.dropdown && $state.current.name.search('gallery')==0" ng-class="getClass('gallery.view.thumbs')" uib-dropdown is-open="status.isopen" ng-mouseenter="status.isopen=true" ng-mouseleave="status.isopen=false">
+                      <a uib-dropdown-toggle id="gallery-dropdown" ui-sref="gallery.view.thumbs" class="gallery fa fa-photo"><span>Gallery</span>
+                        <span class="caret"></span>
+                      </a>
+                      <ul role="menu" uib-dropdown-menu aria-labelledby="gallery-dropdown">
+                        <li role="menuitem">
+                          <a data-name="my-segments">
+                            <input id="my-segments" type="checkbox" ng-checked="params['my-segments']">
+                            <label for="my-segments">My Segments</label>
+                          </a>
+                        </li>
+                        <li role="menuitem">
+                          <a data-name="all-segments">
+                            <input id="all-segments" type="checkbox" ng-checked="params['all-segments']">
+                            <label for="all-segments">Show Unprocessed</label>
+                          </a>
+                        </li>
+                      </ul>
+                    </li-->
+
                     <li ng-class="getClass('gallery.view.cloud')"><a ui-sref="gallery.view.cloud" class="viewer fa fa-eye"><span>Viewer</span></a></li>
                     <li ng-class="getClass('upload')"><a ui-sref="upload" class="upload fa fa-upload"><span>Upload</span></a></li>
                     <li><a class="github-issues fa fa-bug" ng-href="{{githubHref+'/issues'}}" target="_blank" ng-click="goto('github-issues')"><span>Bug Report</span></a></li>
@@ -228,6 +251,7 @@
           <script src="scripts/services/uploader-service.js"></script>
           <script src="scripts/services/segments-service.js"></script>
           <script src="scripts/browserified.js"></script>
+          <script src="scripts/services/gallery-filter-service.js"></script>
           <!-- endbuild -->
           <!--script src="scripts/directives/picture-details.js"></script>
           <script src="scripts/directives/segment-status.js"></script>
