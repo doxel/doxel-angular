@@ -284,6 +284,9 @@ var app=angular
     $rootScope.$state=$state;
     $rootScope.params={};
 
+    // init or restore local user settings
+    $rootScope.localSettings=(localStorage.doxel&&(JSON.parse(localStorage.doxel)))||{};
+
     $rootScope.$on('unauthorized',function() {
       $state.transitionTo('login');
     });
