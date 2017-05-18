@@ -87,8 +87,18 @@ angular.module('doxelApp')
       show: function(){
         var segmentId=$location.search().s || $scope.params.s || ($scope.segments && $scope.segments[0] && $scope.segments[0].id);
         if (!segmentId) {
+          // when no segment is specified, wait for loaded segments and
+          // open the first with a pointcloud
+          // TODO: maybe theres no pointcloud in this segments chunk
           $scope._loadSegments.promise.then(function(_segments) {
-            $rootScope.$broadcast('segment.click',_segments[0]);
+            var segment=_segments.some(function(segment){
+              if (segment.pointCloudId) {
+                return segment;
+              }
+            });
+            if (segment) {
+              $rootScope.$broadcast('segment.click',segment);
+            }
           });
           return;
         }
@@ -97,7 +107,9 @@ angular.module('doxelApp')
 
         // get segment details
         $scope.getSegment(segmentId).then(function(segment){
-          q.resolve(segment);
+          if (segment.pointCloudId) {
+            q.resolve(segment);
+          }
         },q.reject);
 
         q.promise.then(function(segment){
