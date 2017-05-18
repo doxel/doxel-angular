@@ -4,7 +4,7 @@
     <div class="date">{{segment.timestamp | formatTimestamp}}</div>
   </a>
 </span-->
-<span ng-repeat="(index, segment) in segments">
+<span ng-repeat="(index, segment) in segments track by $index">
   <a class="loading" data-sid="{{segment.id}}" data-index="{{index}}" ng-click="click($event)">
     <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
     <div class="date">{{segment.timestamp | formatTimestamp}}</div>
