@@ -219,9 +219,9 @@ angular.module('doxelApp')
         } else {
           if ($scope.map_visible) {
             $scope.map_visible=false;
-            $scope.gallery.map_wasvisible=true;
 
           }
+          /*
           if ($scope.gallery.map_wasvisible) {
             if (state.name=='gallery.view.thumbs' || state.name=='gallery.view.home') {
               var segmentId;
@@ -234,18 +234,21 @@ angular.module('doxelApp')
               }
 
               // rebuild thumbs list
-              $scope.clearThumbsList();
-              if (segmentId) {
-                $scope.loadSegmentsAround(segmentId);
+              $scope.clearThumbsList().finally(function(){
+                if (segmentId) {
+                  $scope.loadSegmentsAround(segmentId);
 
-              } else {
-                $scope.loadSegments();
-              }
+                } else {
+                  $scope.loadSegments();
+                }
+              });
+
             } else {
               // lock thumbs when leaving map for viewer
               $scope._end[state.name]=angular.merge({},$scope._end['gallery.view.map']);
             }
           }
+          */
 
           $rootScope.map_promise=null;
         }
@@ -280,11 +283,10 @@ angular.module('doxelApp')
           var segments=args.segments;
           $scope.updateShownSegments(args).then(function(){
             $scope.getMap($scope.updateMarkers);
-            console.log('skip',$scope.skip,'loaded', segments.length, 'inpool',$scope.loadedCount)
-            if (!$scope.prevLoadedCount) $scope.prevLoadedCount=0;
-            if ($scope.loadedCount>$scope.prevLoadedCount) {
+            console.log('skip',$scope.skip,'loaded', segments.length, 'inpool',$scope.loaded.length)
+            if (segments.length) {
+              $scope.skip+=segments.length;
               console.log('loadmore');
-              $scope.prevLoadedCount=$scope.loadedCount;
               $timeout($scope.loadSegments);
             }
           });
@@ -326,7 +328,9 @@ angular.module('doxelApp')
        $scope.markerClick=function(segmentId){
           $scope.getSegment(segmentId).then(function(segment){
             if (elementSelection.isSelected('segment',segment)) {
-              $scope.$state.transitionTo('gallery.view.cloud');
+              if (segment.pointCloudId) {
+                $scope.$state.transitionTo('gallery.view.cloud');
+              }
             } else {
               $rootScope.$broadcast('segment.click',segment,{show:true});
             }
@@ -348,6 +352,17 @@ angular.module('doxelApp')
           });
 
 
+        });
+
+        $scope.$on('options.gallery.my-segments',function(event){
+            $scope.updateShownSegments().then(function(){
+              $scope.skip=0;
+              $scope.end('forward',false);
+              $scope.end('backward',false);
+              $scope.loadSegments();
+            }).catch(function(err){
+              console.log(err);
+            });
         });
 
         $scope._galleryFilter['segment-thumbs-onmap']=$scope.galleryFilter;
@@ -379,6 +394,7 @@ angular.module('doxelApp')
       updateShownSegments: function(args) {
         var q=$q.defer();
         var filter=args && args.filter;
+        if (filter) $scope.filter=filter;
 
         $scope.getMap(function(map){
 
@@ -389,13 +405,53 @@ angular.module('doxelApp')
           // get map bounds
           var bounds=map.getBounds();
 
-          $scope.skip=0;
 
-          var segpool=$scope.loaded
-          $scope.loadedCount=segpool.length;
+          if (!$scope.filter) {
+            return q.resolve();
+          }
+
+          var segments;
+          if (args && args.segments) {
+            segments=loopbackFilters(args.segments,{
+              where: $scope.filter.where,
+              order: $scope.filter.order
+
+            });
+
+          } else {
+            // called on map move
+            $scope.skip=0;
+            segments=loopbackFilters($scope.loaded,{
+              where: $scope.filter.where,
+              order: $scope.filter.order
+            });
+            $scope.loaded.forEach(function(segment){
+              if (segments.indexOf(segment)<0){
+                var alreadyDisplayed;
+                var index;
+
+                alreadyDisplayed=false;
+                // is the segment already displayed ?
+                $scope.segments.some(function(_segment,i){
+                  if (_segment.id==segment.id) {
+                    index=i;
+                    return alreadyDisplayed=true;
+                  }
+                });
+                if (alreadyDisplayed) {
+                  // segment not geolocated and already displayed  ?
+                  // remove from thumbs list
+                  $scope.segments.splice(index,1);
+                  // remove from map
+                  if (segment.marker) $scope.cluster.removeLayer(segment.marker);
+                }
+              }
+            });
+          }
 
           // for each segment loaded
-          segpool.reduce(function(promise,segment){
+          segments.reduce(function(promise,segment){
+
             return promise.then(function(){
               var index;
               var alreadyDisplayed;
@@ -421,9 +477,10 @@ angular.module('doxelApp')
               } else {
                 // segment location in map bounds ?
                 segment.latLng=new L.latLng(segment.geo.lat,segment.geo.lng);
-                if (filter && center.distanceTo(segment.latLng)<=filter.where.geo.maxDistance) {
+          /*      if (filter && center.distanceTo(segment.latLng)<=filter.where.geo.maxDistance) {
                   ++$scope.skip;
                 }
+          */
                 segment.showMarker=bounds.contains(segment.latLng);
                 if (segment.showMarker) {
                   // display in bound segment unless limit is not reached
@@ -445,7 +502,11 @@ angular.module('doxelApp')
               }
             });
 
-          },$q.resolve()).finally(q.resolve);
+          },$q.resolve())
+          .finally(function(){
+            $scope.getPicturesCount(segments)
+            .finally(q.resolve);
+          });
 
         });
 
@@ -546,10 +607,24 @@ angular.module('doxelApp')
 
       updateMarkers: function(map){
         var cluster=$scope.cluster;
-
+        var segments=loopbackFilters($scope.loaded,{where:($scope.filter && $scope.filter.where)})
         for(var i in $scope.loaded) {
           var segment=$scope.loaded[i];
-          if (!segment.geo || !segment.showMarker) continue;
+          if (!segment.geo) continue;
+
+          var has;
+          has=false;
+          if (segments.length) {
+            segments.some(function(_segment){
+              return has=(segment.id==_segment.id);
+            });
+          }
+          if (!has) {
+            if (segment.marker && cluster.hasLayer(segment.marker)) {
+              cluster.removeLayer(segment.marker);
+            }
+            continue;
+          }
 
           if (!segment.marker) {
               segment.marker=L.marker(
