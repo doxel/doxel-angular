@@ -130,8 +130,28 @@ angular.module('doxelApp')
 
         }, // getPicturesCount
 
+
+        sortField: 'created',
+        sortASC: false,
+
+        updateSortField: function(sort){
+          if (sort) {
+            sort=sort.split(' ');
+            if (sort[0].length){
+              $scope.sortField=sort[0];
+            }
+            if (sort[1]) {
+              $scope.sortASC=(sort[1]=='ASC');
+            } else {
+              $scope.sortASC=true;
+            }
+          }
+
+        },
+
         init: function(){
 
+          $scope.updateSortField($scope.params.sort);
           $scope.updateMetrics();
           $scope.dropdownInit()
 
@@ -144,7 +164,7 @@ angular.module('doxelApp')
 
             $scope.updateMetrics();
 
-            var params=$rootScope.params;
+            var params=$scope.params;
 
             // when state is "gallery", switch gallery.view.thumbs
 

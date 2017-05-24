@@ -187,7 +187,16 @@ angular.module('doxelApp')
 
         }, // horizontalScrollConfig
 
-        sortField: 'created',
+        getSortOrder: function(options){
+          var order;
+          if (options && options.inverse) {
+            order=$scope.sortField+' '+(($scope.sortASC)?'DESC':'ASC');
+          } else {
+            order=$scope.sortField+' '+(($scope.sortASC)?'ASC':'DESC');
+          }
+          console.log(order);
+          return order;
+        },
 
         galleryFilter: function(direction,segment) {
           var filter={
@@ -202,14 +211,14 @@ angular.module('doxelApp')
               if (!segment) {
                 segment=$scope.segments[$scope.segments.length-1];
               }
-              filter.where[$scope.sortField]={
-                lte: segment[$scope.sortField]
-              };
               filter.where.id={
                 neq: segment.id
               };
+              var comp=($scope.sortASC)?'gte':'lte';
+              filter.where[$scope.sortField]=filter.where[$scope.sortField]||{};
+              filter.where[$scope.sortField][comp]=segment[$scope.sortField];
             }
-            filter.order=$scope.sortField+' DESC';
+            filter.order=$scope.getSortOrder();
 
           } else {
               // load chunk before specified segment or, by default,
@@ -218,14 +227,14 @@ angular.module('doxelApp')
               if (!segment) {
                 segment=$scope.segments[0];
               }
-              filter.where[$scope.sortField]={
-                gte: segment[$scope.sortField]
-              };
               filter.where.id={
                 neq: segment.id
               };
+              var comp=($scope.sortASC)?'lte':'gte';
+              filter.where[$scope.sortField]=filter.where[$scope.sortField]||{};
+              filter.where[$scope.sortField][comp]=segment[$scope.sortField];
             }
-            filter.order=$scope.sortField+' ASC';
+            filter.order=$scope.getSortOrder({inverse:true});
           }
 
           return $q.resolve(filter);
@@ -383,11 +392,19 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           });
 
           $scope.$on('location.search',function(event,value){
+            console.log('location.search');
             if (value[0].s!=value[1].s) {
               // update selection for history back here
               console.log('TODO: update selection on history back without messing with click');
               $scope.updateSelection(value[0].s);
             }
+            if (value[0].sort!=value[1].sort) {
+              $scope.updateSortField(value[0].sort);
+              $scope.clearThumbsList().finally(function(){
+                $scope.update($scope.$state.current);
+              });
+            }
+
           });
 
           $scope.$on('segments-loaded',function(event,args){
