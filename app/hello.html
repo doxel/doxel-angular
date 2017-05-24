@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DOXEL</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta property="fb:app_id" content="457781937746762" />
+  <meta property="og:title" content="DOXEL.ORG" />
+  <meta property="og:url" content="https://www.doxel.org/" />
+  <meta property="og:image" content="https://www.doxel.org/logo-200x200.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:description" content="Upload your own photo footage to have a 3D reconstruction, or view existent 3D in your browser." />
+
+  <link rel="icon" href="/favicon.ico?v=2" />
+
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffc40d">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <link rel="stylesheet" type="text/css" href="styles/reset.css">
+  <link rel="stylesheet" href="styles/main.css">
+
+
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="styles/theme.min.css">
+
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+  <style>
+    html {
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+      transition: opacity 1s;
+    }
+    html, body {
+      color: white;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: auto;
+      opacity: 0;
+    }
+
+    body {
+      opacity: 0;
+      font-family: helvetica;
+    }
+
+    body.gradient {
+      /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#7d7e7d+0,0e0e0e+100;Black+3D */
+      background: rgb(125,126,125); /* Old browsers */
+      background: -moz-linear-gradient(-45deg, rgba(127,126,255,0) 0%, rgba(4,8,14,1) 100%); /* FF3.6-15 */
+      background: -webkit-linear-gradient(-45deg, rgba(127,126,255,0) 0%,rgba(4,8,14,1) 100%); /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(135deg, rgba(127,126,255,0) 0%,rgba(4,8,14,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7f7eff', endColorstr='#04080e',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: rgba(0,0,0,0.5);
+      text-align: center;
+      width: 60%;
+      height: 100%;
+      margin-left: 20%;
+    }
+
+    .content > div {
+      padding-top: 64px;
+      padding-bottom: 64px;
+  }
+
+    button {
+      font-size: large;
+      color: black;
+    }
+
+    header {
+      width: 100%;
+      height: 64px;
+      position: absolute;
+      background: rgba(88,88,88,0.5); /* Old browsers */
+    }
+
+    h1 {
+      margin-top: 0.3em;
+      padding-left: 4px;
+
+    }
+
+    header > a {
+      position: relative;
+    }
+
+    p {
+      font-size: 1.5em;
+      margin-top: 2em;
+    }
+
+    img.logo {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 4px;
+      margin-right: 4px;
+
+    }
+    footer {
+      position: absolute;
+      bottom: 0;
+      text-align: center;
+      width: 100%;
+      padding: 0.5em;
+      background: rgba(88,88,88,0.5); /* Old browsers */
+    }
+
+    footer > * {
+      position: relative;
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="/#!/doxel/about"><h1><img class="logo" src="/favicon-96x96.png" alt="DOXEL">DOXEL</h1></a>
+  </header>
+  <div class="content">
+    <div>
+      <p>We convert your own photos to 3D point clouds</p>
+      <a href="/app/#!/upload"><button class="btn btn-success">Start Uploading Now</button></a>
+      <p>View and share the results</p>
+      <a href="/app/#!/doxel/gallery"><button class="btn btn-info">Go To The Gallery</button></a>
+    </div>
+  </div>
+  <footer>
+    <div>&copy; 2015-2017 <a href="https://doxel.org/" title="DOXEL.org">DOXEL.org – Dynamic Volumetric Pixel</a></</div>
+  </footer>
+  <a href="https://github.com/doxel"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+<script>
+  var img=new Image();
+  img.onload=function(){
+    $('html').css({
+      backgroundImage: 'url(/images/background.jpg)',
+      zIndex: -1,
+      opacity: 1
+    });
+    $('body').addClass('gradient').css('opacity',1);
+  }
+  img.src='/images/background.jpg';
+</script>
+
+</body>
+
+</html>
