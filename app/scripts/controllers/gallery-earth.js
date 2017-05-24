@@ -43,7 +43,13 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryEarthCtrl', function ($scope,$q,$state,$rootScope,$timeout) {
+.controller('GalleryEarthCtrl', [
+  '$scope',
+  '$q',
+  '$state',
+  '$rootScope',
+  '$timeout',
+  function ($scope,$q,$state,$rootScope,$timeout) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -377,4 +383,4 @@ angular.module('doxelApp')
 
     $scope.init();
 
-  });
+  }]);

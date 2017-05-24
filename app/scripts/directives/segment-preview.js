@@ -42,7 +42,7 @@
  * # segmentPreview
  */
 angular.module('doxelApp')
-  .directive('segmentPreview', function (Picture, errorMessage) {
+  .directive('segmentPreview', ['Picture','errorMessage', function (Picture, errorMessage) {
     return {
       restrict: 'E',
       replace: false,
@@ -82,6 +82,6 @@ angular.module('doxelApp')
           }, false);
       },
 
-      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.selected||segment.picture.selected?\' selected\':\'\')}}"/>'
+      template: '<picture picture="segment.picture" label="label" picture-class="{{segmentPreviewClass + (segment.picture.selected?\' selected\':\'\')}}"/>'
     };
-  });
+  }]);

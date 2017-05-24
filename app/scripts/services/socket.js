@@ -43,7 +43,19 @@
  * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .service('socketService', function ($rootScope,$cookies,errorMessage,socketFactory,LoopBackAuth) {
+.service('socketService', [
+  '$rootScope',
+  '$cookies',
+  'errorMessage',
+  'socketFactory',
+  'LoopBackAuth',
+  function (
+    $rootScope,
+    $cookies,
+    errorMessage,
+    socketFactory,
+    LoopBackAuth
+  ) {
     var self=this;
 
     this.enabled=false;
@@ -111,4 +123,4 @@ angular.module('doxelApp')
     }
     return this;
 
-  });
+  }]);

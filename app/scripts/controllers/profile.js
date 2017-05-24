@@ -44,7 +44,17 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('ProfileCtrl', function ($rootScope,$scope,User,errorMessage) {
+.controller('ProfileCtrl', [
+  '$rootScope',
+  '$scope',
+  'User',
+  'errorMessage',
+  function (
+    $rootScope,
+    $scope,
+    User,
+    errorMessage
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -122,4 +132,4 @@ angular.module('doxelApp')
       document.location.assign('/link/google');
     };
 
-  });
+  }]);

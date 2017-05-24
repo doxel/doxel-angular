@@ -43,7 +43,35 @@
 * Controller of the doxelApp
 */
 angular.module('doxelApp')
-.controller('LoginCtrl', function ($window, $scope, User, LoopBackAuth, $location, $sce, errorMessage, socketService, $q, $timeout, $compile, $state, appConfig) {
+.controller('LoginCtrl', [
+  '$window',
+  '$scope',
+  'User',
+  'LoopBackAuth',
+  '$location',
+  '$sce',
+  'errorMessage',
+  'socketService',
+  '$q',
+  '$timeout',
+  '$compile',
+  '$state',
+  'appConfig',
+  function (
+    $window,
+    $scope,
+    User,
+    LoopBackAuth,
+    $location,
+    $sce,
+    errorMessage,
+    socketService,
+    $q,
+    $timeout,
+    $compile,
+    $state,
+    appConfig
+  ) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
     'AngularJS',
@@ -325,4 +353,4 @@ angular.module('doxelApp')
   };
 
 
-});
+}]);

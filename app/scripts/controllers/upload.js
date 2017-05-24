@@ -15,7 +15,14 @@ angular.module('doxelApp')
   '$state',
   'uploaderService',
   '$window',
-  function ($scope,$rootScope,LoopBackAuth,$state,uploaderService,$window) {
+  function (
+    $scope,
+    $rootScope,
+    LoopBackAuth,
+    $state,
+    uploaderService,
+    $window
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',

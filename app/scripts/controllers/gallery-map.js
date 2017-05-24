@@ -43,7 +43,37 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryMapCtrl', function ($scope,$rootScope,$q,$location,$window,$timeout,leafletData,leafletBoundsHelpers,Segment,$state,appConfig,errorMessage,$http,elementSelection) {
+.controller('GalleryMapCtrl', [
+  '$scope',
+  '$rootScope',
+  '$q',
+  '$location',
+  '$window',
+  '$timeout',
+  'leafletData',
+  'leafletBoundsHelpers',
+  'Segment',
+  '$state',
+  'appConfig',
+  'errorMessage',
+  '$http',
+  'elementSelection',
+  function (
+    $scope,
+    $rootScope,
+    $q,
+    $location,
+    $window,
+    $timeout,
+    leafletData,
+    leafletBoundsHelpers,
+    Segment,
+    $state,
+    appConfig,
+    errorMessage,
+    $http,
+    elementSelection
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -768,4 +798,4 @@ angular.module('doxelApp')
     .catch(console.log)
     .finally($scope.init);;
 
-  });
+  }]);

@@ -8,7 +8,27 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('ResetPasswordCtrl', function ($scope,$cookies,errorMessage,LoopBackAuth,$routeParams,User,$rootScope,$location,$state) {
+.controller('ResetPasswordCtrl', [
+  '$scope',
+  '$cookies',
+  'errorMessage',
+  'LoopBackAuth',
+  '$routeParams',
+  'User',
+  '$rootScope',
+  '$location',
+  '$state',
+  function (
+    $scope,
+    $cookies,
+    errorMessage,
+    LoopBackAuth,
+    $routeParams,
+    User,
+    $rootScope,
+    $location,
+    $state
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -97,4 +117,4 @@ angular.module('doxelApp')
       }
     }
 
-  });
+  }]);

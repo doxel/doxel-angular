@@ -43,7 +43,27 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('LogoutCtrl', function ($scope, $rootScope, $location, User, LoopBackAuth, $cookies, socketService, $state, appConfig) {
+.controller('LogoutCtrl', [
+  '$scope',
+  'rootScope',
+  '$location',
+  'User',
+  'LoopBackAuth',
+  '$cookies',
+  'socketService',
+  '$state',
+  'appConfig',
+  function (
+    $scope,
+    rootScope,
+    $location,
+    User,
+    LoopBackAuth,
+    $cookies,
+    socketService,
+    $state,
+    appConfig
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -84,4 +104,4 @@ angular.module('doxelApp')
       socketService.ioSocket.close();
     }
 
-});
+}]);

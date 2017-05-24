@@ -42,7 +42,15 @@
  * # dnd
  */
 angular.module('doxelApp')
-  .directive('dnd', function ($parse,dndService,$timeout) {
+.directive('dnd', [
+  '$parse',
+  'dndService',
+  '$timeout',
+  function (
+    $parse,
+    dndService,
+    $timeout
+  ) {
     return {
       restrict: 'A',
       replace: false,
@@ -217,4 +225,4 @@ angular.module('doxelApp')
         }
       }
     };
-  });
+  }]);

@@ -43,7 +43,17 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('NavBarCtrl', function ($scope, $location, $rootScope, $state) {
+.controller('NavBarCtrl', [
+  '$scope',
+  '$location',
+  '$rootScope',
+  '$state',
+  function (
+    $scope,
+    $location,
+    $rootScope,
+    $state
+  ) {
     this.awesomeThings=[
       'HTML5 Boilerplate',
       'AngularJS',
@@ -79,7 +89,6 @@ angular.module('doxelApp')
       },
 
       init: function() {
-
         $scope.test=localStorage && localStorage.test;
         $rootScope.$on('$stateChangeSuccess', function (event, toState) {
           if ($scope.autoHide_enabled || $scope.isNavbarExpandedVertically()){
@@ -127,4 +136,4 @@ angular.module('doxelApp')
 
     $scope.init();
 
-  });
+  }]);

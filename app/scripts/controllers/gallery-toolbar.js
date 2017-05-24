@@ -43,7 +43,17 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-  .controller('GalleryToolbarCtrl', function ($scope,$rootScope,$state,$location) {
+.controller('GalleryToolbarCtrl', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  '$location',
+  function (
+    $scope,
+    $rootScope,
+    $state,
+    $location
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -109,4 +119,4 @@ return;
 
     $scope.init();
 
-  });
+  }]);

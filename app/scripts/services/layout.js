@@ -43,7 +43,7 @@
  * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .service('layout', function ($window) {
+  .service('layout', ['$window', function ($window) {
     return {
       fitToContainer: function(container,element,offset){
         var elementOffset=element.offset();
@@ -55,4 +55,4 @@ angular.module('doxelApp')
         fitToContainer(angular.element($window),element,offset);
       }
     }
-  });
+  }]);

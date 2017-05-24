@@ -42,7 +42,7 @@
  * # pictureSet
  */
 angular.module('doxelApp')
-  .directive('pictureSet', function ($window) {
+  .directive('pictureSet', ['$window', function ($window) {
     return {
       templateUrl: 'views/picture-set.html',
       restrict: 'E',
@@ -71,4 +71,4 @@ angular.module('doxelApp')
   //      scope.resize();
       }
     };
-  });
+  }]);

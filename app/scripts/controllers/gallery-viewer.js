@@ -44,7 +44,29 @@
  */
 
 angular.module('doxelApp')
-  .controller('GalleryViewerCtrl', function ($timeout,$scope,$rootScope,$location,$q,Segment,$state,$http,LoopBackAuth,errorMessage) {
+.controller('GalleryViewerCtrl', [
+  '$timeout',
+  '$scope',
+  '$rootScope',
+  '$location',
+  '$q',
+  'Segment',
+  '$state',
+  '$http',
+  'LoopBackAuth',
+  'errorMessage',
+  function (
+    $timeout,
+    $scope,
+    $rootScope,
+    $location,
+    $q,
+    Segment,
+    $state,
+    $http,
+    LoopBackAuth,
+    errorMessage
+  ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
@@ -152,4 +174,4 @@ angular.module('doxelApp')
     $scope.init();
 
 
-  });
+  }]);

@@ -42,7 +42,7 @@
  * # segmentMap
  */
 angular.module('doxelApp')
-  .directive('segmentMap', function (leafletData) {
+  .directive('segmentMap', ['leafletData', function (leafletData) {
     return {
       scope: {
         segment: '=',
@@ -96,4 +96,4 @@ angular.module('doxelApp')
         }); // scope.$watch
       }
     };
-  });
+  }]);

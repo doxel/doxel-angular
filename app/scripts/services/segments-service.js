@@ -13,12 +13,29 @@ angular.module('doxelApp')
     var segmentsService=this;
     angular.extend(segmentsService,{
       segments: [],
-      loaded: []
+      loaded: [],
+      tagLoaded: []
     });
+
+    segmentsService.segments._push=segmentsService.segments.push
+    segmentsService.segments.push=function(){
+      return this._push.apply(this,Array.prototype.slice.apply(arguments));
+    }
+
+    segmentsService.segments._unshift=segmentsService.segments.unshift
+    segmentsService.segments.unshift=function(){
+      return this._unshift.apply(this,Array.prototype.slice.apply(arguments));
+    }
+
+    segmentsService.segments._slice=segmentsService.segments.slice
+    segmentsService.segments.slice=function(){
+      return this._slice.apply(this,Array.prototype.slice.apply(arguments));
+    }
 
     Object.defineProperty(segmentsService.segments,'has',{
       value: function(segmentId){
         return this.find(function(segment){
+          if (segment.id==segmentId) console.log('has');
           return segment.id==segmentId;
         });
       }
@@ -27,6 +44,7 @@ angular.module('doxelApp')
     Object.defineProperty(segmentsService.loaded,'has',{
       value: function(segmentId){
         return this.find(function(segment){
+          if (segment.id==segmentId) console.log('has');
           return segment.id==segmentId;
         });
       }

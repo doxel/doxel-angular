@@ -7,7 +7,7 @@
  * # webglearth2
  */
 angular.module('doxelApp')
-  .directive('webglearth2', function ($timeout) {
+  .directive('webglearth2', ['$timeout', function ($timeout) {
     return {
       template: '<div class="webglearth2" ng-attr-id="{{div_id}}"></div>',
       restrict: 'E',
@@ -74,77 +74,77 @@ angular.module('doxelApp')
 							fixedZoom: z===undefined,
 							noConstraints: true,
 							forceStayTheCourse: true
-					
+
 						});
 					},
 				  zoomAndPan: function(options) {
 						 var earth=$scope.earth;
 						 var from=options.from||{};
 						 var to=options.to;
-									
+
 						 if ($scope.zoomandpanForceStayTheCourse===true && options.firstPan!==true) {
 							 return;
 						 }
 						 $scope.zoomandpanForceStayTheCourse=options.forceStayTheCourse;
-									
+
 						 Math.easeOutCubic = function (time, base, delta, duration) {
 								 time /= duration;
 								 --time;
 								 return base+delta*(time*time*time+1);
 						 };
-									
+
 						 if (from.lat===undefined) {
 							 var center=earth.getCenter();
 							 from.lat=center[0];
 							 from.lon=center[1];
 						 }
-									
+
 						 if (from.zoom===undefined) {
 								 from.zoom=earth.getZoom();
 						 }
-									
+
 						 if (to.zoom===undefined) {
 							 to.zoom=earth.getZoom();
 						 }
-									
+
 						 if (!options.callback) {
 							 options.callback=function(){};
 						 }
-									
+
 						 if (!options.steps) {
 							 options.steps=1;
 						 }
-									
+
 						 var cur={
 								 lat: from.lat,
 								 lon: from.lon,
 								 zoom: from.zoom
 						 }
-									
+
 						 var delta={
 								 lat: (to.lat-from.lat)%180,
 								 lon: (to.lon-from.lon)%360,
 								 zoom: (to.zoom-from.zoom)
 						 }
-									
+
 						 if (!options.noConstraints) {
 							 if (delta.lon>180) {
 								 delta.lon=delta.lon-360;
 							 } else if (delta.lon<-180) {
 								 delta.lon=360+delta.lon;
 							 }
-									
+
 							 if (delta.lat>90) {
 								 delta.lat=delta.lat-180;
 							 } else if (delta.lat<-90) {
 								 delta.lat=180+delta.lat;
 							 }
 						 }
-									
+
 						 var i=0;
 						 var now=Date.now();
 						 $scope.zoomandpanId=now;
-									
+
 						 function loop() {
 								 if ($scope.zoomandpanId!=now) return;
 								 earth.setView([cur.lat,cur.lon],options.fixedZoom?undefined:cur.zoom);
@@ -170,4 +170,4 @@ angular.module('doxelApp')
 
       } // controller
     };
-  });
+  }]);

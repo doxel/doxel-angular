@@ -42,7 +42,7 @@
  * # segmentSet
  */
 angular.module('doxelApp')
-  .directive('segmentSet', function (elementSelection) {
+  .directive('segmentSet', ['elementSelection', function (elementSelection) {
     return {
       templateUrl: 'views/segment-set.html',
       restrict: 'E',
@@ -111,4 +111,4 @@ angular.module('doxelApp')
     //    scope.resize();
       }
     };
-  });
+  }]);

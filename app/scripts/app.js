@@ -67,7 +67,19 @@ var app=angular
     'smart-table'
 
   ])
-  .config(function ($httpProvider, $urlRouterProvider, $stateProvider, $locationProvider, ngHttpCacheConfigProvider) {
+  .config([
+    '$httpProvider',
+    '$urlRouterProvider',
+    '$stateProvider',
+    '$locationProvider',
+    'ngHttpCacheConfigProvider',
+    function (
+      $httpProvider,
+      $urlRouterProvider,
+      $stateProvider,
+      $locationProvider,
+      ngHttpCacheConfigProvider
+    ) {
 
     ngHttpCacheConfigProvider.urls = ['/api'];
 
@@ -88,19 +100,20 @@ var app=angular
     */
 
     // Inside app config block
-    $httpProvider.interceptors.push(function($q, $location, LoopBackAuth) {
+    $httpProvider.interceptors.push(['$q', 'LoopBackAuth', function($q, LoopBackAuth) {
       return {
         responseError: function(rejection) {
           if (rejection.status == 401) {
             //Now clearing the loopback values from client browser for safe logout...
             LoopBackAuth.clearUser();
             LoopBackAuth.clearStorage();
+            console.log('unauthorized');
             this.$rootscope.$emit('unauthorized');
           }
           return $q.reject(rejection);
         }
       };
-    });
+    }]);
 
     $urlRouterProvider.otherwise(function($injector){
       $injector.invoke(['$state', function($state) {
@@ -279,10 +292,35 @@ var app=angular
         controllerAs: 'viewer'
       })
       */
-  })
-  .run(function ($rootScope,$state,$location,$window,User,$cookies,LoopBackAuth,appConfig,$timeout,errorMessage,uploaderService) {
+  }]) // config
+  .run([
+    '$rootScope',
+    '$state',
+    '$location',
+    '$window',
+    'User',
+    '$cookies',
+    'LoopBackAuth',
+    'appConfig',
+    '$timeout',
+    'errorMessage',
+    'uploaderService',
+
+    function (
+      $rootScope,
+      $state,
+      $location,
+      $window,
+      User,
+      $cookies,
+      LoopBackAuth,
+      appConfig,
+      $timeout,
+      errorMessage,
+      uploaderService
+    ) {
     $rootScope.$state=$state;
-    $rootScope.params={};
+    $rootScope.params=angular.merge({},$location.search());
 
     // init or restore local user settings
     $rootScope.localSettings=(localStorage.doxel&&(JSON.parse(localStorage.doxel)))||{};
@@ -452,4 +490,4 @@ var app=angular
       }
     });
 
-  });
+  }]);
