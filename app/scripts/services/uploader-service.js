@@ -52,7 +52,18 @@ angular.module('doxelApp')
      'LoopBackAuth',
      'ngNotify',
      '$timeout',
-     function ($q, FileUploader, jpegFile, Picture, $state, LoopBackAuth, ngNotify, $timeout) {
+     '$rootScope',
+     function (
+       $q,
+       FileUploader,
+       jpegFile,
+       Picture,
+       $state,
+       LoopBackAuth,
+       ngNotify,
+       $timeout,
+       $rootScope
+     ) {
       // AngularJS will instantiate a singleton by calling "new" on this function
 
 //      console.info=console.log=function(){};
@@ -350,5 +361,9 @@ angular.module('doxelApp')
         }
 
       }); // extend uploaderService
+
+      $rootScope.$on('unauthorized',function(){
+        uploaderService.stopUpload();
+      });
 
     }]);
