@@ -393,16 +393,46 @@ if (false) // TODO: make it work without flickering -> dig into malihu
 
           $scope.$on('location.search',function(event,value){
             console.log('location.search');
-            if (value[0].s!=value[1].s) {
-              // update selection for history back here
-              console.log('TODO: update selection on history back without messing with click');
-              $scope.updateSelection(value[0].s);
-            }
-            if (value[0].sort!=value[1].sort) {
-              $scope.updateSortField(value[0].sort);
+
+            var reload=false;
+            var newValue=value[0];
+            var oldValue=value[1];
+
+            $scope.locationSearch.forEach(function(option){
+              var name;
+              var handler;
+              var _reload;
+
+              if (typeof(option)=='string') {
+                name=option;
+                handler=null;
+                _reload=true;
+
+              } else {
+                name=option.name;
+                handler=option.handler;
+                _reload=option.reload;
+              }
+
+              if (oldValue[name]!=newValue[name]) {
+                $scope.params[name]=newValue[name];
+                if (handler) {
+                  handler(newValue[name],oldValue[name]);
+                }
+                reload|=_reload;
+              }
+            });
+
+            if (reload) {
               $scope.clearThumbsList().finally(function(){
                 $scope.update($scope.$state.current);
               });
+
+            } else {
+              if (oldValue.s!=newValue.s) {
+                $scope.params.s=value[0].s;
+                $scope.updateSelection(value[0].s);
+              }
             }
 
           });
@@ -460,6 +490,20 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           });
 
         }, // initEventHandlers
+
+        locationSearch: [
+          {
+            name: 'sort',
+            handler:  function(newValue){
+              $scope.updateSortField(newValue);
+            }
+          },
+          'search',
+          'all-segments',
+          'my-segments',
+          'dropdown'
+
+        ],
 
         init: function() {
           angular.extend($scope.$parent,{
