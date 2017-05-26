@@ -1,5 +1,8 @@
 # robotstxt.org
 
 User-agent: *
-Crawl-delay: 30
+Crawl-delay: 10
 Allow: /
+Disallow: /cgi-bin/
+Disallow: /app/
+Disallow: /index.html
