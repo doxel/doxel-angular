@@ -47,14 +47,15 @@ angular.module('doxelApp')
     '$scope',
     '$rootScope',
     '$state',
-    'errorMessage',
     'Segment',
     '$timeout',
     '$location',
     '$q',
     'appConfig',
     'segmentsService',
-    function ($scope,$rootScope,$state,errorMessage,Segment,$timeout,$location,$q,appConfig,segmentsService) {
+    'ngNotify',
+    'Tag',
+    function ($scope,$rootScope,$state,Segment,$timeout,$location,$q,appConfig,segmentsService,ngNotify,Tag) {
       this.awesomeThings = [
         'HTML5 Boilerplate',
         'AngularJS',
@@ -97,7 +98,7 @@ angular.module('doxelApp')
               setTimeout(function(){
                 input.prop('checked', options[name]);
               });
-              $scope.$broadcast('options.gallery.'+name);
+  //            $scope.$broadcast('options.gallery.'+name);
               console.log(options);
               $timeout(function(){
                 $location.search($rootScope.params).replace();
@@ -255,13 +256,53 @@ angular.module('doxelApp')
               include: 'pointCloud'
             };
 
-              if ($scope.params['my-segments'] && localStorage.$LoopBack$currentUserId) {
-                filter.where.userId=localStorage.$LoopBack$currentUserId;
-              }
-              if (!$scope.params['all-segments'])  {
-                filter.where.pointCloudId={exists: true};
-              }
-            return $q.resolve(filter);
+            var q=$q.defer();
+
+            if ($scope.params['my-segments'] && localStorage.$LoopBack$currentUserId) {
+              filter.where.userId=localStorage.$LoopBack$currentUserId;
+            }
+            if (!$scope.params['all-segments'])  {
+              filter.where.pointCloudId={exists: true};
+            }
+            if ($scope.params.search && $scope.params.search.trim().length>=3) {
+              Tag.find({
+                filter: {
+                  where: {
+                    value: {
+                      regexp: $scope.params.search.trim()
+                    }
+                  }
+                }
+
+              },function(tags){
+                if (tags.length) {
+                  var or=[];
+                  tags.forEach(function(tag){
+                    if (tag.id) {
+                      var elemMatch={
+                        tagId: {'$eq': tag.id},
+                        score: {'$gte': 0.5}
+                      };
+                      or.push({tag:{elemMatch: elemMatch}});
+                    }
+                  });
+                  filter.where.or=or;
+                  return q.resolve(filter);
+
+                } else {
+                  return q.reject('no tag');
+                }
+
+              },function(err){
+                console.log(err);
+                q.reject(err);
+              });
+
+            } else {
+              q.resolve(filter);
+            }
+
+            return q.promise;;
           },
         },
 
@@ -374,7 +415,7 @@ angular.module('doxelApp')
 
             }, function(err){
               console.log(err);
-              errorMessage.show('Could not load segments');
+              ngNotify.set('Segments data could not be loaded !');
               $scope._loadSegments.reject(err);
             });
 
