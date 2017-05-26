@@ -201,7 +201,7 @@ angular.module('doxelApp')
                 }
 
                 item.headers.Authorization=LoopBackAuth.accessTokenId;
-                item.formData.push({
+                item.formData[0]={
                   sha256: data.sha256,
                   timestamp: data.timestamp,
                   lat: data.lat,
@@ -209,7 +209,7 @@ angular.module('doxelApp')
                   chunks: 1,
                   chunk: 0,
                   name: blob.name
-                });
+                };
                 $timeout(q.resolve);
               })
               .catch(function(err){
