@@ -45,7 +45,7 @@
 angular.module('doxelApp')
 .controller('LogoutCtrl', [
   '$scope',
-  'rootScope',
+  '$rootScope',
   '$location',
   'User',
   'LoopBackAuth',
@@ -55,7 +55,7 @@ angular.module('doxelApp')
   'appConfig',
   function (
     $scope,
-    rootScope,
+    $rootScope,
     $location,
     User,
     LoopBackAuth,
@@ -70,14 +70,13 @@ angular.module('doxelApp')
       'Karma'
     ];
 
-    User.signout({removeAllAccessTokens: true},function(err,result){
-      if (err) {
-        return console.log(err);
-      }
+    User.signout({removeAllAccessTokens: true},function(result){
       if (result && result.error) {
         console.log(result.error);
       }
 
+    }, function(err){
+      console.log(err);
     });
 
     User.logout({
@@ -98,6 +97,10 @@ angular.module('doxelApp')
       $cookies.remove('pp-access_token',{path:'/'});
       $cookies.remove('pp-userId',{path:'/'});
       $state.transitionTo(appConfig.stateAfterSignout);
+    });
+
+    $scope.on('unauthorized',function(){
+      $state.transitionTo('gallery.view.home');
     });
 
     if (socketService.ioSocket && socketService.ioSocket.connected) {
