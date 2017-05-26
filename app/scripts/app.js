@@ -100,7 +100,7 @@ var app=angular
     */
 
     // Inside app config block
-    $httpProvider.interceptors.push(['$q', 'LoopBackAuth', function($q, LoopBackAuth) {
+    $httpProvider.interceptors.push(['$q', 'LoopBackAuth', '$rootScope', function($q, LoopBackAuth, $rootScope) {
       return {
         responseError: function(rejection) {
           if (rejection.status == 401) {
@@ -108,7 +108,7 @@ var app=angular
             LoopBackAuth.clearUser();
             LoopBackAuth.clearStorage();
             console.log('unauthorized');
-            this.$rootscope.$emit('unauthorized');
+            $rootScope.$emit('unauthorized');
           }
           return $q.reject(rejection);
         }
@@ -343,6 +343,7 @@ var app=angular
     $rootScope.$watch(function(){
       return $location.search();
     }, function(newValue,oldValue){
+      /// TODO ? merge rootScope.params here ?
       $rootScope.$broadcast('location.search',arguments);
     });
 
