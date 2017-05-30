@@ -13,7 +13,7 @@ angular.module('doxelApp')
   '$cookies',
   'errorMessage',
   'LoopBackAuth',
-  '$routeParams',
+  '$stateParams',
   'User',
   '$rootScope',
   '$location',
@@ -23,7 +23,7 @@ angular.module('doxelApp')
     $cookies,
     errorMessage,
     LoopBackAuth,
-    $routeParams,
+    $stateParams,
     User,
     $rootScope,
     $location,
@@ -35,7 +35,7 @@ angular.module('doxelApp')
       'Karma'
     ];
 
-    LoopBackAuth.setUser($routeParams.access_token, null, null);
+    LoopBackAuth.setUser($stateParams.accessToken, null, null);
 
     $scope.visible=true;
 

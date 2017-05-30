@@ -153,7 +153,7 @@ var app=angular
 */      .state('reset-password-form', {
         url: '/reset-password-form/:accessToken',
         templateUrl: 'views/reset-password.html',
-        controller: 'ResetPass',
+        controller: 'ResetPasswordCtrl',
         controllerAs: 'resetPassword'
       })
       .state('upload', {
