@@ -144,7 +144,7 @@
 
 <body>
   <header>
-    <a href="/#!/doxel/about"><h1><img class="logo" src="/favicon-96x96.png" alt="DOXEL">DOXEL</h1></a>
+    <a href="/app/#!/doxel/home"><h1><img class="logo" src="/favicon-96x96.png">DOXEL</h1></a>
   </header>
   <div class="content">
     <div>
@@ -155,21 +155,24 @@
     </div>
   </div>
   <footer>
-    <div>&copy; 2015-2017 <a href="https://doxel.org/" title="DOXEL.org">DOXEL.org – Dynamic Volumetric Pixel</a></div>
+    <div>&copy; 2015-2017 <a href="https://doxel.org/" title="DOXEL.org">DOXEL.org – Dynamic Volumetric Pixel</a></</div>
   </footer>
   <a href="https://github.com/doxel"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67"  data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
 <script>
   var img=new Image();
+  <!-- if directly specified in background image url below it would be substituted here during grunt build but not below for img.src -->
+  var imgfile='/images/background.jpg';
   img.onload=function(){
     $('html').css({
-      backgroundImage: 'url(/images/background.jpg)',
+      backgroundImage: 'url('+imgfile+')',
     });
     $('html').css({
       zIndex: -1
     });
-    $('html, body').addClass('gradient').css('opacity',1);
+    $('html,body').addClass('gradient');
+    $('html, body').css('opacity',1);
   }
-  img.src='/images/background.jpg';
+  img.src=imgfile;
 </script>
 
 </body>
