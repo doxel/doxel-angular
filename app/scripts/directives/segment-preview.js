@@ -60,9 +60,15 @@ angular.module('doxelApp')
             $scope.segment.loaded=true;
             return;
           }
+          var applyTimeout;
           var listener=$rootScope.$on('picture.onload',function($event,picture){
             if (picture.segmentId==$scope.segment.id) {
               $scope.segment.loaded=true;
+              // workaround for (last loaded?) thumb not displayed when using search
+              clearTimeout(applyTimeout);
+              applyTimeout=setTimeout(function(){
+                $scope.$apply()
+              },500);
               listener();
             }
           });
