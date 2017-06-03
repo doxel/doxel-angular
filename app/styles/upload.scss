@@ -41,21 +41,12 @@
       right: 0;
       border: 1px solid white;
       background: #3a3f44;
-      a.stop-upload {
-        position: absolute;
-        top: -1em;
-        right: -1em;
-        border-radius: 100%;
-        padding: 10px;
-        background-color: #08f;
-        border: 1px solid white;
-        .fa {
-          font-size: 2em;
+      button.stop-upload {
+        width: 100%;
+        span {
+          padding-right: 2px;
         }
-      }
-      a.stop-upload:hover {
-      }
-      a.stop-upload:active {
+
       }
       .uploader-preview {
         border: 1px solid white;
@@ -70,6 +61,9 @@
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
+        .filename {
+          overflow: hidden;
+        }
       }
       .uploader-progress, .uploader-progress-bar, .uploader-progress-background {
         bottom: 2em;
