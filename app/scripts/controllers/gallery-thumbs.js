@@ -391,6 +391,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             $scope.update(toState);
           });
 
+          // handle url parameter changes
           $scope.$on('location.search',function(event,value){
             console.log('location.search');
 
@@ -435,6 +436,10 @@ if (false) // TODO: make it work without flickering -> dig into malihu
               }
             }
 
+          });
+
+          $scope.$on('no-tag', function(event) {
+            $scope.searchTag=$rootScope.params.search;
           });
 
           $scope.$on('segments-loaded',function(event,args){
@@ -649,8 +654,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           console.log('fillScrollableContainer');
 
           $timeout.cancel($scope.fillTimeout);
-          if (!$scope.end(direction||'forward'))
-          $scope.fillTimeout=$timeout(function(){
+          if (!$scope.end(direction||'forward')) $scope.fillTimeout=$timeout(function(){
   /*
           // check if the last row is complete
           var _top;

@@ -1,0 +1,10 @@
+<div class="search-tag">
+  <input type="text" placeholder="Enter search string..." ngValue="search">
+  <div class="tags">
+    <ul>
+      <li ng-repeat="(key, tag) in tags">
+        <a class="tag" ng-click="click(key)" ng-style="::style[tag[0].tagId]">{{::tag[0].tag.value}}</a>
+      </li>
+    </ul>
+  </div>
+</div>

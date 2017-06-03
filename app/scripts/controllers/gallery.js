@@ -290,7 +290,7 @@ angular.module('doxelApp')
                   return q.resolve(filter);
 
                 } else {
-                  return q.reject('no tag');
+                  return q.reject('no-tag');
                 }
 
               },function(err){
@@ -311,7 +311,8 @@ angular.module('doxelApp')
           var q=$q.defer();
 
           // get default filter
-          $scope._galleryFilter.default(direction,from).then(function(filter0){
+          $scope._galleryFilter.default(direction,from)
+          .then(function(filter0){
 
             // get current state filter
             var stateFilter=$scope._galleryFilter[$scope.galleryMode];
@@ -326,7 +327,8 @@ angular.module('doxelApp')
               // or return vanilla default filter
               q.resolve(filter0);
             }
-          });
+          })
+          .catch(q.reject);
 
           return q.promise;
         }, // getGalleryFilter
@@ -368,7 +370,8 @@ angular.module('doxelApp')
             return $scope._loadSegments;
           }
 
-          $scope.getGalleryFilter(direction,from).then(function(filter){
+          $scope.getGalleryFilter(direction,from)
+          .then(function(filter){
             console.log(filter);
             _filter=filter;
 
@@ -422,9 +425,17 @@ angular.module('doxelApp')
           })
           .catch(function(err){
             console.log(err);
-            if (err=='cancel') {
+            switch(err) {
+            case 'cancel':
               $scope._loadSegments.resolve([]);
-            }
+              break;
+            case 'no-tag':
+              $scope.end('forward',true);
+              $scope.end('backward',true);
+              $scope.$broadcast('no-tag');
+              $scope._loadSegments.resolve([]);
+              break;
+            };
           });
 
           return $scope._loadSegments;
