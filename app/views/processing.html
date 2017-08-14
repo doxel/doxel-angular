@@ -1,0 +1,56 @@
+<div id="processing">
+
+	<button type="button" ng-click="addRandomItem(row)" class="btn btn-sm btn-success">
+		<i class="glyphicon glyphicon-plus">
+		</i> Add random item
+	</button>
+
+  <div class="progress-wrap" ng-if="loading">
+		<div class="message">Loading unprocessed segments info...</div>
+		<div class="progress">
+  		<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="{{segments.length}}" aria-valuenow="{{loadingProgress}}" ng-style="progressStyle"></div>
+			<div class="progress-status">{{loadingProgress+' / '+segments.length}}</div>
+		</div>
+	</div>
+
+	<table st-table="segmentsVisible" st-safe-src="segmentsPool" class="table table-striped">
+		<thead>
+			<tr>
+				<th>Preview</th>
+				<th st-sort="timestamp">Date</th>
+				<th st-sort="created">Created</th>
+				<th st-sort="user.name">User</th>
+				<th st-sort="picturesCount">Pictures</th>
+				<th st-sort="status">Status</th>
+			</tr>
+			<tr>
+				<th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="row in segmentsVisible">
+				<td><segment-preview segment="row" segment-preview-class="thumb"></segment-preview></td>
+				<td>{{row.timestamp_str}}</td>
+				<td>{{row.created}}</td>
+				<td><user id="row.userId" /></td>
+				<td>{{row.picturesCount}}</td>
+				<td>{{row.status}}</td>
+				<td>
+					<button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">
+						<i class="glyphicon glyphicon-remove-circle">
+						</i>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="5" class="text-center">
+					<div st-pagination="" st-items-by-page="10" st-displayed-pages="7"></div>
+				</td>
+			</tr>
+		</tfoot>
+
+	</table>
+
+</div>
