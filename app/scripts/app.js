@@ -226,8 +226,8 @@ var app=angular
       })
 
       .state('gallery.view.thumbs', {
-        url: '/gallery',
-        controller: 'GalleryThumbsCtrl'
+        url: '/gallery'
+
       })
 /*
       .state('gallery.view.info', {
@@ -265,6 +265,12 @@ var app=angular
         templateUrl: 'views/segments-tree.html',
         controller: 'SegmentsCtrl',
         controllerAs: 'segments',
+      })
+      .state('processing', {
+        url: '/processing',
+        templateUrl: 'views/processing.html',
+        controller: 'ProcessingCtrl',
+        controllerAs: 'processing'
       })
       /*
       .state('map', {

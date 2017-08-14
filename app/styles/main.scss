@@ -330,6 +330,20 @@ a * {
   }
 }
 
+segment-preview {
+  picture {
+    width: 192px;
+    height: 116px;
+    .thumb {
+      background-position: center;
+      background-size: cover;
+
+      width: 192px;
+      height: 116px;
+    }
+  }
+}
+
 
 @import "../styles/gallery.scss";
 @import "../styles/gallery-thumbs.scss";
@@ -351,3 +365,4 @@ a * {
 @import "../styles/buttons.scss";
 @import "../styles/home.scss";
 @import "../styles/gallery-classifiers.scss";
+@import "../styles/processing.scss";

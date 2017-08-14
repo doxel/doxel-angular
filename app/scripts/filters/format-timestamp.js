@@ -19,6 +19,9 @@ angular.module('doxelApp')
       })
     }
     return function (timestamp,format) {
+      if (!timestamp) {
+        throw 'invalid timestamp';
+      }
       var date=new Date(Number(timestamp.substr(0,10)+'000'));
       var mm=date.getMonth()+1;
       var dd=date.getDate();
