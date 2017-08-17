@@ -1,10 +1,5 @@
 <div id="processing">
 
-	<button type="button" ng-click="addRandomItem(row)" class="btn btn-sm btn-success">
-		<i class="glyphicon glyphicon-plus">
-		</i> Add random item
-	</button>
-
   <div class="progress-wrap" ng-if="loading">
 		<div class="message">Loading unprocessed segments info...</div>
 		<div class="progress">
@@ -13,28 +8,34 @@
 		</div>
 	</div>
 
-	<table st-table="segmentsVisible" st-safe-src="segmentsPool" class="table table-striped">
+	<table ng-show="!segment" st-table="segmentsVisible" st-safe-src="segmentsPool" class="table table-striped">
 		<thead>
 			<tr>
 				<th>Preview</th>
 				<th st-sort="timestamp">Date</th>
 				<th st-sort="created">Created</th>
-				<th st-sort="user.name">User</th>
+				<th st-sort="_username">User</th>
 				<th st-sort="picturesCount">Pictures</th>
 				<th st-sort="status">Status</th>
 			</tr>
 			<tr>
-				<th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+				<th colspan="8"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="row in segmentsVisible">
 				<td><segment-preview segment="row" segment-preview-class="thumb"></segment-preview></td>
 				<td>{{row.timestamp_str}}</td>
-				<td>{{row.created}}</td>
-				<td><user id="row.userId" /></td>
+				<td>{{row.created | date:'yyyy/MM/dd, HH:mm':'utc'}}</td>
+				<td><userinfo user="row.user" /></td>
 				<td>{{row.picturesCount}}</td>
 				<td>{{row.status}}</td>
+				<td>
+					<button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-success">
+						<i class="glyphicon glyphicon-eye-open">
+						</i>
+					</button>
+				</td>
 				<td>
 					<button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">
 						<i class="glyphicon glyphicon-remove-circle">
@@ -52,5 +53,22 @@
 		</tfoot>
 
 	</table>
+
+	<button ng-show="segment" type="button" ng-click="segment=null" class="btn btn-sm btn-success">
+		<i class="glyphicon glyphicon-eye-close">
+		</i>Close
+	</button>
+
+  <div class="pictures" ng-if="segment" lr-infinite-scroll="getPictures" nga-scrollbars nga-scrollbars-config="verticalScrollConfig">
+		<div>
+			<div class="thumbs">
+					<!--div class="picture" ng-repeat="pic in picturesVisible">
+							<picture picture-class="thumb" picture="pic"></picture>
+					</div-->
+					<picture-set pictures="picturesVisible" />
+
+			</div>
+		</div>
+	</div>
 
 </div>
