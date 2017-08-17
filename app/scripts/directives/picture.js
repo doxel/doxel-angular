@@ -56,49 +56,71 @@ angular.module('doxelApp')
       controller: function($scope, $rootScope, errorMessage, getPictureBlobAndExif) {
         $scope._class=$scope.pictureClass;
         $scope.pictureClass+=' loading';
+
         $scope.updatePicture=function(element) {
           var thumb=element.find('.thumb');
           var picture=$scope.picture;
+
           if (picture.selected) {
            thumb.addClass('selected');
           } else {
             thumb.removeClass('selected');
           }
+
           if (picture.blob) {
+            // picture already loaded
+            // just set background image and return
             $scope.style="background-image: url("+picture.blob+");";
             thumb.addClass('loaded');
             $rootScope.$broadcast('picture.onload',picture);
             return;
           }
+
+          // load picture
           var pictureClass=$scope.pictureClass;
           thumb.addClass('loading');
-          console.log(pictureClass);
+//          console.log(pictureClass);
           picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
           getPictureBlobAndExif(picture,((pictureClass.search('thumb')>=0)?'thumb':undefined)).then(function(picture){
             $scope.pictureClass=pictureClass;
 
+            // avoid flickering, load blob in an IMG before setting background image.
             var img=new Image();
             $(img).on('load',function(e){
               $scope.style="background-image: url("+picture.blob+");";
               picture.loaded=true;
-              thumb.addClass('loaded').removeClass('loading');
+              thumb.removeClass('loading').addClass('loaded');
               $rootScope.$broadcast('picture.onload',picture);
               img=null;
+              $scope.$apply();
             });
             img.src=picture.blob;
 
           }, function(err) {
   //          thumb.addClass('load-error').removeClass('loading');
   //          $rootScope.$broadcast('picture.onerror',picture);
-            var img=new Image();
-            $(img).on('load',function(e){
+
+            // display placeholder on image load error
+            if (!$rootScope.imgPlaceholder) {
+              var img=new Image();
+              $rootScope.imgPlaceholder=img;
+              $(img).on('load',function(e){
+                $scope.style="background-image: url("+img.src+");";
+                picture.loaded=true;
+                thumb.removeClass('loading').addClass('loaded');
+                $rootScope.$broadcast('picture.onload',picture);
+                img=null;
+                $scope.$apply();
+              });
+              img.src='/images/img-placeholder-dark.jpg';
+
+            } else {
+              var img=$rootScope.imgPlaceholder;
               $scope.style="background-image: url("+img.src+");";
               picture.loaded=true;
-              thumb.addClass('loaded').removeClass('loading');
+              thumb.removeClass('loading').addClass('loaded');
               $rootScope.$broadcast('picture.onload',picture);
-              img=null;
-            });
-            img.src='/images/img-placeholder-dark.jpg';
+            }
 
           });
         };
