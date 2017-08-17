@@ -39,6 +39,8 @@ angular.module('doxelApp')
         case 'locale':
         console.log(timestamp)
           return date.getFullYear()+' '+formatter.month.format(date)+' '+dd+' '+formatter.day.format(date);
+        case 'ymdhm':
+          return date.getFullYear()+'/'+mm+'/'+dd+', '+hh+':'+mi;
         case 'ymdhms':
           return date.getFullYear()+'/'+mm+'/'+dd+', '+hh+':'+mi+':'+ss;
         default:
