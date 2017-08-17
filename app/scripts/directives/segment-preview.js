@@ -56,6 +56,9 @@ angular.module('doxelApp')
       controller: function($scope, $rootScope){
         $scope.updateSegment=function(){
           var segment=$scope.segment;
+          if (!segment || !segment.previewId) {
+            return;
+          }
           if (segment.picture && segment.picture.id==segment.previewId) {
             $scope.segment.loaded=true;
             return;
