@@ -44,6 +44,7 @@ angular.module('doxelApp')
   .service('global', function () {
     var global=this;
     angular.extend(global,{
+      usersCache: {},
       selected: [],
       segments: []
     });
