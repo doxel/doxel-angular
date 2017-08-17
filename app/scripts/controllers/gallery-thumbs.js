@@ -330,11 +330,11 @@ if (false) // TODO: make it work without flickering -> dig into malihu
 
         initEventHandlers: function() {
 
-          window.jQuery('#segments').on('mcswheel','.mCustomScrollbar',function(e,delta){
+          window.jQuery('#segments').on('mcswheel.gallery_thumbs','.mCustomScrollbar',function(e,delta){
             $scope.whileScrolling.apply(this,[{delta: -delta}]);
           });
 
-          window.jQuery('body').on('mousemove','.thumb',updateMousePosition);
+          window.jQuery('body').on('mousemove.gallery-thumbs','.thumb',updateMousePosition);
           function updateMousePosition(e){
             var element=window.jQuery(e.target);
             var offset=element.offset();
@@ -344,7 +344,7 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             });
           }
 
-          window.jQuery('body').on('mouseenter','.thumb',function(e){
+          window.jQuery('body').on('mouseenter.gallery_thumbs','.thumb',function(e){
             updateMousePosition(e);
             $timeout.cancel($scope.nextThumb_timeout);
             $scope.nextThumb_segmentId=$(e.target).closest('a').data('sid');
@@ -358,11 +358,17 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             });
           });
 
-          window.jQuery('body').on('mouseleave', '.thumb', function(e){
+          window.jQuery('body').on('mouseleave.gallery_thumbs', '.thumb', function(e){
             console.log('leave');
             $timeout.cancel($scope.nextThumb_timeout);
             $scope.nextThumb_timeout=null;
             $scope.nextThumb_segmentId=null;
+          });
+
+          $scope.$on('$destroy',function($event){
+            window.jQuery('#segments').off('.gallery_thumbs');
+            window.jQuery('body').off('.gallery_thumbs');
+            console.log('destroy !');
           });
 
           $scope.$on('segment.click',function($event,segment,options){
@@ -423,6 +429,8 @@ if (false) // TODO: make it work without flickering -> dig into malihu
                 reload|=_reload;
               }
             });
+
+            $scope.searchTag=null;
 
             if (reload) {
               $scope.clearThumbsList().finally(function(){
