@@ -44,9 +44,8 @@
  */
 angular.module('doxelApp')
   .service('getPictureBlobAndExif', [ '$q', '$http', function ($q, $http) {
-    return function(picture,format) {
+    return function(picture) {
       var q=$q.defer();
-
 
       function blobToText(blob){
         var q=$q.defer();
@@ -63,8 +62,7 @@ angular.module('doxelApp')
         reader.readAsText(blob);
         return q.promise;
 
-      } // blotToText
-
+      } // blobToText
 
       function errorMessageFromBlob(blob){
         blobToText(blob)
@@ -84,7 +82,7 @@ angular.module('doxelApp')
         method: 'GET',
         cache: true,
         responseType: 'blob',
-        url: picture.url+(format ? '?what='+format : '')
+        url: picture.url
 
       }).then(function successCallback(response) {
         if (response.status!=200) {
