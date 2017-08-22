@@ -54,11 +54,12 @@ angular.module('doxelApp')
         label: '=?'
       },
       controller: function($scope, $rootScope, errorMessage, getPictureBlobAndExif) {
-        $scope._class=$scope.pictureClass;
+        $scope.pictureClass=$scope.pictureClass || 'full';
+        $scope._class='.'+$scope.pictureClass.split(' ').join('.');
         $scope.pictureClass+=' loading';
 
         $scope.updatePicture=function(element) {
-          var thumb=element.find('.thumb');
+          var thumb=element.find($scope._class);
           var picture=$scope.picture;
 
           if (picture.selected) {
@@ -80,8 +81,8 @@ angular.module('doxelApp')
           var pictureClass=$scope.pictureClass;
           thumb.addClass('loading');
 //          console.log(pictureClass);
-          picture.url='/api/Pictures/download/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
-          getPictureBlobAndExif(picture,((pictureClass.search('thumb')>=0)?'thumb':undefined)).then(function(picture){
+          picture.url='/api/Pictures/'+((pictureClass.search('thumb')>=0)?'thumb':'download')+'/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
+          getPictureBlobAndExif(picture).then(function(picture){
             $scope.pictureClass=pictureClass;
 
             // avoid flickering, load blob in an IMG before setting background image.
@@ -131,10 +132,11 @@ angular.module('doxelApp')
             scope.updatePicture(element);
           }
         });
+
         if (scope.picture && scope.picture.selected) {
-          element.find('.thumb').addClass('selected');
+          element.find(scope._class).addClass('selected');
         } else {
-          element.find('.thumb').removeClass('selected');
+          element.find(scope._class).removeClass('selected');
         }
 
       },
