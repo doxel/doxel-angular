@@ -8,37 +8,49 @@
 		</div>
 	</div>
 
-	<table ng-show="!segment" st-table="segmentsVisible" st-safe-src="segmentsPool" class="table table-striped">
+	<table ng-show="!segment && !loading" st-table="segmentsVisible" st-safe-src="segmentsPool" class="table table-striped">
 		<thead>
 			<tr>
 				<th>Preview</th>
-				<th st-sort="timestamp">Date</th>
-				<th st-sort="created">Created</th>
+				<th st-sort="created">Uploaded</th>
+        <th st-sort="timestamp">Shooted</th>
 				<th st-sort="_username">User</th>
 				<th st-sort="picturesCount">Pictures</th>
 				<th st-sort="status">Status</th>
 			</tr>
 			<tr>
-				<th colspan="8"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+				<th colspan="10"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="row in segmentsVisible">
 				<td><segment-preview segment="row" segment-preview-class="thumb"></segment-preview></td>
-				<td>{{row.timestamp_str}}</td>
 				<td>{{row.created | date:'yyyy/MM/dd, HH:mm':'utc'}}</td>
+        <td>{{row.timestamp_str}}</td>
 				<td><userinfo user="row.user" /></td>
 				<td>{{row.picturesCount}}</td>
-				<td>{{row.status}}</td>
+				<td class="first-uppercase">{{row.status}}</td>
 				<td>
-					<button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-success">
-						<i class="glyphicon glyphicon-eye-open">
+					<button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-default" title="View segment pictures">
+						<i class="fa fa-fw fa-picture-o">
+						</i>
+					</button>
+				</td>
+        <td>
+					<button ng-disabled="row.status!='processed' && row.status!='published'" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
+						<i class="fa fa-fw fa-eye">
+						</i>
+					</button>
+				</td>
+        <td>
+					<button ng-disabled="isCheckButtonDisabled(row)" ng-type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" title="Go on with this segment">
+						<i class="fa fa-fw fa-check">
 						</i>
 					</button>
 				</td>
 				<td>
-					<button type="button" ng-click="removeItem(row)" class="btn btn-sm btn-danger">
-						<i class="glyphicon glyphicon-remove-circle">
+					<button type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
+						<i class="fa fa-fw fa-times">
 						</i>
 					</button>
 				</td>
@@ -54,12 +66,12 @@
 
 	</table>
 
-	<button ng-show="segment" type="button" ng-click="segment=null" class="btn btn-sm btn-success">
+	<button ng-show="segment && !picture" type="button" ng-click="segment=null" class="btn btn-sm btn-default">
 		<i class="glyphicon glyphicon-eye-close">
 		</i>Close
 	</button>
 
-  <div class="pictures" ng-if="segment" lr-infinite-scroll="getPictures" nga-scrollbars nga-scrollbars-config="verticalScrollConfig">
+  <div class="pictures" ng-if="segment && !picture" lr-infinite-scroll="getPictures">
 		<div>
 			<div class="thumbs">
 					<!--div class="picture" ng-repeat="pic in picturesVisible">
@@ -68,6 +80,13 @@
 					<picture-set pictures="picturesVisible" />
 
 			</div>
+		</div>
+	</div>
+
+  <div class="single-picture" ng-if="picture">
+    <div>
+					<picture picture="picture" use-img />
+          <a class="prev">&lt;</a><a class="next">&gt;</a>
 		</div>
 	</div>
 
