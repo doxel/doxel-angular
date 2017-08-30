@@ -1,0 +1,75 @@
+
+picture {
+  .button {
+    z-index: 9999999999999;
+    position: absolute;
+    -webkit-border-radius:50%;
+            border-radius:50%;
+  }
+
+  .icon {
+    width: 41px;
+    height: 41px;
+    background-image: url(FreeVector-Tech-Icon-Pack.png);
+    background-repeat: no-repeat;
+    border-width: 0px;
+  }
+
+  .text {
+    height: 16px;
+    padding: 10px;
+    border-width: 1px;
+    border-color: #00B8F1;
+    background-color: white;
+    opacity: 40%;
+    color: #135FAC;
+  }
+
+
+  a.button.zoom-in {
+    top:  140px;
+    left: 35px;
+    background-position: -60px -179px;
+  }
+
+  a.button.zoom-out {
+    top: 185px;
+    left: 35px;
+    background-position: -60px -246px;
+  }
+  a.button.nav-right {
+    top: 60px;
+    left: 60px;
+    background-position: -60px -112px;
+  }
+  a.button.nav-left {
+    top:60px;
+    left: 10px;
+    background-position: -60px -379px;
+  }
+  a.button.nav-up {
+    top:  25px;
+    left: 35px;
+    background-position: -60px -45px;
+  }
+  a.button.nav-down {
+    top:  94px;
+    left: 35px;
+    background-position: -60px -312px;
+  }
+
+  .relief {
+    opacity: 0.3;
+    background: linear-gradient( to bottom, white, gray);
+    border-style: outset;
+  }
+  .relief:hover {
+    background: linear-gradient( to top, white, gray);
+    border-style: outset;
+  }
+  .relief:active {
+    background: linear-gradient( to top, white, black);
+    border-style: inset;
+  }
+
+}

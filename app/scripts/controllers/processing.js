@@ -152,7 +152,7 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: {
-              status: {ne: 'published'}
+//              status: {eq: 'published'}
             },
 //            limit: 2,
             fields: {
@@ -263,6 +263,13 @@ angular.module('doxelApp')
         $location.search($rootScope.params);
         $scope.segment=segment;
 
+      },
+
+      viewCloud: function(segment) {
+        $rootScope.params.s=segment.id;;
+        delete $rootScope.params.pose;
+        $location.search($rootScope.params);
+        $scope.$state.transitionTo('gallery.view.cloud');
       },
 
       fillScrollableContainer: function() {

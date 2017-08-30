@@ -42,96 +42,123 @@
  * # picture
  */
 
-/* TODO: no reference to .thumb, style must be applied to element and scss updated accordingly */
+
+/* TODO: no reference to .div, style must be applied to element and scss updated accordingly */
 angular.module('doxelApp')
   .directive('picture', function () {
     return {
       restrict: 'E',
       replace: false,
+      transclude: true,
+
       scope: {
         picture: '=',
+        useCanvas: '@',
+        useImg: '@',
         pictureClass: '@',
         label: '=?'
       },
+
       controller: function($scope, $rootScope, errorMessage, getPictureBlobAndExif) {
         $scope.pictureClass=$scope.pictureClass || 'full';
         $scope._class='.'+$scope.pictureClass.split(' ').join('.');
         $scope.pictureClass+=' loading';
+        var isThumb=($scope.pictureClass.search('thumb')>=0);
 
         $scope.updatePicture=function(element) {
-          var thumb=element.find($scope._class);
+          var div=element.find($scope._class);
           var picture=$scope.picture;
+          var url='/api/Pictures/'+(isThumb?'thumb':'download')+'/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
+
+          function setPicture(url){
+            if ($scope.useImg!==undefined || $scope.canvas) {
+              var img=new Image();
+              $(img).on('load',function(e){
+                if ($scope.canvas) {
+                  var ctx=$scope.ctx=$scope.canvas.getContext('2d');
+                  if (!$scope.inav)
+                  $scope.inav=$scope.inav||new $.image_navigator({
+                    canvas: $scope.canvas,
+                    target: $scope.canvas.parentElement,
+                    img: [img],
+                    view: 0,
+                    color: true,
+                    ctx: ctx,
+                    zoomin_elem: $('.zoom-in'),
+                    zoomout_elem: $('.zoom-out'),
+                    scrollleft_elem: $('.scroll-left'),
+                    scrollright_elem: $('.scroll-right'),
+                    scrollup_elem: $('.scroll-up'),
+                    scrolldown_elem: $('.scroll-down'),
+
+                  });
+                  else
+                  $scope.inav.img[0]=img;
+                } else {
+                  $scope.src=img.src;
+                }
+
+                img=null;
+                picture.loaded=true;
+                div.removeClass('loading').addClass('loaded');
+                $rootScope.$broadcast('picture.onload',picture);
+                $scope.$apply();
+              });
+              img.src=url;
+
+            } else {
+              $scope.style="background-image: url("+url+");";
+              picture.loaded=true;
+              div.removeClass('loading').addClass('loaded');
+              $rootScope.$broadcast('picture.onload',picture);
+            }
+          } // setPicture
 
           if (picture.selected) {
-           thumb.addClass('selected');
+           div.addClass('selected');
           } else {
-            thumb.removeClass('selected');
+            div.removeClass('selected');
           }
 
-          if (picture.blob) {
+          if (picture.blob && picture.url==url) {
             // picture already loaded
             // just set background image and return
-            $scope.style="background-image: url("+picture.blob+");";
-            thumb.addClass('loaded');
-            $rootScope.$broadcast('picture.onload',picture);
+            setPicture(picture.blob);
             return;
           }
 
           // load picture
-          var pictureClass=$scope.pictureClass;
-          thumb.addClass('loading');
+//          var pictureClass=$scope.pictureClass;
+          div.addClass('loading').removeClass('loaded');
 //          console.log(pictureClass);
-          picture.url='/api/Pictures/'+((pictureClass.search('thumb')>=0)?'thumb':'download')+'/'+picture.sha256+'/'+picture.segmentId+'/'+picture.id+'/'+picture.timestamp+'.jpg';
+          picture.url=url;
           getPictureBlobAndExif(picture).then(function(picture){
-            $scope.pictureClass=pictureClass;
+//            $scope.pictureClass=pictureClass;
 
-            // avoid flickering, load blob in an IMG before setting background image.
-            var img=new Image();
-            $(img).on('load',function(e){
-              $scope.style="background-image: url("+picture.blob+");";
-              picture.loaded=true;
-              thumb.removeClass('loading').addClass('loaded');
-              $rootScope.$broadcast('picture.onload',picture);
-              img=null;
-              $scope.$apply();
-            });
-            img.src=picture.blob;
+            setPicture(picture.blob);
 
           }, function(err) {
-  //          thumb.addClass('load-error').removeClass('loading');
+  //          div.addClass('load-error').removeClass('loading');
   //          $rootScope.$broadcast('picture.onerror',picture);
 
             // display placeholder on image load error
-            if (!$rootScope.imgPlaceholder) {
-              var img=new Image();
-              $rootScope.imgPlaceholder=img;
-              $(img).on('load',function(e){
-                $scope.style="background-image: url("+img.src+");";
-                picture.loaded=true;
-                thumb.removeClass('loading').addClass('loaded');
-                $rootScope.$broadcast('picture.onload',picture);
-                img=null;
-                $scope.$apply();
-              });
+            var img=$rootScope.imgPlaceholder;
+            if (!img) {
+              img=$rootScope.imgPlaceholder=new Image();
               img.src='/images/img-placeholder-dark.jpg';
-
-            } else {
-              var img=$rootScope.imgPlaceholder;
-              $scope.style="background-image: url("+img.src+");";
-              picture.loaded=true;
-              thumb.removeClass('loading').addClass('loaded');
-              $rootScope.$broadcast('picture.onload',picture);
             }
+            setPicture(img.src);
 
           });
         };
       },
+
       link: function(scope,element,attrs){
         scope.$watch('picture', function(newValue, oldValue) {
           if (newValue) {
             scope.updatePicture(element);
           }
-        });
+        }, true);
 
         if (scope.picture && scope.picture.selected) {
           element.find(scope._class).addClass('selected');
@@ -139,7 +166,38 @@ angular.module('doxelApp')
           element.find(scope._class).removeClass('selected');
         }
 
+        if (scope.useCanvas===undefined) return;
+
+        scope.canvas=$('canvas',element)[0];
+
+
       },
-      template: '<div class="{{pictureClass}}" style="{{style}});"><div class="label">{{label}}</div></div>'
+
+      template: function(tElement, tAttrs) {
+        return  [
+          '<div class="{{pictureClass}}" style="{{style}}">',
+          ((tAttrs.useImg!==undefined)?'<img ng-if="src" img-fix-orientation="src" ng-src="{{src}}"></img>':''),
+          ((tAttrs.useCanvas!==undefined)?[
+            '<canvas></canvas>'
+          ].join(''):''),
+          '<div class="label">{{label}}</div></div>',
+          ((tAttrs.useCanvas!==undefined)?[
+            '<a class="button icon zoom zoom-in></a>',
+            '<a class="button icon zoom zoom-out"></a>',
+            '<a class="button icon scroll nav-right"></a>',
+            '<a class="button icon scroll nav-left"></a>',
+            '<a class="button icon scroll nav-up"></a>',
+            '<a class="button icon scroll nav-down"></a>',
+            '<a class="button icon relief zoom-in"></a>',
+            '<a class="button icon relief zoom-out"></a>',
+            '<a class="button icon relief nav-left"></a>',
+            '<a class="button icon relief nav-right"></a>',
+            '<a class="button icon relief nav-up"></a>',
+            '<a class="button icon relief nav-down"></a>'
+          ].join(''):'')
+
+        ].join('');
+      }
+
     };
   });
