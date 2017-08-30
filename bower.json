@@ -44,7 +44,12 @@
     "leaflet": "^1.0.3",
     "ng-tags-input": "^3.1.2",
     "malihu-custom-scrollbar-plugin": "git://github.com/doxel/malihu-custom-scrollbar-plugin.git#8efb2a6651d731fef9fa4c12876d988f6b431f51",
-    "ng-http-cache": "ngHttpCache#^1.0.0"
+    "ng-http-cache": "ngHttpCache#^1.0.0",
+    "angular-ui-select3": "ui-select#*",
+    "bootstrap": "^3.3.7",
+    "bootstrap-sass": "bootstrap-sass-official#^3.3.7",
+    "jquery": "^3.2.1",
+    "angular-fix-image-orientation": "czarpino/angular-fix-image-orientation"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"

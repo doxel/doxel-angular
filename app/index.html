@@ -10,7 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta property="fb:app_id" content="457781937746762" />
     <meta property="og:title" content="DOXEL.ORG" />
-    <meta property="og:url" content="https://www.doxel.org/doxel/home" />
+    <meta property="og:url" content="https://www.doxel.org/" />
     <meta property="og:image" content="https://www.doxel.org/logo-200x200.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:description" content="Upload your own photo footage to have a 3D reconstruction, or view existent 3D in your browser." />
@@ -51,6 +51,7 @@
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css" />
+    <link rel="stylesheet" href="bower_components/select2/select2.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -85,7 +86,7 @@
 
                   <ul class="nav navbar-nav">
                     <!--li ng-class="getClass('home')"><a ui-sref="home" class="home fa fa-home"><span>Home</span></a></li-->
-                    <li ng-class="getClass('gallery.view.thumbs')">
+                    <li ng-show="!params.dropdown || $state.current.name.search('gallery')!=0" ng-class="getClass('gallery.view.thumbs')">
                       <a ui-sref="gallery.view.thumbs" class="gallery fa fa-photo"><span>Gallery</span></a>
                       <!--a ng-show="authenticated" ui-sref="gallery.view.thumbs" class="gallery fa fa-photo" data-toggle="dropdown"><span>Gallery</span></a-->
                     </li>
@@ -205,6 +206,11 @@
           <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
           <script src="bower_components/ng-tags-input/ng-tags-input.js"></script>
           <script src="bower_components/ng-http-cache/src/ngHttpCache.js"></script>
+          <script src="bower_components/select2/select2.js"></script>
+          <script src="bower_components/angular-ui-select3/src/select3.js"></script>
+          <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
+          <script src="bower_components/exif-js/exif.js"></script>
+          <script src="bower_components/angular-fix-image-orientation/angular-fix-image-orientation.js"></script>
           <!-- endbower -->
           <script src="scripts/webglearth2/api.js"></script>
           <!-- endbuild -->
@@ -221,6 +227,7 @@
           <script src="scripts/controllers/navbar.js"></script>
           <script src="scripts/services/error-message.js"></script>
           <script src="scripts/filters/format-timestamp.js"></script>
+          <script src="scripts/filters/anonymous-username.js"></script>
           <script src="scripts/directives/dom-onload.js"></script>
           <script src="scripts/directives/segment-preview.js"></script>
           <script src="scripts/directives/segment-details.js"></script>
@@ -252,16 +259,22 @@
           <script src="scripts/services/segments-service.js"></script>
           <script src="scripts/browserified.js"></script>
           <script src="scripts/services/gallery-filter-service.js"></script>
+          <script src="scripts/directives/search-tag.js"></script>
+          <script src="scripts/controllers/processing.js"></script>
+          <script src="scripts/filters/getsegmentpictures.js"></script>
+          <script src="scripts/directives/user.js"></script>
+          <script src="scripts/image-navigator.js"></script>
+
           <!-- endbuild -->
           <!--script src="scripts/directives/picture-details.js"></script>
           <script src="scripts/directives/segment-status.js"></script>
           <script src="scripts/directives/toggle.js"></script>
           <script src="scripts/controllers/browser.js"></script-->
-          <script>
+          <!--script>
           $(document).ready(function(){
             window.scrollTo(0,1);
           });
-          </script>
+        </script-->
 
     </div>
   </body>
