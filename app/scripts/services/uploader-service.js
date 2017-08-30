@@ -221,7 +221,7 @@ angular.module('doxelApp')
                   q.reject();
 
                 } else {
-                  ngNotify.set(err.message);
+                  ngNotify.set(err.message||err||'Unexpected error');
                   q.reject(err);
                 }
               });
