@@ -64,7 +64,8 @@ var app=angular
     'FBAngular',
     'angularFileUpload',
     'ngNotify',
-    'smart-table'
+    'smart-table',
+    'cp.ng.fix-image-orientation'
 
   ])
   .config([

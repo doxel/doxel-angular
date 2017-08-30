@@ -637,14 +637,17 @@ angular.module('doxelApp')
 
       updateMarkers: function(map){
         var cluster=$scope.cluster;
-        var segments=loopbackFilters($scope.loaded,{where:($scope.filter && $scope.filter.where)})
+        if ($scope.filter && $scope.filter.where) {
+        var segments=loopbackFilters($scope.loaded,{where:$scope.filter.where});
+        }
         for(var i in $scope.loaded) {
           var segment=$scope.loaded[i];
           if (!segment.geo) continue;
 
           var has;
-          has=false;
+          has=true;
           if (segments.length) {
+            has=false;
             segments.some(function(_segment){
               return has=(segment.id==_segment.id);
             });

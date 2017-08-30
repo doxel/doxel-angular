@@ -1,5 +1,5 @@
-<div id="classifiers" ng-cloak>
-  <div ng-if="classifiers_visible">
+<div id="classifiers" ng-cloak ng-if="classifiers_visible">
+  <div>
   <tags-input ng-model="tags" add-on-paste="true">
     <auto-complete source="loadTags($query)"
                    min-length="0"

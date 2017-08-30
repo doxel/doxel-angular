@@ -19,13 +19,14 @@ angular.module('doxelApp')
   '$q',
   '$state',
   '$timeout',
-  function ($scope,$rootScope,Tag,SegmentTag,Segment,PictureTag,Pose,$q,$state,$timeout) {
+  'segmentsService',
+  function ($scope,$rootScope,Tag,SegmentTag,Segment,PictureTag,Pose,$q,$state,$timeout,segmentsService) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',
       'Karma'
     ];
-
+return;
     angular.extend($scope,{
       minScore: 0.7,
       // tags in input
@@ -90,8 +91,10 @@ angular.module('doxelApp')
 
       tagAdded: function(tag){
         $scope.end('forward',false);
-        $scope.skip=0;
-        $scope.loadSegments();
+        $scope.clearThumbsList().finally(function(){
+          $scope.skip=0;
+          $scope.loadSegments();
+        });
 
       }, // tagAdded
 
@@ -104,11 +107,9 @@ angular.module('doxelApp')
           var segments=args.segments;
         }
 
-        if (!$scope.tags.length || $scope.skip==0) {
-          $scope.segments.splice(0,$scope.segments.length);
-          if (!$scope.tags.length) {
-            return $q.resolve();
-          }
+        if (args.direction=='backward') {
+          // prepend segments
+          segments.reverse();
         }
 
         // for each segment loaded
@@ -205,15 +206,22 @@ angular.module('doxelApp')
           }
         })
         .catch(console.log)
+        .finally(setTimeout(function(){
+          $scope.$apply();
+        },1000));
 
       }, // updateShownSegments
 
       operator: 'or',
 
-      galleryFilter: function(){
+      galleryFilter: function(direction,segment){
         /// {"tag": {"elemMatch":  {"tagId": "58e40dc0a15b4e3907a1717e"}}, "tag.score": {"gte" : 0.9}}
 //{"where":{"tag":{"elemMatch":{"score":{"$gt":0.6},"tagId":{"$eq":"58e40dbea15b4e3907a16e2c"}}}}}
-        var where={};
+        var filter={
+          skip: $scope.skip,
+          where:{}
+        };
+
         var tagCond=[];
         $scope.tags.forEach(function(tag){
           if (tag.id) {
@@ -224,33 +232,85 @@ angular.module('doxelApp')
             tagCond.push({tag:{elemMatch: elemMatch}});
           }
         });
+
         switch(tagCond.length) {
-          case 0: //where={'tag.score': {'gte': $scope.minScore}};
-                  return $q.reject('cancel');
+          case 0: //filter.where={'tag.score': {'gte': $scope.minScore}};
+              //    return $q.reject('cancel');
                   break;
-          case 1: where=tagCond[0];
+          case 1: filter.where=tagCond[0];
                   break;
-          default: where[$scope.operator]=tagCond;
+          default: filter.where[$scope.operator]=tagCond;
                    break;
         }
 
-        return $q.resolve({
-          skip: $scope.skip,
-          where: where
-        });
+        switch(direction){
+        case 'forward':
+          // load chunk after specified segment or, by default,
+          // after last segment in $scope.segments
+          if (segment || $scope.segments.length) {
+            if (!segment) {
+              segment=$scope.segments[$scope.segments.length-1];
+            }
+            filter.where.timestamp={
+              lte: segment.timestamp
+            };
+            filter.where.id={
+              neq: segment.id
+            };
+          }
+          filter.order='timestamp DESC';
+          break;
+
+        case 'backward':
+          // load chunk before specified segment or, by default,
+          // before first segment in $scope.segments
+          if (segment || $scope.segments.length) {
+            if (!segment) {
+              segment=$scope.segments[0];
+            }
+            filter.where.timestamp={
+              gte: segment.timestamp
+            };
+            filter.where.id={
+              neq: segment.id
+            };
+          }
+          filter.order='timestamp ASC';
+          break;
+
+        defaut: throw new Error('invalid direction: '+direction);
+        }
+
+        return $q.resolve(filter);
 
       }, // galleryFilter
 
       init: function(){
         $scope._galleryFilter['segment-thumbs-tagged']=$scope.galleryFilter;
+        $scope.initEventHandlers();
+        $scope.classifiers_visible=false;
+      }, // init
 
+      initEventHandlers: function() {
         $scope.$on('$stateChangeStart', function (event, next, current) {
-          console.log('next',next.name);
-          $scope.update(next);
+        //  $scope.update(next);
         });
 
         $scope.$on('$stateChangeSuccess', function (event, toState) {
           $scope.update(toState);
+        });
+
+        $scope.$on('gallery-mode-change',function(event,from,to){
+          console.log(from,to);
+          if (to=='segment-thumbs-tagged') {
+            $scope.clearThumbsList();
+/*            if ($rootScope.params.s) {
+              $scope.updateSelection($rootScope.params.s);
+            } else {
+              $scope.loadSegments();
+            }
+            */
+          }
         });
 
         $scope.$on('segments-loaded',function(event,args){
@@ -260,7 +320,7 @@ angular.module('doxelApp')
             $scope.updateShownSegments(args).finally(function(){
               if (segments.length && !$scope.scrollBufferFull('forward')) {
                 $scope.end('forward',false);
-                $timeout($scope.loadSegments);
+                $timeout($scope.fillScrollableContainer,1000);
               }
             })
           }
@@ -280,6 +340,7 @@ angular.module('doxelApp')
 
       update: function(toState){
         console.log(toState.name);
+        $scope.updateGalleryMode(toState);
         $scope.classifiers_visible=(toState.name.split('.').pop()=='classifiers');
         if ($scope.classifiers_visible) {
           $scope.updateTags();

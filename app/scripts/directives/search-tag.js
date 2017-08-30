@@ -64,6 +64,7 @@ angular.module('doxelApp')
                   $scope.search=tagList[0].tag.value;
     //              $rootScope.params.search=tagList[0].value;
                   $location.search('search',$scope.search);
+                  $rootScope.$broadcast('location.search',[$location.search(),$rootScope.params]);
                 }
               });
             }

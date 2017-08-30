@@ -35,7 +35,6 @@ angular.module('doxelApp')
     Object.defineProperty(segmentsService.segments,'has',{
       value: function(segmentId){
         return this.find(function(segment){
-          if (segment.id==segmentId) console.log('has');
           return segment.id==segmentId;
         });
       }
@@ -44,7 +43,6 @@ angular.module('doxelApp')
     Object.defineProperty(segmentsService.loaded,'has',{
       value: function(segmentId){
         return this.find(function(segment){
-          if (segment.id==segmentId) console.log('has');
           return segment.id==segmentId;
         });
       }
