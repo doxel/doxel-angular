@@ -262,9 +262,9 @@ angular.module('doxelApp')
               filter.where.userId=localStorage.$LoopBack$currentUserId;
             }
             if (!$scope.params['all-segments'])  {
-              filter.where.pointCloudId={exists: true};
+              filter.where.status='published';
             }
-            if ($scope.params.search && $scope.params.search.trim().length>=3) {
+            if ($scope.params.search && $scope.params.search.trim && $scope.params.search.trim().length>=3) {
               Tag.find({
                 filter: {
                   where: {
