@@ -152,15 +152,16 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: {
-//              status: {eq: 'published'}
+              status: {ne: 'published'}
             },
-//            limit: 2,
+            limit: 10,
             fields: {
               id: true,
               previewId: true,
               timestamp: true,
               userId: true,
               status: true,
+              status_timestamp: true,
               pointCloudId: true,
               created: true
             }
@@ -308,11 +309,13 @@ angular.module('doxelApp')
       proceed: function(segment, direction){
         return Segment.proceed({
           id: segment.id,
-          status: segment.status,
+          status: segment.status||'new',
+          status_timestamp: segment.status_timestamp||Date.now(),
           direction: direction
 
         }).$promise.then(function(res){
-          segment.status=res.status;
+          segment.status=(res.status&&res.status.length)?res.status:'new';
+          segment.status_timestamp=(res.status_timestamp!==undefined)?res.status_timestamp:segment.status_timestamp;
         })
         .catch(function(err){
           console.log(err);
@@ -325,7 +328,7 @@ angular.module('doxelApp')
         $scope.proceed(segment,'forward').finally($scope.unlock);
       },
 
-      proceedNoFurther: function(segment){
+      cancel: function(segment){
         $scope.lock();
         $scope.proceed(segment,'backward').finally($scope.unlock);
       },
@@ -340,59 +343,71 @@ angular.module('doxelApp')
       },
 
       isCheckButtonDisabled: function(segment){
-        return segment.status=='processing'||segment.status=='queued';
+        return [
+          'processing',
+          'queued',
+          'published'
+
+        ].indexOf(segment.status)>=0;
+      },
+
+      checkButtonTitle: function(segment){
+        switch(segment.status) {
+          default:
+            return '';
+
+          case 'new':
+            return 'Queue for processing';
+
+          case 'processed':
+            return 'Publish segment';
+
+          case 'cancel_pending':
+            return 'Resume processing';
+
+          case 'discarded':
+            if (segment.pointCloudId) {
+              return 'Publish segment';
+
+            } else {
+              return 'Approve segment';
+            }
+            break;
+        }
+      },
+
+      isCancelButtonDisabled: function(segment){
+        return [
+          'discarded',
+          'cancel_pending'
+
+        ].indexOf(segment.status)>=0;
       },
 
       cancelButtonTitle: function(segment){
         switch(segment.status) {
+          case 'discarded':
           default:
-            console.log('unhandled status, assume discard');
+            return '';
 
-          case undefined:
+          case 'new':
           case 'processed':
+          case 'published':
             return 'Discard this segment';
 
           case 'queued':
             return 'Remove from queue';
 
-          case 'processing':
-            return 'Cancel processing';
-        }
-
-      },
-
-      cancelButtonClick: function(segment) {
-        switch(segment.status) {
-          default:
-            console.log('unhandled status, assume discard');
-
-          case undefined:
-          case 'processed':
-            proceedNoFurther(segment);
-            break;
-
-          case 'queued':
-            return 'Remove from queue';
+          case 'pending':
+            return 'Back in queue';
 
           case 'processing':
             return 'Cancel processing';
+
+          case 'cancel_pending':
+              return 'Resume processing'
         }
-      },
-
-      proceedNoFurther: function(segment){
-        Segment.proceedNoFurther({
-          id: segment.id
-        }).$promise.then(function(res){
-          segment.status=res.status;
-        })
-        .catch(function(err){
-          console.log(err);
-          $scope.error=err;
-        });
-      },
-
-
-
+      }
     });
 
     $scope.init();

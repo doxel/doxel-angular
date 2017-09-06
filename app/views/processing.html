@@ -37,19 +37,19 @@
 					</button>
 				</td>
         <td>
-					<button ng-disabled="row.status!='processed' && row.status!='published'" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
+					<button ng-disabled="!row.pointCloudId" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
 						<i class="fa fa-fw fa-eye">
 						</i>
 					</button>
 				</td>
         <td>
-					<button ng-disabled="isCheckButtonDisabled(row)" ng-type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" title="Go on with this segment">
+					<button ng-disabled="isCheckButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{checkButtonTitle(row)}}">
 						<i class="fa fa-fw fa-check">
 						</i>
 					</button>
 				</td>
 				<td>
-					<button type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
+					<button ng-disabled="isCancelButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
 						<i class="fa fa-fw fa-times">
 						</i>
 					</button>

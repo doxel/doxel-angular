@@ -11,8 +11,14 @@
   align-content: center;
   overflow: auto;
 
-  td.st-stort {
+  th, td {
     cursor: pointer;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  td:first{
+    text-align: left;
   }
 
   button {
