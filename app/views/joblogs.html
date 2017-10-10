@@ -1,0 +1,29 @@
+<div id="joblogs" style="margin-top: 80px;">
+  {{hello}}
+  <div class="outer" ng-repeat="row in segment.jobs">
+    <table class="outer">
+      <tr class="outer" ng-repeat="(key,value) in row">
+        <td class="key">{{key}}</td><td compile="formatField(row.id, key,value)"></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!--
+[
+  {
+    "type": "string",
+    "assigned": 0,
+    "started": 0,
+    "progressed": 0,
+    "history": [
+      {}
+    ],
+    "completed": 0,
+    "completion_status": "string",
+    "id": "string",
+    "userId": "string",
+    "segmentId": "string"
+  }
+]
+-->

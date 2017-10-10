@@ -1,0 +1,30 @@
+#joblogs {
+  position: absolute;
+  left: 0;
+  width: 100%;
+
+  div.outer {
+    border-top: 1px solid white;
+    padding-top: 1em;
+    border-bottom: 1px solid white;
+    padding-bottom: 1em;
+
+  }
+  table.outer {
+      margin-left: 2em;
+      tr.outer {
+        margin-bottom: 0.25em;
+      }
+      td.key {
+        text-align: right;
+      }
+      td.key::after {
+        content: ":";
+      }
+  }
+  td {
+    white-space: nowrap;
+    font-family: monospace;
+    padding: 0em 0.5em 0 0;
+  }
+}
