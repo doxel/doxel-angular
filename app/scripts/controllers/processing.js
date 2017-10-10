@@ -51,6 +51,7 @@ angular.module('doxelApp')
 
         };
     }])
+
 .controller('ProcessingCtrl', [
   '$scope',
   '$rootScope',
@@ -145,7 +146,6 @@ angular.module('doxelApp')
               $scope.loading=false;
             });
           });
-
       },
 
       loadSegments: function(){
@@ -164,8 +164,14 @@ angular.module('doxelApp')
               status_timestamp: true,
               pointCloudId: true,
               created: true
+            },
+            include: {
+              relation: 'jobs',
+              scope: {
+                fields: ['id'],
+              }
             }
-          }
+          },
         }).$promise;
       },
 
@@ -224,6 +230,12 @@ angular.module('doxelApp')
         }, function(err){
           console.log(err);
         }).$promise;
+      },
+
+      viewHistory: function(segment){
+        $rootScope.params.s=segment.id;;
+        $location.search($rootScope.params);
+        $scope.$state.transitionTo('jobs');
       },
 
       // display segment pictures
@@ -345,6 +357,7 @@ angular.module('doxelApp')
       isCheckButtonDisabled: function(segment){
         return [
           'processing',
+          'processed',
           'queued',
           'published'
 
@@ -360,10 +373,7 @@ angular.module('doxelApp')
             return 'Queue for processing';
 
           case 'processed':
-            return 'Publish segment';
-
-          case 'cancel_pending':
-            return 'Resume processing';
+            return 'Waiting for pointcloud injection';
 
           case 'discarded':
             if (segment.pointCloudId) {
@@ -378,8 +388,7 @@ angular.module('doxelApp')
 
       isCancelButtonDisabled: function(segment){
         return [
-          'discarded',
-          'cancel_pending'
+          'discarded'
 
         ].indexOf(segment.status)>=0;
       },
@@ -392,6 +401,7 @@ angular.module('doxelApp')
 
           case 'new':
           case 'processed':
+          case 'publishable':
           case 'published':
             return 'Discard this segment';
 
@@ -402,10 +412,8 @@ angular.module('doxelApp')
             return 'Back in queue';
 
           case 'processing':
-            return 'Cancel processing';
+            return 'Back in queue';
 
-          case 'cancel_pending':
-              return 'Resume processing'
         }
       }
     });
