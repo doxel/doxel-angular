@@ -197,8 +197,8 @@ angular.module('doxelApp')
           });
           return;
         }
-        LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
         LoopBackAuth.rememberMe=true;
+        LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, res.result);
         LoopBackAuth.save();
         $state.transitionTo($scope.stateAfterSignin||appConfig.stateAfterSignin);
       },
@@ -283,8 +283,8 @@ angular.module('doxelApp')
         return;
       }
       console.log(res.result.session);
-      LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, null);
       LoopBackAuth.rememberMe=true;
+      LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, res.result);
       LoopBackAuth.save();
       socketService.connect();
       $state.transitionTo($scope.stateAfterSignin||appConfig.stateAfterSignin);
