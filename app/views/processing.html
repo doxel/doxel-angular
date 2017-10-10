@@ -19,7 +19,7 @@
 				<th st-sort="status">Status</th>
 			</tr>
 			<tr>
-				<th colspan="10"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+				<th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -30,14 +30,20 @@
 				<td><userinfo user="row.user" /></td>
 				<td>{{row.picturesCount}}</td>
 				<td class="first-uppercase">{{row.status}}</td>
-				<td>
+        <td>
+          <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row)" class="btn btn-sm btn-default" title="View processing history">
+            <i class="fa fa-fw fa-history">
+            </i>
+          </button>
+        </td>
+        <td>
 					<button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-default" title="View segment pictures">
 						<i class="fa fa-fw fa-picture-o">
 						</i>
 					</button>
 				</td>
         <td>
-					<button ng-disabled="!row.pointCloudId" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
+					<button ng-disabled="row.pointCloudId" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
 						<i class="fa fa-fw fa-eye">
 						</i>
 					</button>
