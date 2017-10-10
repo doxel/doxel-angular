@@ -273,6 +273,12 @@ var app=angular
         controller: 'ProcessingCtrl',
         controllerAs: 'processing'
       })
+      .state('joblogs', {
+        url: '/joblogs',
+        templateUrl: 'views/joblogs.html',
+        controller: 'JoblogsCtrl',
+        controllerAs: 'joblogs'
+      })
       /*
       .state('map', {
         url: '/map',
@@ -329,8 +335,16 @@ var app=angular
     $rootScope.$state=$state;
     $rootScope.params=angular.merge({},$location.search());
 
-    // init or restore local user settings
-    $rootScope.localSettings=(localStorage.doxel&&(JSON.parse(localStorage.doxel)))||{};
+    window.lba=LoopBackAuth;
+    if (LoopBackAuth.currentUserData && LoopBackAuth.currentUserData.session) {
+      var expiration=new Date(LoopBackAuth.currentUserData.session.created).getTime()+LoopBackAuth.currentUserData.session.ttl;
+      var remain=expiration-Date.now();
+      if (remain<=0) {
+        LoopbackAuth.clearStorage();
+        LoopbackAuth.clearUser();
+        $rootScope.authenticated=false;
+      }
+    }
 
     $rootScope.$on('unauthorized',function() {
       $state.transitionTo('login');
@@ -398,6 +412,9 @@ var app=angular
       });
     });
     */
+    $rootScope.isAdmin=function(){
+      return (LoopBackAuth.currentUserData&&LoopBackAuth.currentUserData.roles&&LoopBackAuth.currentUserData.roles.admin);
+    }
 
     // Whenever the route changes we see if either the user is logged in or is
     // trying to access a public route. Otherwise she will be redirected to
@@ -407,6 +424,17 @@ var app=angular
         $rootScope.previousState=$state.current.name;
       }
       $rootScope.authenticated=User.isAuthenticated();
+      if (LoopBackAuth.currentUserData && LoopBackAuth.currentUserData.session) {
+        var expiration=new Date(LoopBackAuth.currentUserData.session.created).getTime()+LoopBackAuth.currentUserData.session.ttl;
+        var remain=expiration-Date.now();
+        if (remain<=0) {
+          $state.transitionTo('logout');
+          alert('You have been logged out !');
+        } else {
+          $rootScope.authenticated=true;
+        }
+      }
+
       var state=next.name;
 
       // When the user just logged in with passport,
@@ -425,7 +453,8 @@ var app=angular
         }
         if (cookies['pp-userId']!='undefined') {
           // user logged in with third-party account (returned credentials may be for main account)
-          LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null);
+
+          LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null /* TODO: populate user data (roles) */);
           LoopBackAuth.save();
           $state.transitionTo($location.stateAfterSignin||appConfig.stateAfterSignin);
           return;
