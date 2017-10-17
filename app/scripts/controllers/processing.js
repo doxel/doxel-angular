@@ -8,52 +8,9 @@
  * Controller of the doxelApp
  */
 angular.module('doxelApp')
-.directive('lrInfiniteScroll', ['$timeout', function ($timeout) {
-        return{
-            link: function (scope, element, attr) {
-                var
-                    lengthThreshold = attr.scrollThreshold || 250,
-                    timeThreshold = attr.timeThreshold || 0,
-                    handler = scope.$eval(attr.lrInfiniteScroll),
-                    promise = null,
-                    lastRemaining = 9999;
-
-                lengthThreshold = parseInt(lengthThreshold, 10);
-                timeThreshold = parseInt(timeThreshold, 10);
-
-                if (!handler || !angular.isFunction(handler)) {
-                    handler = angular.noop;
-                }
-
-                element.bind('scroll', function () {
-                    lengthThreshold = parseInt(attr.scrollThreshold) || element[0].clientHeight/3;
-
-                    var
-                        remaining = element[0].scrollHeight - (element[0].clientHeight + element[0].scrollTop);
-                        console.log(remaining);
-
-                    //if we have reached the threshold and we scroll down
-                    if (remaining < lengthThreshold && (remaining - lastRemaining) < 0) {
-
-                        //if there is already a timer running which has no expired yet we have to cancel it and restart the timer
-                        if (promise !== null) {
-                          return;
-                        }
-                          promise = handler();
-                          console.log(promise);
-                          promise.then(function(){
-                              promise = null;
-                          });
-                    }
-                    lastRemaining = remaining;
-                });
-            }
-
-        };
-    }])
-
 .controller('ProcessingCtrl', [
   '$scope',
+  '$state',
   '$rootScope',
   '$q',
   'Segment',
@@ -64,6 +21,7 @@ angular.module('doxelApp')
   '$location',
   function (
     $scope,
+    $state,
     $rootScope,
     $q,
     Segment,
@@ -80,6 +38,7 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
+      $state: $state,
       segmentsPool: [],
       segmentsVisible: [],
       picturesVisible: [],
@@ -114,10 +73,6 @@ angular.module('doxelApp')
           console.log(arguments);
         });
 
-        $scope.$on('picture.click', function($event,picture){
-    //      $scope.picture=picture;
-        });
-
       },
 
       init: function() {
@@ -126,7 +81,7 @@ angular.module('doxelApp')
         // load unprocessed segments list
         $scope.loading=true;
         $scope.loadingProgress=0;
-        $scope.loadSegments()
+        $scope.segmentsPromise=$scope.loadSegments()
           .then(function(segments){
             segments=loopbackFilters(segments,{
               order: 'created DESC'
@@ -145,6 +100,7 @@ angular.module('doxelApp')
               Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
               $scope.loading=false;
             });
+            return segments;
           });
       },
 
@@ -152,9 +108,9 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: {
-              status: {ne: 'published'}
+        //      status: {ne: 'published'}
             },
-            limit: 10,
+        //    limit: 10,
             fields: {
               id: true,
               previewId: true,
@@ -233,90 +189,25 @@ angular.module('doxelApp')
       },
 
       viewHistory: function(segment){
-        $rootScope.params.s=segment.id;;
-        $location.search($rootScope.params);
-        $scope.$state.transitionTo('jobs');
+        $state.transitionTo('processing.joblogs',{
+          segmentId: segment.id
+        });
       },
 
       // display segment pictures
       viewSegment: function(segment){
-        if (!segment.pictures) {
-
-          // load picture ids
-          segment.pictures_promise=Segment.pictures({
-            id: segment.id,
-            fields: {
-              id: true
-            }
-
-          }, function(pictures){
-
-            segment.pictures=pictures;
-
-            // initialize picture ids pool
-            $scope.picturesPool=pictures;
-
-            // initialize visible pictures
-            $scope.picturesVisible=pictures.slice(0,$scope.itemsPerPage);
-
-            // set picture label
-            pictures.some(function(picture){
-              picture.label=picture.timestamp;
-            });
-
-            $scope.fillScrollableContainer();
-
-          }, function(err){
-            console.log(err);
-
-          }).$promise;
-        }
-
-        $rootScope.params.s=segment.id;
-        $location.search($rootScope.params);
         $scope.segment=segment;
+        $state.transitionTo('processing.pictures',{segmentId: segment.id});
 
       },
 
       viewCloud: function(segment) {
-        $rootScope.params.s=segment.id;;
-        delete $rootScope.params.pose;
-        $location.search($rootScope.params);
-        $scope.$state.transitionTo('gallery.view.cloud');
-      },
-
-      fillScrollableContainer: function() {
-        function loop() {
-          if ($scope.picturesVisible.length<$scope.picturesPool.length && !$scope.isScrollbarVisible()){
-            $scope.getPictures();
-          }
-          $timeout(loop,2000);
-        }
-        loop();
-      },
-
-      isScrollbarVisible: function(){
-        return $('.thumbs').height>$('.pictures').height();
-
-      //  return ($('#processing .pictures .mCSB_scrollTools_vertical:visible').length != 0);
-      },
-
-/*
-      onTotalScroll: function() {
-        $scope.getPictures();
-      },
-*/
-
-      // Add pictures to visible pictures
-      getPictures: function(tableState){
-        if (!$scope.segment) return $q.resolve();
-        var q=$q.defer();
-        $scope.segment.pictures_promise.then(function(){
-          $scope.picturesVisible=$scope.picturesVisible.concat($scope.picturesPool.slice($scope.picturesVisible.length, $scope.picturesVisible.length+$scope.itemsPerPage/2));
-          $timeout(q.resolve());
+        $state.transitionTo('gallery.view.cloud',{
+          pose: 0,
+          segmentId: segment.id
         });
-        return q.promise;
       },
+
 
       proceed: function(segment, direction){
         return Segment.proceed({
