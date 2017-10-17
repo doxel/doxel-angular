@@ -53,6 +53,7 @@ angular.module('doxelApp')
     '$q',
     '$location',
     '$state',
+    '$stateParams',
     '$timeout',
     '$window',
     'elementSelection',
@@ -66,6 +67,7 @@ angular.module('doxelApp')
       $q,
       $location,
       $state,
+      $stateParams,
       $timeout,
       $window,
       elementSelection
@@ -397,55 +399,6 @@ if (false) // TODO: make it work without flickering -> dig into malihu
             $scope.update(toState);
           });
 
-          // handle url parameter changes
-          $scope.$on('location.search',function(event,value){
-            console.log('location.search');
-
-            var reload=false;
-            var newValue=value[0];
-            var oldValue=value[1];
-
-            $scope.locationSearch.forEach(function(option){
-              var name;
-              var handler;
-              var _reload;
-
-              if (typeof(option)=='string') {
-                name=option;
-                handler=null;
-                _reload=true;
-
-              } else {
-                name=option.name;
-                handler=option.handler;
-                _reload=option.reload;
-              }
-
-              if (oldValue[name]!=newValue[name]) {
-                $scope.params[name]=newValue[name];
-                if (handler) {
-                  handler(newValue[name],oldValue[name]);
-                }
-                reload|=_reload;
-              }
-            });
-
-            $scope.searchTag=null;
-
-            if (reload) {
-              $scope.clearThumbsList().finally(function(){
-                $scope.update($scope.$state.current);
-              });
-
-            } else {
-              if (oldValue.s!=newValue.s) {
-                $scope.params.s=value[0].s;
-                $scope.updateSelection(value[0].s);
-              }
-            }
-
-          });
-
           $scope.$on('no-tag', function(event) {
             $scope.searchTag=$rootScope.params.search;
           });
@@ -464,17 +417,17 @@ if (false) // TODO: make it work without flickering -> dig into malihu
           });
 
           $scope.$on('window.resize',function(){
-            $scope.updateThumbsStyle($rootScope.$state.current);
+            $scope.updateThumbsStyle($state.current);
             $scope.updateMetrics();
             // allow loading more thumbs
-            $scope.updateVisibility($rootScope.$state.current);
+            $scope.updateVisibility($state.current);
           });
 
           $scope.$on('orientationchange',function(){
-            $scope.updateThumbsStyle($rootScope.$state.current);
+            $scope.updateThumbsStyle($state.current);
             $scope.updateMetrics();
             // allow loading more thumbs
-            $scope.updateVisibility($rootScope.$state.current);
+            $scope.updateVisibility($state.current);
           });
 
           $('.thumbs-handle').on('click',function(){
@@ -490,14 +443,14 @@ if (false) // TODO: make it work without flickering -> dig into malihu
 
           $scope.$on('options.gallery.my-segments',function(event){
             $scope.clearThumbsList().finally(function(){
-              $scope.update($scope.$state.current);
+              $scope.update($state.current);
             });
 
           });
 
           $scope.$on('options.gallery.all-segments',function(event){
             $scope.clearThumbsList().finally(function(){
-              $scope.update($scope.$state.current);
+              $scope.update($state.current);
             });
 
           });
@@ -529,49 +482,68 @@ if (false) // TODO: make it work without flickering -> dig into malihu
         }, // init
 
         segmentClick: function(options) {
-          console.log('segment click',options.segment,$scope.selected);
            var segment=options.segment;
            var justRestoringSelection=options.justRestoringSelection;
            var show=options.show;
            var setView=options.setView;
 
           // in map view, switch to cloud on second click TODO: put it in gallery-map
-          if ($scope.$state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
+          if ($state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
             if (segment.pointCloud) {
-              $scope.$state.transitionTo('gallery.view.cloud');
+              $state.transitionTo('gallery.view.cloud',{
+                segmentId: segment.id
+              });
             }
             return;
           }
 
-    //      $scope.$root.$broadcast('segment.show',segment);
-    //      $state.go('gallery',{segmentId: segment.id},{notify: false, reload:' gallery.details'});
-            $scope.select(segment,{
-              selected: true,
-              unique: true,
-              show: show
-            });
-            $rootScope.params.s=segment.id;;
+          $scope.select(segment,{
+            selected: true,
+            unique: true,
+            show: show
+          });
 
-            // user clicked ?
-            if (!justRestoringSelection) {
-              // update query string
-              delete $rootScope.params.pose;
-              $location.search($rootScope.params);
-              // open viewer
-              if ($scope.$state.current.name=='gallery.view.thumbs' || $scope.$state.current.name=='gallery.view.home') {
-                if (segment.pointCloud) {
-                  $scope.$state.transitionTo('gallery.view.cloud');
-                }
-                return;
+          $state.params.segmentId=segment.id;
+
+          // update url via state params (notify = false)
+          $timeout(function(){
+            $state.transitionTo(
+              $state.current.name,
+              angular.extend($stateParams,{
+                segmentId: segment.id,
+
+              }),
+              {
+                location: true,
+                inherit: true,
+                relative: $state.$current,
+                notify: false
               }
-            }
+            );
+          });
 
-            if (setView) {
-              // show segment on map
-              $rootScope.$broadcast('segment.setview',{segment: segment});
+          // user clicked ?
+          if (!justRestoringSelection) {
+            // update query string
+            delete $rootScope.params.pose;
+//              $location.search($rootScope.params);
+            // open viewer
+            if ($state.current.name=='gallery.view.thumbs' || $state.current.name=='gallery.view.home') {
+              if (segment.pointCloud) {
+                $state.transitionTo('gallery.view.cloud',{
+                    segmentId: segment.id
+                });
+              }
+              return;
             }
+          }
 
-            $rootScope.$broadcast('updateButtons');
+          if (setView) {
+            // show segment on map
+            $rootScope.$broadcast('segment.setview',{segment: segment});
+          }
+
+          $rootScope.$broadcast('updateButtons');
 
         }, // segmentClick
 
@@ -868,7 +840,7 @@ if (false)              if(segments.length){
           $scope.updateVisibility(state);
           $scope.updateThumbsStyle(state);
           $scope.updateMetrics();
-          $scope.updateSelection($rootScope.params.s);
+          $scope.updateSelection($state.params.segmentId);
         },
 
       });
