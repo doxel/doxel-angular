@@ -47,6 +47,7 @@ angular.module('doxelApp')
     '$scope',
     '$rootScope',
     '$state',
+    '$stateParams',
     'Segment',
     '$timeout',
     '$location',
@@ -55,7 +56,20 @@ angular.module('doxelApp')
     'segmentsService',
     'ngNotify',
     'Tag',
-    function ($scope,$rootScope,$state,Segment,$timeout,$location,$q,appConfig,segmentsService,ngNotify,Tag) {
+    function (
+      $scope,
+      $rootScope,
+      $state,
+      $stateParams,
+      Segment,
+      $timeout,
+      $location,
+      $q,
+      appConfig,
+      segmentsService,
+      ngNotify,
+      Tag
+    ) {
       this.awesomeThings = [
         'HTML5 Boilerplate',
         'AngularJS',
@@ -189,7 +203,7 @@ angular.module('doxelApp')
             });
           }
 
-          var segmentId=$rootScope.params.s||$location.search().s;
+          var segmentId=$stateParams.segmentId||$rootScope.params.s||$location.search().s;
           $scope.updateGalleryMode($state.current);
           if (segmentId) {
           /*  $scope.getSegment(segmentId).then(function(segment){
@@ -341,7 +355,7 @@ angular.module('doxelApp')
             count=from;
             from=undefined;
           }
-          console.trace('loadSegments');
+          console.log('loadSegments');
           $scope.updateMetrics();
           if ($scope._loadSegments) {
             return $scope._loadSegments;
@@ -459,9 +473,8 @@ angular.module('doxelApp')
             if ($scope._loadSegments && $scope._loadSegments.promise.$$state.pending) {
               // search in segment being loaded
               $scope._loadSegments.promise.then(function(_segments){
-                _segments.some(function(segment){
+                var found=_segments.some(function(segment){
                   if (segment.id==segmentId) {
-                    found=true;
                     q.resolve(segment);
                     return true;
                   }
