@@ -275,7 +275,6 @@ var app=angular
           }
         }
       })
-
       .state('gallery.view.classifiers', {
         url: '/classifiers'
       })
@@ -383,27 +382,8 @@ var app=angular
       errorMessage,
       uploaderService
     ) {
-if (false) {
-    $rootScope.$state=$state;
-    $rootScope.$stateParams=$stateParams;
-    $rootScope.params=angular.merge({},$location.search());
-    if ($rootScope.params.s) {
-      $rootScope.params.segmentId=$rootScope.params.s;
-      delete $rootScope.params.s;
-    }
-}
-$rootScope.params=angular.merge({},$location.search());
 
-    window.lba=LoopBackAuth;
-    if (LoopBackAuth.currentUserData && LoopBackAuth.currentUserData.session) {
-      var expiration=new Date(LoopBackAuth.currentUserData.session.created).getTime()+LoopBackAuth.currentUserData.session.ttl;
-      var remain=expiration-Date.now();
-      if (remain<=0) {
-        LoopbackAuth.clearStorage();
-        LoopbackAuth.clearUser();
-        $rootScope.authenticated=false;
-      }
-    }
+    $rootScope.params=angular.merge({},$location.search());
 
     $rootScope.$on('unauthorized',function() {
       $state.transitionTo('login');
@@ -418,14 +398,6 @@ $rootScope.params=angular.merge({},$location.search());
     $rootScope.toggleFullscreen=function(){
       $rootScope.isFullscreen=true;
     }
-
-    // broadcast location.search event on query string change
-if (false)    $rootScope.$watch(function(){
-      return $location.search();
-    }, function(newValue,oldValue){
-      /// TODO ? merge rootScope.params here ?
-      $rootScope.$broadcast('location.search',arguments);
-    });
 
     // return gallery thumbs style
     $rootScope.getClass=function(){
@@ -448,29 +420,6 @@ if (false)    $rootScope.$watch(function(){
       $rootScope.$broadcast('orientationchange',e);
     });
 
-    /*
-    $rootScope.$on('viewer.show',function(event,segment){
-      if (appConfig && appConfig.viewerInMainWindow) {
-        // open viewer view
-        $location.path('/viewer').search({
-          sid: segment.id,
-          sts: segment.timestamp
-        });
-      } else {
-        // open viewer in another window
-        segment.viewerWindow=$window.open('/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html');
-      }
-    });
-    */
-
-    /*
-    $rootScope.$on('segment.show',function(event,segment){
-      $location.path('/segments').search({
-        sid: segment.id,
-        sts: segment.timestamp
-      });
-    });
-    */
     $rootScope.isAdmin=function(){
       return $rootScope.hasRole('admin');
     }
@@ -479,9 +428,8 @@ if (false)    $rootScope.$watch(function(){
     $rootScope.hasRole=function(name){
       return (
         LoopBackAuth.currentUserData
-        && LoopBackAuth.currentUserData.data
-        && LoopBackAuth.currentUserData.data.roles
-        && LoopBackAuth.currentUserData.data.roles.find(function(role){return role.name==name}));
+        && LoopBackAuth.currentUserData.roles
+        && LoopBackAuth.currentUserData.roles.find(function(role){return role.name==name}));
     }
 
     // Whenever the route changes we see if either the user is logged in or is
@@ -493,22 +441,7 @@ if (false)    $rootScope.$watch(function(){
       }
       $rootScope.authenticated=User.isAuthenticated();
       console.log('auth',$rootScope.authenticated)
-/*
-      if (LoopBackAuth.currentUserData && LoopBackAuth.currentUserData.session) {
-        var expiration=new Date(LoopBackAuth.currentUserData.session.created).getTime()+LoopBackAuth.currentUserData.session.ttl;
-        var remain=expiration-Date.now();
-        if (remain<=0) {
-          if (next.name!='logout' && next.name!='login') {
-            event.preventDefault();
-            $location.stateAfterSignin=next;
-            $state.transitionTo('logout');
-            console.log('You have been logged out !');
-          }
-        } else {
-          $rootScope.authenticated=true;
-        }
-      }
-*/
+
       // When the user just logged in with passport,
       // bind and switch to parent user if any
       var cookies=$cookies.getAll();
@@ -536,8 +469,18 @@ if (false)    $rootScope.$watch(function(){
 
       if (User.isAuthenticated()) {
 
-        // dont display login page if already authenticated
         if (next.name=='login') {
+          // unless we need a role for stateAfterSigning....
+          if (
+            $location.stateAfterSignin
+            && $location.stateAfterSignin.params
+            && $location.stateAfterSignin.params.needsRole
+            && !$rootScope.hasRole($location.stateAfterSignin.needsRole)
+          ) {
+            return;
+          }
+
+          // ... dont display login page if already authenticated
           event.preventDefault();
           if (!$state.current.name.length || $state.current.name=='login') {
             $state.transitionTo($location.stateAfterSignin||appConfig.stateAfterSignin);
@@ -564,11 +507,19 @@ if (false)    $rootScope.$watch(function(){
 
     });
 
-    // syncronize rootScope.params and location.search()
     $rootScope.$on('$stateChangeSuccess', function (event, toState) {
-      if ($state.params && $state.params.needsAuth) {
+
+      // When accessTokenId is defined but currentUserData is not,
+      // it means page reload, we need to refresh currentUserData
+      // it will check if the accessToken is still valid as well.
+      // Interceptor will redirect to login state automatically if not.
+      // Also, when state.params.needsRole, we need to redirect
+      // manually in case the role is not matched in currentUserData
+      if ((LoopBackAuth.accessTokenId && !LoopBackAuth.currentUserData)
+      || ($state.params && ($state.params.needsAuth || $state.params.needsRole)))
+      {
         User.getCurrent(function(user){
-          if ($state.params.needsRole) {
+          if ($state.params && $state.params.needsRole) {
             if (!$rootScope.hasRole($state.params.needsRole)) {
               $location.stateAfterSignin=toState;
               $state.transitionTo('login');
@@ -576,38 +527,6 @@ if (false)    $rootScope.$watch(function(){
           }
         });
       }
-
-if (false) {
-      var search=$location.search();
-      var params=$rootScope.params;
-      // check for changed querystring param
-      var changed=false;
-      for (var prop in params) {
-        if (params.hasOwnProperty(prop)) {
-          if (params[prop]!=search[prop]) {
-            changed=true;
-            break;
-          }
-        }
-      }
-      if (!changed) {
-        for (var prop in search) {
-          if (search.hasOwnProperty(prop)) {
-            if (params[prop]!=search[prop]) {
-              changed=true;
-              break;
-            }
-          }
-        }
-      }
-
-      if (changed) {
-        angular.extend($rootScope.params,$location.search());
-        $timeout(function(){
-          $location.search($rootScope.params).replace();
-        },1);
-      }
-}
     });
 
   }]);
