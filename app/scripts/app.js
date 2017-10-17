@@ -161,7 +161,10 @@ var app=angular
         url: '/upload',
         templateUrl: 'views/upload.html',
         controller: 'UploadCtrl',
-        controllerAs: 'upload'
+        controllerAs: 'upload',
+        params: {
+          needsAuth: true
+        }
       })
       .state('gallery', {
         url: '/doxel',
@@ -222,13 +225,23 @@ var app=angular
       })
 
       .state('gallery.view.home', {
-        url: '/home',
-        controller: 'MainCtrl'
+        url: '/home/:segmentId?',
+        params: {
+          segmentId: {
+            value: null,
+            squash: true
+          }
+        }
       })
 
       .state('gallery.view.thumbs', {
-        url: '/gallery'
-
+        url: '/gallery/:segmentId?',
+        params: {
+          segmentId: {
+            value: null,
+            squash: true
+          }
+        }
       })
 /*
       .state('gallery.view.info', {
@@ -237,18 +250,30 @@ var app=angular
       })
 */
       .state('gallery.view.map', {
-        url: '/map',
+        url: '/map/:segmentId?',
         controller: 'GalleryMapCtrl'
       })
 
       .state('gallery.view.earth', {
-        url: '/earth',
-        controller: 'GalleryEarthCtrl'
+        url: '/earth/:segmentId?',
+        controller: 'GalleryEarthCtrl',
+        params: {
+          segmentId: {
+            value: null,
+            squash: true
+          }
+        }
       })
 
       .state('gallery.view.cloud', {
-        url: '/viewer',
-        controller: 'GalleryViewerCtrl'
+        url: '/viewer/:segmentId?',
+        controller: 'GalleryViewerCtrl',
+        params: {
+          segmentId: {
+            value: null,
+            squash: true
+          }
+        }
       })
 
       .state('gallery.view.classifiers', {
@@ -268,16 +293,40 @@ var app=angular
         controllerAs: 'segments',
       })
       .state('processing', {
-        url: '/processing',
+        url: '/processing/:segmentId?',
         templateUrl: 'views/processing.html',
         controller: 'ProcessingCtrl',
-        controllerAs: 'processing'
+        controllerAs: 'processing',
+        params: {
+          segmentId: {
+            value: null,
+            squash: true
+          },
+          needsAuth: true,
+          needsRole: 'admin'
+
+        }
       })
-      .state('joblogs', {
+      .state('processing.pictures', {
+        url: '/pictures',
+        controller: 'SegmentPicturesCtrl',
+        templateUrl: 'views/segment-pictures.html',
+        params: {
+          needsAuth: true,
+          needsRole: 'admin'
+        }
+      })
+      .state('processing.joblogs', {
         url: '/joblogs',
         templateUrl: 'views/joblogs.html',
         controller: 'JoblogsCtrl',
-        controllerAs: 'joblogs'
+        controllerAs: 'joblogs',
+        params: {
+          segmentId: null,
+          needsAuth: true,
+          needsRole: 'admin'
+
+        }
       })
       /*
       .state('map', {
@@ -309,6 +358,7 @@ var app=angular
   .run([
     '$rootScope',
     '$state',
+    '$stateParams',
     '$location',
     '$window',
     'User',
@@ -322,6 +372,7 @@ var app=angular
     function (
       $rootScope,
       $state,
+      $stateParams,
       $location,
       $window,
       User,
@@ -332,8 +383,16 @@ var app=angular
       errorMessage,
       uploaderService
     ) {
+if (false) {
     $rootScope.$state=$state;
+    $rootScope.$stateParams=$stateParams;
     $rootScope.params=angular.merge({},$location.search());
+    if ($rootScope.params.s) {
+      $rootScope.params.segmentId=$rootScope.params.s;
+      delete $rootScope.params.s;
+    }
+}
+$rootScope.params=angular.merge({},$location.search());
 
     window.lba=LoopBackAuth;
     if (LoopBackAuth.currentUserData && LoopBackAuth.currentUserData.session) {
@@ -361,7 +420,7 @@ var app=angular
     }
 
     // broadcast location.search event on query string change
-    $rootScope.$watch(function(){
+if (false)    $rootScope.$watch(function(){
       return $location.search();
     }, function(newValue,oldValue){
       /// TODO ? merge rootScope.params here ?
@@ -413,7 +472,16 @@ var app=angular
     });
     */
     $rootScope.isAdmin=function(){
-      return (LoopBackAuth.currentUserData&&LoopBackAuth.currentUserData.roles&&LoopBackAuth.currentUserData.roles.admin);
+      return $rootScope.hasRole('admin');
+    }
+
+    // must be called after User.getCurrent()
+    $rootScope.hasRole=function(name){
+      return (
+        LoopBackAuth.currentUserData
+        && LoopBackAuth.currentUserData.data
+        && LoopBackAuth.currentUserData.data.roles
+        && LoopBackAuth.currentUserData.data.roles.find(function(role){return role.name==name}));
     }
 
     // Whenever the route changes we see if either the user is logged in or is
@@ -424,19 +492,23 @@ var app=angular
         $rootScope.previousState=$state.current.name;
       }
       $rootScope.authenticated=User.isAuthenticated();
+      console.log('auth',$rootScope.authenticated)
+/*
       if (LoopBackAuth.currentUserData && LoopBackAuth.currentUserData.session) {
         var expiration=new Date(LoopBackAuth.currentUserData.session.created).getTime()+LoopBackAuth.currentUserData.session.ttl;
         var remain=expiration-Date.now();
         if (remain<=0) {
-          $state.transitionTo('logout');
-          alert('You have been logged out !');
+          if (next.name!='logout' && next.name!='login') {
+            event.preventDefault();
+            $location.stateAfterSignin=next;
+            $state.transitionTo('logout');
+            console.log('You have been logged out !');
+          }
         } else {
           $rootScope.authenticated=true;
         }
       }
-
-      var state=next.name;
-
+*/
       // When the user just logged in with passport,
       // bind and switch to parent user if any
       var cookies=$cookies.getAll();
@@ -463,33 +535,51 @@ var app=angular
       }
 
       if (User.isAuthenticated()) {
-        if (state=='login') {
+
+        // dont display login page if already authenticated
+        if (next.name=='login') {
           event.preventDefault();
+          if (!$state.current.name.length || $state.current.name=='login') {
+            $state.transitionTo($location.stateAfterSignin||appConfig.stateAfterSignin);
+          }
           return;
         }
 
       } else {
-        switch(state) {
-          case 'upload':
-          case 'profile':
-            $location.stateAfterSignin=state;
-            event.preventDefault();
-            $state.transitionTo('login');
-//            $location.path('/login');
-            return;
 
-          case 'logout':
-            event.preventDefault();
-            return;
+        // transition to login page if auth needed
+        if (next.params && next.params.needsAuth) {
+          $location.stateAfterSignin=next;
+          event.preventDefault();
+          $state.transitionTo('login');
+          return;
+        }
+
+        // already logged out
+        if (next.name=='logout') {
+          event.preventDefault();
+          return;
         }
       }
+
     });
 
     // syncronize rootScope.params and location.search()
     $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+      if ($state.params && $state.params.needsAuth) {
+        User.getCurrent(function(user){
+          if ($state.params.needsRole) {
+            if (!$rootScope.hasRole($state.params.needsRole)) {
+              $location.stateAfterSignin=toState;
+              $state.transitionTo('login');
+            }
+          }
+        });
+      }
+
+if (false) {
       var search=$location.search();
       var params=$rootScope.params;
-
       // check for changed querystring param
       var changed=false;
       for (var prop in params) {
@@ -517,14 +607,7 @@ var app=angular
           $location.search($rootScope.params).replace();
         },1);
       }
-
-      if (toState.name) {
-        $rootScope.view=toState.name;
-        $rootScope.$broadcast('rebuild:scrollbar');
-
-      } else {
-        $rootScope.view=null;
-      }
+}
     });
 
   }]);
