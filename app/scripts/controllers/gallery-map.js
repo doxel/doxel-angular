@@ -337,7 +337,7 @@ angular.module('doxelApp')
           console.log(toState);
           $scope.updateVisibility(toState);
         });
-        $scope.updateVisibility($rootScope.$state.current);
+        $scope.updateVisibility($state.current);
 
         // update query string on centerUrlHash change
         $scope.$on('centerUrlHash',function(event,hash){
@@ -359,7 +359,7 @@ angular.module('doxelApp')
           $scope.getSegment(segmentId).then(function(segment){
             if (elementSelection.isSelected('segment',segment)) {
               if (segment.pointCloudId) {
-                $scope.$state.transitionTo('gallery.view.cloud');
+                $state.transitionTo('gallery.view.cloud',{segmentId:segment.id});
               }
             } else {
               $rootScope.$broadcast('segment.click',segment,{show:true});
