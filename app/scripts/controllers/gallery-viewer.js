@@ -52,6 +52,7 @@ angular.module('doxelApp')
   '$q',
   'Segment',
   '$state',
+  '$stateParams',
   '$http',
   'LoopBackAuth',
   'errorMessage',
@@ -63,6 +64,7 @@ angular.module('doxelApp')
     $q,
     Segment,
     $state,
+    $stateParams,
     $http,
     LoopBackAuth,
     errorMessage
@@ -92,7 +94,7 @@ angular.module('doxelApp')
       },
 
       init: function(){
-        $scope.updateViewerVisibility($state.current.name);
+        if ($state.current && $state.current.name) $scope.updateViewerVisibility($state.current.name);
 
         $rootScope.$on('$stateChangeSuccess',function(event,toState){
           console.log(toState)
@@ -100,26 +102,31 @@ angular.module('doxelApp')
         });
 
         $scope.$on('segment.setview',function(event,segment){
-          if ($scope.$state.current.name==$scope.viewer_state) {
+          if ($state.current.name==$scope.viewer_state) {
             $scope.show();
           }
         });
       },
 
       show: function(){
-        var segmentId=$location.search().s || $scope.params.s || ($scope.segments && $scope.segments[0] && $scope.segments[0].id);
+        var segmentId=$state.params.segmentId || $location.search().s || $scope.params.s || ($scope.segments && $scope.segments[0] && $scope.segments[0].id);
+        $stateParams.segmentId=segmentId;
         if (!segmentId) {
           // when no segment is specified, wait for loaded segments and
           // open the first with a pointcloud
           // TODO: maybe theres no pointcloud in this segments chunk
-          $scope._loadSegments.promise.then(function(_segments) {
-            var segment=_segments.some(function(segment){
-              if (segment.pointCloudId) {
-                return segment;
+          $scope.loadSegments().promise.then(function(_segments) {
+            var segment=null;
+            _segments.some(function(_segment){
+              if (_segment.pointCloudId) {
+                segment=_segment;
+                return true;
               }
             });
             if (segment) {
-              $rootScope.$broadcast('segment.click',segment);
+              $timeout(function(){
+                $rootScope.$broadcast('segment.click',segment);
+              },100);
             }
           });
           return;
