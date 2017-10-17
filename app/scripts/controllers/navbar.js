@@ -48,11 +48,13 @@ angular.module('doxelApp')
   '$location',
   '$rootScope',
   '$state',
+  '$stateParams',
   function (
     $scope,
     $location,
     $rootScope,
-    $state
+    $state,
+    $stateParams
   ) {
     this.awesomeThings=[
       'HTML5 Boilerplate',
@@ -86,6 +88,10 @@ angular.module('doxelApp')
 
       isNavbarExpandedVertically: function(){
         return !$('#js-navbar-collapse').hasClass('collapsed') && $('#js-navbar-collapse').position().top > $('#main-navbar').position().top
+      },
+
+      getshref: function(name){
+        return '/app/'+$state.href(name,{segmentId: $state.params.segmentId})
       },
 
       init: function() {
