@@ -124,9 +124,7 @@ angular.module('doxelApp')
               }
             });
             if (segment) {
-              $timeout(function(){
-                $rootScope.$broadcast('segment.click',segment);
-              },100);
+              $rootScope.$broadcast('segment.click',segment);
             }
           });
           return;
