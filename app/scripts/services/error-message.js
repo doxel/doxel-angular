@@ -43,7 +43,11 @@
  * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .service('errorMessage', function () {
+  .service('errorMessage', [
+   '$timeout',
+   function (
+     $timeout
+   ) {
     // AngularJS will instantiate a singleton by calling "new" on this function
     //
     var self=this;
@@ -73,16 +77,16 @@ angular.module('doxelApp')
 
       if (scope && scope.error[err] && scope.error[err].field) {
         var field=scope.error[err].field;
-        setTimeout(function(){
-        options.form[field].$setValidity(err,false);
-        scope.hideMessages=false;
-        scope.$apply();
-        setTimeout(function(){
+        $timeout(function(){
+          console.log(err);
           options.form[field].$setValidity(err,false);
-          scope.hideMessages=true;
-          scope.$apply();
-        },3000);
-      },100);
+          scope.hideMessages=false;
+          $timeout(function(){
+            options.form[field].$setValidity(err,false);
+            scope.hideMessages=true;
+          },5000);
+        },300);
+        alert(scope.error[err].msg);
 
       } else {
         var title=scope && (scope.error[err] && scope.error[err].title) || '';
@@ -107,4 +111,4 @@ angular.module('doxelApp')
       }
 
     }
-  });
+  }]);
