@@ -2,7 +2,7 @@
 <html>
   <head>
     <!--- base href is required in production for $locationProvider html5Mode -->
-    <base href="/">
+    <base href="/app">
     <meta charset="utf-8">
     <title></title>
     <meta name="description" content="">
@@ -114,7 +114,7 @@
                     <li ng-class="getClass('upload')"><a ui-sref="upload" class="upload fa fa-upload"><span>Upload</span></a></li>
                     <li><a class="github-issues fa fa-bug" ng-href="{{githubHref+'/issues'}}" target="_blank" ng-click="goto('github-issues')"><span>Bug Report</span></a></li>
                     <li ng-show="!authenticated" ng-class="getClass('login')"><a ui-sref="login" class="login fa fa-sign-in"><span>Login</span></a></li>
-                    <li ng-show="isAdmin()" ng-class="getClass('processing')"><a ui-sref="processing" class="processing fa fa-industry"><span>Admin</span></a></li>
+                    <li ng-show="hasRole('foreman')" ng-class="getClass('processing')"><a ui-sref="processing" class="processing fa fa-industry"><span>Admin</span></a></li>
                     <li ng-show="authenticated" ng-class="getClass('logout')"><a ui-sref="logout" class="logout fa fa-sign-out"><span>Logout</span></a></li>
                     <!--li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
                     <li ng-class="getClass('gallery.view.map,gallery.view.earth')"><a ui-sref="gallery.view.map" class="map fa fa-globe"><span>Map</span></a></li>
@@ -178,7 +178,6 @@
           <script src="bower_components/angular-touch/angular-touch.js"></script>
           <script src="bower_components/angular-ui-scroll/dist/ui-scroll.js"></script>
           <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-          <script src="bower_components/ui-router-extras/release/ct-ui-router-extras.js"></script>
           <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
           <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
           <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
@@ -188,12 +187,14 @@
           <script src="bower_components/fingerprintjs2/fingerprint2.js"></script>
           <script src="bower_components/jquery-ui/jquery-ui.js"></script>
           <script src="bower_components/ng-scrollbar/dist/ng-scrollbar.js"></script>
+          <script src="bower_components/ui-router-extras/release/ct-ui-router-extras.js"></script>
           <script src="bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
           <script src="bower_components/html5-sortable-angularjs/lib/html5-sortable.js"></script>
           <script src="bower_components/piexifjs/piexif.js"></script>
           <script src="bower_components/angular-live-set/dist/live-set.js"></script>
           <script src="bower_components/angular-socket-io/socket.js"></script>
           <script src="bower_components/socket-io-client/socket.io.js"></script>
+          <script src="bower_components/angular-ui-router.stateHelper/statehelper.js"></script>
           <script src="bower_components/jquery-mousewheel/jquery.mousewheel.js"></script>
           <script src="bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
           <script src="bower_components/ng-scrollbars/src/scrollbars.js"></script>

@@ -302,7 +302,7 @@ var app=angular
             squash: true
           },
           needsAuth: true,
-          needsRole: 'admin'
+          needsRole: 'foreman'
 
         }
       })
@@ -429,7 +429,8 @@ var app=angular
       return (
         LoopBackAuth.currentUserData
         && LoopBackAuth.currentUserData.roles
-        && LoopBackAuth.currentUserData.roles.find(function(role){return role.name==name}));
+        && LoopBackAuth.currentUserData.roles.find(function(role){return role.name==name || role.name=='admin'})
+      );
     }
 
     // Whenever the route changes we see if either the user is logged in or is
