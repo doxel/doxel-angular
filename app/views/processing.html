@@ -8,7 +8,7 @@
 		</div>
 	</div>
 
-	<table ng-show="$state.current.name=='processing' && !loading" st-table="segmentsVisible" st-safe-src="segmentsPool" class="table table-striped">
+	<table ng-show="$state.current.name=='processing' && !loading" st-table="segmentsVisible" st-persist="processingTable" st-safe-src="segmentsPool" class="table table-striped">
 		<thead>
 			<tr>
 				<th>Preview</th>
