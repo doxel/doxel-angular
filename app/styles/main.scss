@@ -154,8 +154,9 @@ div.footer {
   }
 }
 
-  .container {
-    max-width: 730px;
+  .navbar .container {
+  //  max-width: 730px;
+    width: 100%;
   }
 
   /* Remove the padding we set earlier */
