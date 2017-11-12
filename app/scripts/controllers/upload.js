@@ -40,24 +40,6 @@ angular.module('doxelApp')
           totalProgressBar: $('#doxel-upload .uploader-total-progress-bar'),
           totalProgress: $('#doxel-upload .uploader-total-progress')
         });
-
-        $scope.$on('$stateChangeStart',function(e, next, current){
-          console.log(next);
-          if (next.name=='upload') {
-            if (!LoopBackAuth.accessTokenId) {
-              $rootScope.emit('unauthorized');
-            }
-          }
-        });
-
-        $scope.$on('$stateChangeSuccess',function(e, toState){
-          console.log(toState);
-          if (toState.name=='upload') {
-            if (!LoopBackAuth.accessTokenId) {
-              $rootScope.$emit('unauthorized');
-            }
-          }
-        });
       }, // init
 
       removeAll: function(){
