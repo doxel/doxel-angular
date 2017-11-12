@@ -324,9 +324,17 @@ angular.module('doxelApp')
                 scope.$watch(function () {
                     return ctrl.tableState();
                 }, function (newValue, oldValue) {
-                    if (newValue !== oldValue) {
-                        localStorage.setItem(nameSpace, JSON.stringify(newValue));
+                  if (newValue.pagination.start2) {
+                    if (newValue.pagination.start2 < newValue.pagination.totalItemCount) {
+                      // consume start2
+                      newValue.pagination.start = newValue.pagination.start2;
+                      newValue.pagination.start2 = undefined;
+                      ctrl.pipe();
                     }
+                  }
+                  if (newValue !== oldValue) {
+                      localStorage.setItem(nameSpace, JSON.stringify(newValue));
+                  }
                 }, true);
 
                 //fetch the table state when the directive is loaded
@@ -335,6 +343,7 @@ angular.module('doxelApp')
                     var tableState = ctrl.tableState();
 
                     angular.extend(tableState, savedState);
+                    tableState.pagination.start2 = tableState.pagination.start;
                     ctrl.pipe();
 
                 }
