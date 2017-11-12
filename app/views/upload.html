@@ -13,10 +13,9 @@
 
     </div>
 
-    <div class="col-md-9" style="margin-bottom: 40px">
+    <div ng-if="uploader.queue.length" class="col-md-9" style="margin-bottom: 40px">
 
-      <h3>Upload queue</h3>
-      <p>Queue length: {{ uploader.queue.length }}</p>
+      <h3 ng-if="uploader.queue.length">{{ uploader.queue.length }} file{{ uploader.queue.length>1 ? 's' : '' }} in queue ({{ uploader.queue.size/1024/1024|number:2 }}Mb)</h3>
 
       <div>
         <!--div>
@@ -41,10 +40,12 @@
     <div>
       <input id="toggleShowThumb" type="checkbox" ng-model="uploaderService.showThumb"><label for="toggleShowThumb">Show pictures while uploading</label>
     </div>
+    <!--div>
+      <input id="toggleAllIsHere" type="checkbox" ng-model="uploaderService.allIsHere"><label for="toggleAllIsHere">Full segment</label>
+    </div-->
 
   </div>
-
-  <table st-safe-src="uploader.queue" st-table="rows" class="table table-striped" ng-if="showFileList">
+  <table ng-if="uploader.queue.length" st-safe-src="uploader.queue" st-table="rows" class="table table-striped" ng-if="showFileList">
     <thead>
       <tr>
         <th width="50%">Name</th>
