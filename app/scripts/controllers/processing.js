@@ -209,12 +209,12 @@ angular.module('doxelApp')
       },
 
 
-      proceed: function(segment, direction){
+      proceed: function(segment, operation){
         return Segment.proceed({
           id: segment.id,
           status: segment.status||'new',
           status_timestamp: segment.status_timestamp||Date.now(),
-          direction: direction
+          operation: operation
 
         }).$promise.then(function(res){
           segment.status=(res.status&&res.status.length)?res.status:'new';
