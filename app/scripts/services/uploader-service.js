@@ -90,6 +90,17 @@ angular.module('doxelApp')
         initUploader: function(options) {
           angular.extend(uploaderService,options);
           var uploader=uploaderService.uploader=new FileUploader(uploaderService.fileUploaderOptions);
+
+          // update totalsize on queue length update
+          if (uploaderService.watchQueueLength) {
+            uploaderService.watchQueueLength();
+          }
+          uploaderService.watchQueueLength=$rootScope.$watch(function(){
+            return uploader.queue.length;
+          }, function(oldValue, newValue) {
+            uploader.updateTotalSize();
+          });
+
           uploader.isPaused=true;
           // FILTERS
 
@@ -141,6 +152,13 @@ angular.module('doxelApp')
           uploader.onAfterAddingAll = function(addedFileItems) {
 //            console.info('onAfterAddingAll', addedFileItems);
           };
+
+          uploader.updateTotalSize=function() {
+            var size=0;
+            uploader.queue.forEach(function(t){size+=(t.file.size)});
+            uploader.queue.size=size;
+          }
+
           uploader.onBeforeUploadItem = function(item) {
 //            console.info('onBeforeUploadItem', item);
             if (uploader.isPaused) {
