@@ -146,7 +146,7 @@ angular.module('doxelApp')
         }, // getPicturesCount
 
 
-        sortField: 'created',
+        sortField: 'pointCloudId',
         sortASC: false,
 
         updateSortField: function(sort){
