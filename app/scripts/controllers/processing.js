@@ -108,7 +108,7 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: {
-        //      status: {ne: 'published'}
+              status: {ne: 'published'}
             },
         //    limit: 10,
             fields: {
@@ -306,7 +306,19 @@ angular.module('doxelApp')
             return 'Back in queue';
 
         }
+      },
+
+      restoreScroll: function(){
+        $timeout(function(){
+          $('#processing').scrollTop(localStorage.processing_scrollTop);
+        });
+      },
+
+      saveScrollTop: function(e){
+        localStorage.processing_scrollTop=$(e.target).scrollTop();
+        console.log(localStorage.processing_scrollTop);
       }
+
     });
 
     $scope.init();
@@ -330,6 +342,7 @@ angular.module('doxelApp')
                       newValue.pagination.start = newValue.pagination.start2;
                       newValue.pagination.start2 = undefined;
                       ctrl.pipe();
+                      scope.restoreScroll();
                     }
                   }
                   if (newValue !== oldValue) {
@@ -345,9 +358,20 @@ angular.module('doxelApp')
                     angular.extend(tableState, savedState);
                     tableState.pagination.start2 = tableState.pagination.start;
                     ctrl.pipe();
+                    scope.restoreScroll();
 
                 }
 
             }
         };
-    });;
+    })
+    .directive("scroll", function ($window) {
+   return {
+      scope: {
+         scrollEvent: '&'
+      },
+      link : function(scope, element, attrs) {
+        $(element).scroll(function(e) { scope.scrollEvent ?  scope.scrollEvent()(e) : null })
+      }
+   }
+})
