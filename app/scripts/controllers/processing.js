@@ -97,6 +97,11 @@ angular.module('doxelApp')
               });
             }, $q.resolve())
             .then(function(){
+              segments=loopbackFilters(segments,{
+                where: {
+                  picturesCount: {gt: 1}
+                }
+              });
               Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
               $scope.loading=false;
             });
@@ -108,7 +113,7 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: {
-              status: {ne: 'published'}
+    //          status: {ne: 'published'}
             },
         //    limit: 10,
             fields: {

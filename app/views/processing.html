@@ -1,76 +1,82 @@
 <div id="processing" ng-cloak scroll scroll-event="saveScrollTop">
 
   <div class="progress-wrap" ng-if="loading">
-		<div class="message">Loading unprocessed segments info...</div>
-		<div class="progress">
-  		<div class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="{{segments.length}}" aria-valuenow="{{loadingProgress}}" ng-style="progressStyle"></div>
-			<div class="progress-status">{{loadingProgress+' / '+segments.length}}</div>
-		</div>
-	</div>
+    <div class="message">Loading unprocessed segments info...</div>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="{{segments.length}}" aria-valuenow="{{loadingProgress}}" ng-style="progressStyle"></div>
+      <div class="progress-status">{{loadingProgress+' / '+segments.length}}</div>
+    </div>
+  </div>
 
-	<table ng-show="$state.current.name=='processing' && !loading" st-table="segmentsVisible" st-persist="processingTable" st-safe-src="segmentsPool" class="table table-striped">
-		<thead>
-			<tr>
-				<th>Preview</th>
-				<th st-sort="created">Uploaded</th>
+  <table ng-show="$state.current.name=='processing' && !loading" st-table="segmentsVisible" st-persist="processingTable" st-safe-src="segmentsPool" class="table table-striped">
+    <thead>
+      <tr>
+        <th>Preview</th>
+        <th st-sort="created">Uploaded</th>
         <th st-sort="timestamp">Shooted</th>
-				<th st-sort="_username">User</th>
-				<th st-sort="picturesCount">Pictures</th>
-				<th st-sort="status">Status</th>
-			</tr>
-			<tr>
-				<th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="row in segmentsVisible">
-				<td><segment-preview segment="row" segment-preview-class="thumb"></segment-preview></td>
-				<td>{{row.created | date:'yyyy/MM/dd, HH:mm':'utc'}}</td>
+        <th st-sort="_username">User</th>
+        <th st-sort="picturesCount">Pictures</th>
+        <th st-sort="status">Status</th>
+      </tr>
+      <tr>
+        <th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in segmentsVisible">
+        <td><segment-preview segment="row" segment-preview-class="thumb"></segment-preview></td>
+        <td>{{row.created | date:'yyyy/MM/dd, HH:mm':'utc'}}</td>
         <td>{{row.timestamp_str}}</td>
-				<td><userinfo user="row.user" /></td>
-				<td>{{row.picturesCount}}</td>
-				<td class="first-uppercase">{{row.status}}</td>
+        <td><userinfo user="row.user" /></td>
+        <td>{{row.picturesCount}}</td>
+        <td class="first-uppercase">{{row.status}}</td>
         <td>
-          <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row)" class="btn btn-sm btn-default" title="View processing history">
-            <i class="fa fa-fw fa-history">
+          <a ng-href="{{(row.jobs.length ? '/app/#!/processing/'+row.id+'/joblogs' : '')}}" ng-click="return false">
+            <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row)" class="btn btn-sm btn-default" title="View processing history">
+              <i class="fa fa-fw fa-history">
+              </i>
+            </button>
+          </a>
+        </td>
+        <td>
+          <a ng-href="{{::'/app/#!/processing/'+row.id+'/pictures'}}" ng-click="return false">
+            <button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-default" title="View segment pictures">
+              <i class="fa fa-fw fa-picture-o">
+              </i>
+            </button>
+          </a>
+        </td>
+        <td>
+          <a ng-href="{{::(row.pointCoudId ? '/api/segments/viewer/'+row.id+'/'+row.timestamp+'/viewer.html' : '')}}" ng-click="return false">
+            <button ng-disabled="!row.pointCloudId" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
+              <i class="fa fa-fw fa-eye">
+              </i>
+            </button>
+          </a>
+        </td>
+        <td>
+          <button ng-disabled="isCheckButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{checkButtonTitle(row)}}">
+            <i class="fa fa-fw fa-check">
             </i>
           </button>
         </td>
         <td>
-					<button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-default" title="View segment pictures">
-						<i class="fa fa-fw fa-picture-o">
-						</i>
-					</button>
-				</td>
-        <td>
-					<button ng-disabled="!row.pointCloudId" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
-						<i class="fa fa-fw fa-eye">
-						</i>
-					</button>
-				</td>
-        <td>
-					<button ng-disabled="isCheckButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{checkButtonTitle(row)}}">
-						<i class="fa fa-fw fa-check">
-						</i>
-					</button>
-				</td>
-				<td>
-					<button ng-disabled="isCancelButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
-						<i class="fa fa-fw fa-times">
-						</i>
-					</button>
-				</td>
-			</tr>
-		</tbody>
-		<tfoot>
-			<tr>
-				<td colspan="5" class="text-center">
-					<div st-pagination="" st-items-by-page="10" st-displayed-pages="7"></div>
-				</td>
-			</tr>
-		</tfoot>
+          <button ng-disabled="isCancelButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
+            <i class="fa fa-fw fa-times">
+            </i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5" class="text-center">
+          <div st-pagination="" st-items-by-page="10" st-displayed-pages="7"></div>
+        </td>
+      </tr>
+    </tfoot>
 
-	</table>
+  </table>
 
   <div ui-view></div>
 
