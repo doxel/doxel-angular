@@ -99,7 +99,7 @@ angular.module('doxelApp')
       $state.transitionTo(appConfig.stateAfterSignout);
     });
 
-    $scope.on('unauthorized',function(){
+    $scope.$on('unauthorized',function(){
       $state.transitionTo('gallery.view.home');
     });
 

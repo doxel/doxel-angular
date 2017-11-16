@@ -200,7 +200,7 @@ angular.module('doxelApp')
         LoopBackAuth.rememberMe=true;
         LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, res.result);
         LoopBackAuth.save();
-        $state.transitionTo($scope.stateAfterSignin||appConfig.stateAfterSignin);
+        appConfig.transitionToStateAfterSignin();
       },
       function(err){
         $timeout(function(){
@@ -274,8 +274,8 @@ angular.module('doxelApp')
       email: $scope.email,
       username: $scope.username,
       password: $scope.password
-    },
-    function(res) {
+    }).$promise
+    .then(function(res) {
       if (res.result.error) {
         $timeout(function(){
           $scope.errorMessage(res.result.error);
@@ -284,12 +284,12 @@ angular.module('doxelApp')
       }
       console.log(res.result.session);
       LoopBackAuth.rememberMe=true;
-      LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, res.result);
+      LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, res.result.user);
       LoopBackAuth.save();
       socketService.connect();
-      $state.transitionTo($scope.stateAfterSignin||appConfig.stateAfterSignin);
-    },
-    function(err){
+      appConfig.transitionToStateAfterSignin();
+    })
+    .catch(function(err){
       console.log(err);
       alert('Login failed !');
     });

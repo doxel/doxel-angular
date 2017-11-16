@@ -436,7 +436,7 @@ var app=angular
     // Whenever the route changes we see if either the user is logged in or is
     // trying to access a public route. Otherwise she will be redirected to
     // login.
-    $rootScope.$on('$stateChangeStart', function (event, next) {
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
       if ($rootScope.previousState!=$state.current.name) {
         $rootScope.previousState=$state.current.name;
       }
@@ -462,7 +462,7 @@ var app=angular
 
           LoopBackAuth.setUser(cookies['pp-access_token'], cookies['pp-userId'], null /* TODO: populate user data (roles) */);
           LoopBackAuth.save();
-          $state.transitionTo($location.stateAfterSignin||appConfig.stateAfterSignin);
+          appConfig.transitionToStateAfterSignin();
           return;
 
         }
@@ -470,13 +470,13 @@ var app=angular
 
       if (User.isAuthenticated()) {
 
-        if (next.name=='login') {
+        if (toState.name=='login') {
           // unless we need a role for stateAfterSigning....
           if (
-            $location.stateAfterSignin
-            && $location.stateAfterSignin.params
-            && $location.stateAfterSignin.params.needsRole
-            && !$rootScope.hasRole($location.stateAfterSignin.needsRole)
+            appConfig.stateAfterSignin
+            && appConfig.stateAfterSignin.state.params
+            && appConfig.stateAfterSignin.state.params.needsRole
+            && !$rootScope.hasRole(appConfig.stateAfterSignin.state.needsRole)
           ) {
             return;
           }
@@ -484,7 +484,7 @@ var app=angular
           // ... dont display login page if already authenticated
           event.preventDefault();
           if (!$state.current.name.length || $state.current.name=='login') {
-            $state.transitionTo($location.stateAfterSignin||appConfig.stateAfterSignin);
+            appConfig.transitionToStateAfterSignin();
           }
           return;
         }
@@ -492,23 +492,27 @@ var app=angular
       } else {
 
         // transition to login page if auth needed
-        if (next.params && next.params.needsAuth) {
-          $location.stateAfterSignin=next;
+        if (toState.params && toState.params.needsAuth) {
+          appConfig.stateAfterSignin={state: toState, params: toParams};
           event.preventDefault();
           $state.transitionTo('login');
           return;
         }
 
         // already logged out
-        if (next.name=='logout') {
+        if (toState.name=='logout') {
           event.preventDefault();
           return;
         }
       }
 
+      if (['login','logout'].indexOf(toState.name)<0) {
+        appConfig.stateAfterSignin={state: toState, params: toParams};
+      }
+
     });
 
-    $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams) {
 
       // When accessTokenId is defined but currentUserData is not,
       // it means page reload, we need to refresh currentUserData
@@ -522,7 +526,7 @@ var app=angular
         User.getCurrent(function(user){
           if ($state.params && $state.params.needsRole) {
             if (!$rootScope.hasRole($state.params.needsRole)) {
-              $location.stateAfterSignin=toState;
+              appConfig.stateAfterSignin={state: toState, params: toParams};
               $state.transitionTo('login');
             }
           }
