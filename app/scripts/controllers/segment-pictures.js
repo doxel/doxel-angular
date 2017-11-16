@@ -70,6 +70,7 @@ angular.module('doxelApp')
     $timeout,
     $location,
     $stateParams
+   
   ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
@@ -122,6 +123,12 @@ angular.module('doxelApp')
         var q;
         var segmentId=$stateParams.segmentId;
         if (!$scope.segment){
+          if (!$scope.segmentsPromise) {
+            $scope.segmentsPromise=Segment.findById({id: segmentId}).$promise
+            .then(function(segment){
+              return [segment];
+            });
+          }
           q=$scope.segmentsPromise.then(function(segments){
             var segment;
             segments.some(function(s){

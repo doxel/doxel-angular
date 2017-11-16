@@ -76,6 +76,9 @@ angular.module('doxelApp')
       },
 
       init: function() {
+        if ($state.current.name!="processing") {
+          return;
+        }
         $scope.initEventHandlers();
 
         // load unprocessed segments list
@@ -194,7 +197,7 @@ angular.module('doxelApp')
       },
 
       viewHistory: function(segment){
-        $state.transitionTo('processing.joblogs',{
+        $state.transitionTo('segment-joblogs',{
           segmentId: segment.id
         });
       },
@@ -202,7 +205,7 @@ angular.module('doxelApp')
       // display segment pictures
       viewSegment: function(segment){
         $scope.segment=segment;
-        $state.transitionTo('processing.pictures',{segmentId: segment.id});
+        $state.transitionTo('segment-pictures',{segmentId: segment.id});
 
       },
 

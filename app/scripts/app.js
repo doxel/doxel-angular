@@ -306,24 +306,24 @@ var app=angular
 
         }
       })
-      .state('processing.pictures', {
-        url: '/pictures',
+      .state('segment-pictures', {
+        url: '/segment/:segmentId/pictures',
         controller: 'SegmentPicturesCtrl',
         templateUrl: 'views/segment-pictures.html',
         params: {
           needsAuth: true,
-          needsRole: 'admin'
+          needsRole: 'foreman'
         }
       })
-      .state('processing.joblogs', {
-        url: '/joblogs',
+      .state('segment-joblogs', {
+        url: '/segment/:segmentId/joblogs',
         templateUrl: 'views/joblogs.html',
         controller: 'JoblogsCtrl',
         controllerAs: 'joblogs',
         params: {
           segmentId: null,
           needsAuth: true,
-          needsRole: 'admin'
+          needsRole: 'foreman'
 
         }
       })
