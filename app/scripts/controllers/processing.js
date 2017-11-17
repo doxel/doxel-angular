@@ -91,24 +91,31 @@ angular.module('doxelApp')
             });
             $scope.segments=segments;
             // load and format segments data (must all be done at once for sortiing)
-            segments.reduce(function(promise, segment){
-              return $scope.getSegmentData(segment).then(function(){
+            function loop(){
+              var segment=segments[$scope.loadingProgress];
+              $scope.getSegmentData(segment).then(function(){
                 ++$scope.loadingProgress;
                 $scope.progressStyle={
                   width: ($scope.loadingProgress / segments.length * 100) + '%'
                 };
-              });
-            }, $q.resolve())
-            .then(function(){
-              segments=loopbackFilters(segments,{
-                where: {
-                  picturesCount: {gt: 1}
+                if ($scope.loadingProgress < segments.length) {
+                  $timeout(loop);
+
+                } else {
+                  segments=loopbackFilters(segments,{
+                    where: {
+                      picturesCount: {gt: 1}
+                    }
+                  });
+                  Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
+                  $scope.loading=false;
                 }
+              })
+              .catch(function(e){
+                console.log(e);
               });
-              Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
-              $scope.loading=false;
-            });
-            return segments;
+            }
+            loop();
           });
       },
 
