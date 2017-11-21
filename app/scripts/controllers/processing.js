@@ -216,7 +216,6 @@ angular.module('doxelApp')
         });
       },
 
-
       proceed: function(segment, operation){
         return Segment.proceed({
           id: segment.id,
@@ -325,6 +324,11 @@ angular.module('doxelApp')
       saveScrollTop: function(e){
         localStorage.processing_scrollTop=$(e.target).scrollTop();
         console.log(localStorage.processing_scrollTop);
+      },
+
+      preventDefault: function(e){
+        e.preventDefault();
+        return false;
       }
 
     });

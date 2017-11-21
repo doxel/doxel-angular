@@ -31,7 +31,7 @@
         <td>{{row.picturesCount}}</td>
         <td class="first-uppercase">{{row.status}}</td>
         <td>
-          <a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/joblogs' : '')}}" ng-click="return false">
+          <a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/joblogs' : '')}}" ng-click="preventDefault($event)">
             <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row)" class="btn btn-sm btn-default" title="View processing history">
               <i class="fa fa-fw fa-history">
               </i>
@@ -39,7 +39,7 @@
           </a>
         </td>
         <td>
-          <a ng-href="{{::'/app/#!/segment/'+row.id+'/pictures'}}" ng-click="return false">
+          <a ng-href="{{::'/app/#!/segment/'+row.id+'/pictures'}}" ng-click="preventDefault($event)">
             <button type="button" ng-click="viewSegment(row)" class="btn btn-sm btn-default" title="View segment pictures">
               <i class="fa fa-fw fa-picture-o">
               </i>
@@ -47,7 +47,7 @@
           </a>
         </td>
         <td>
-          <a ng-href="{{::(row.pointCloudId ? '/api/segments/viewer/'+row.id+'/'+row.timestamp+'/viewer.html' : '')}}" ng-click="return false">
+          <a ng-href="{{::(row.pointCloudId ? '/api/segments/viewer/'+row.id+'/'+row.timestamp+'/viewer.html' : '')}}" ng-click="preventDefault($event)">
             <button ng-disabled="!row.pointCloudId" type="button" ng-click="viewCloud(row)" class="btn btn-sm btn-default" title="Preview pointcloud">
               <i class="fa fa-fw fa-eye">
               </i>
