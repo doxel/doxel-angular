@@ -70,7 +70,7 @@ angular.module('doxelApp')
     $timeout,
     $location,
     $stateParams
-   
+
   ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
@@ -162,7 +162,8 @@ angular.module('doxelApp')
             id: segment.id,
             fields: {
               id: true
-            }
+            },
+            order: "timestamp ASC"
 
           }, function(pictures){
 
