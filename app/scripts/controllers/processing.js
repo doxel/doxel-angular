@@ -19,6 +19,7 @@ angular.module('doxelApp')
   'User',
   '$timeout',
   '$location',
+  '$stateParams',
   function (
     $scope,
     $state,
@@ -29,7 +30,8 @@ angular.module('doxelApp')
     global,
     User,
     $timeout,
-    $location
+    $location,
+    $stateParams
   ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
@@ -113,11 +115,15 @@ angular.module('doxelApp')
       },
 
       loadSegments: function(){
+        var where=$stateParams.filter;
+        try {
+          where=JSON.parse($stateParams.filter);
+        } catch(e){
+          console.log(e);
+        }
         return Segment.find({
           filter: {
-            where: {
-    //          status: {ne: 'published'}
-            },
+            where: where,
         //    limit: 10,
             fields: {
               id: true,
@@ -196,20 +202,23 @@ angular.module('doxelApp')
         }).$promise;
       },
 
-      viewHistory: function(segment){
+      viewHistory: function(segment,$event){
+        if ($event) $event.stopPropagation();
         $state.transitionTo('segment-joblogs',{
           segmentId: segment.id
         });
       },
 
       // display segment pictures
-      viewSegment: function(segment){
+      viewSegment: function(segment,$event){
+        if ($event) $event.stopPropagation();
         $scope.segment=segment;
         $state.transitionTo('segment-pictures',{segmentId: segment.id});
-
       },
 
-      viewCloud: function(segment) {
+      viewCloud: function(segment,$event) {
+        if ($event) $event.stopPropagation();
+        if (segment.status=='published')
         $state.transitionTo('gallery.view.cloud',{
           pose: 0,
           segmentId: segment.id
