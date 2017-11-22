@@ -220,7 +220,7 @@ angular.module('doxelApp')
         var q=$q.defer();
         $scope.segment.pictures_promise.then(function(){
           $scope.picturesVisible=$scope.picturesVisible.concat($scope.picturesPool.slice($scope.picturesVisible.length, $scope.picturesVisible.length+$scope.itemsPerPage/2));
-          $timeout(q.resolve());
+          q.resolve();
         });
         return q.promise;
       },

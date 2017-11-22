@@ -47,8 +47,8 @@
           </a>
         </td>
         <td>
-          <a ng-href="{{::(row.pointCloudId ? '/api/segments/viewer/'+row.id+'/'+row.timestamp+'/viewer.html' : '')}}" ng-click="preventDefault($event)">
-            <button ng-disabled="!row.pointCloudId" type="button" ng-click="viewCloud(row,$event)" class="btn btn-sm btn-default" title="Preview pointcloud">
+          <a ng-href="{{::(row.pointCloudId ? '/api/segments/viewer/'+row.id+'/'+row.timestamp+'/viewer.html' : '')}}" target="_blank">
+            <button ng-disabled="!row.pointCloudId" type="button" ng-click="/*viewCloud(row,$event)*/" class="btn btn-sm btn-default" title="Preview pointcloud">
               <i class="fa fa-fw fa-eye">
               </i>
             </button>
