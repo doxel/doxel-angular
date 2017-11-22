@@ -46,22 +46,22 @@
     </div>
 
     <section class="social" style="text-align:center">
-      <button class="btn btn-social-icon btn-facebook btn-lg" ng-click="facebook($event)">
+      <button class="btn btn-social-icon btn-facebook btn-lg" ng-click="facebook($event)" title="Login with Facebook">
         <span class="disable-selection fa fa-facebook"></span>
       </button>
 
-      <button class="btn btn-social-icon btn-twitter btn-lg" ng-click="twitter($event)">
+      <button class="btn btn-social-icon btn-twitter btn-lg" ng-click="twitter($event)" title="Login with Tweeter">
         <span class="disable-selection fa fa-twitter"></span>
       </button>
 
-      <button style="opacity: 0.3;" disabled class="btn btn-social-icon btn-google btn-lg" ng-click="google($event)">
+      <button style="opacity: 0.3;" disabled class="btn btn-social-icon btn-google btn-lg" ng-click="google($event)" title="Login with Google">
         <span class="disable-selection fa fa-google"></span>
       </button>
     </section>
 
 
   <div class="reset-password">
-    <a ng-click="resetPassword()">Forgot your password ?</a>
+    <a ng-click="resetPassword()" title="Enter email and click to reset password">Forgot your password ?</a>
   </div>
 </form>
 
