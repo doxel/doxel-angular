@@ -292,13 +292,17 @@ var app=angular
         controllerAs: 'segments',
       })
       .state('processing', {
-        url: '/processing/:segmentId?',
+        url: '/processing/:filter?/:segmentId?',
         templateUrl: 'views/processing.html',
         controller: 'ProcessingCtrl',
         controllerAs: 'processing',
         params: {
           segmentId: {
             value: null,
+            squash: true
+          },
+          filter: {
+            value: '{"status": {"ne": "published"}}',
             squash: true
           },
           needsAuth: true,
