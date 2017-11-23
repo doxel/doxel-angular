@@ -154,11 +154,11 @@ angular.module('doxelApp')
             sort=sort.split(' ');
             if (sort[0].length){
               $scope.sortField=sort[0];
-            }
-            if (sort[1]) {
-              $scope.sortASC=(sort[1]=='ASC');
-            } else {
-              $scope.sortASC=true;
+              if (sort[1]) {
+                $scope.sortASC=(sort[1]=='ASC');
+              } else {
+                $scope.sortASC=true;
+              }
             }
           }
 
@@ -516,8 +516,14 @@ angular.module('doxelApp')
               }
             }, function(segment){
               if (segment) {
-                $scope.loaded.push(segment);
-                q.resolve(segment);
+                if (segment.pointCloudId) {
+                  $scope.loaded.push(segment);
+                  q.resolve(segment);
+
+                } else {
+                  Segment.findOne().$promise.then(q.resolve).catch(q.reject);
+                  return;
+                }
 
               } else {
                 _catch(new Error('Segment not found !'));
