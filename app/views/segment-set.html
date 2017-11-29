@@ -5,12 +5,12 @@
   </a>
 </span-->
 <span ng-repeat="(index, segment) in segments track by $index">
-  <a class="loading" data-sid="{{::segment.id}}" data-index="{{index}}" ng-click="click($event)">
-    <segment-preview segment="::segment" segment-preview-class="thumb"></segment-preview>
-    <div class="date">{{::segment.timestamp | formatTimestamp}}</div>
-    <div ng-if="::segment.pointCloud" class="points"><i class="fa fa-cloud fa-fw"></i>{{::segment.pointCloud.pointCount | humanize}}</div>
-    <div ng-if="::segment.pointCloud && segment.pointCloud.poseCount!=segment.pointCloud.viewCount" class="poses"><i class="fa fa-camera fa-fw"></i>{{::segment.pointCloud.poseCount}}/{{::segment.pointCloud.viewCount}}</div>
-    <div ng-if="::segment.pointCloud && segment.pointCloud.poseCount==segment.pointCloud.viewCount" class="poses"><i class="fa fa-camera fa-fw"></i>{{::segment.pointCloud.poseCount}}</div>
-    <div ng-if="::!segment.pointCloud" class="poses"><i class="fa fa-camera fa-fw"></i>{{::segment.picturesCount}}</div>
+  <a class="loading" data-sid="{{segment.id}}" data-index="{{index}}" ng-click="click($event)">
+    <segment-preview segment="segment" segment-preview-class="thumb"></segment-preview>
+    <div class="date">{{segment.timestamp | formatTimestamp}}</div>
+    <div ng-if="segment.pointCloud" class="points"><i class="fa fa-cloud fa-fw"></i>{{segment.pointCloud.pointCount | humanize}}</div>
+    <div ng-if="segment.pointCloud && segment.pointCloud.poseCount!=segment.pointCloud.viewCount" class="poses"><i class="fa fa-camera fa-fw"></i>{{segment.pointCloud.poseCount}}/{{segment.pointCloud.viewCount}}</div>
+    <div ng-if="segment.pointCloud && segment.pointCloud.poseCount==segment.pointCloud.viewCount" class="poses"><i class="fa fa-camera fa-fw"></i>{{segment.pointCloud.poseCount}}</div>
+    <div ng-if="!segment.pointCloud" class="poses"><i class="fa fa-camera fa-fw"></i>{{segment.picturesCount}}</div>
   </a>
 </span>
