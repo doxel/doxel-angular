@@ -521,8 +521,8 @@ angular.module('doxelApp')
                   q.resolve(segment);
 
                 } else {
-                  Segment.findOne().$promise.then(q.resolve).catch(q.reject);
-                  return;
+                  ngNotify.set('Segment '+segmentId+' has no point cloud !');
+                  _catch(new Error('Segment has no point cloud !'));
                 }
 
               } else {
