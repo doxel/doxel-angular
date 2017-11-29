@@ -386,7 +386,7 @@ angular.module('doxelApp')
 
           $scope.getGalleryFilter(direction,from)
           .then(function(filter){
-            console.log(filter);
+            console.log('FILTER',JSON.stringify(filter,false,4));
             _filter=filter;
 
             filter.limit=count||$scope.getLimit();
@@ -416,7 +416,7 @@ angular.module('doxelApp')
 //                 }
               }
               if (segments && segments.length) {
-                segments.forEach(function(segment, si){
+                angular.forEach(segments,function(segment, si){
                   var _segment=$scope.loaded.has(segment.id);
                   if (!_segment) {
                     $scope.loaded.push(segment);

@@ -251,7 +251,13 @@ var app=angular
 */
       .state('gallery.view.map', {
         url: '/map/:segmentId?',
-        controller: 'GalleryMapCtrl'
+        controller: 'GalleryMapCtrl',
+        params: {
+          segmentId: {
+            value: null,
+            squash: true
+          }
+        }
       })
 
       .state('gallery.view.earth', {
