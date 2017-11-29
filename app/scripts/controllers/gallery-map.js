@@ -54,6 +54,7 @@ angular.module('doxelApp')
   'leafletBoundsHelpers',
   'Segment',
   '$state',
+  '$stateParams',
   'appConfig',
   'errorMessage',
   '$http',
@@ -69,6 +70,7 @@ angular.module('doxelApp')
     leafletBoundsHelpers,
     Segment,
     $state,
+    $stateParams,
     appConfig,
     errorMessage,
     $http,
@@ -236,8 +238,8 @@ angular.module('doxelApp')
             $scope.getMap(function(map){
               map.options.inertia=false;
               // select and show current segment
-              if ($scope.params.s) {
-                $scope.getSegment($scope.params.s).then(function(segment){
+              if ($stateParams.segmentId) {
+                $scope.getSegment($stateParams.segmentId).then(function(segment){
                   $scope.setView(segment);
                 });
               }
@@ -258,7 +260,7 @@ angular.module('doxelApp')
               $scope.gallery.map_wasvisible=false;
 
               // get selected segmentId or TODO: top-screen segment id
-              segmentId=$rootScope.params.s;
+              segmentId=$stateParams.segmentId;
               if (segmentId===undefined && $scope.segments.length) {
                 segmentId=$scope.segments[$scope.segments.length>>1];
               }
@@ -455,7 +457,7 @@ angular.module('doxelApp')
               where: $scope.filter.where,
               order: $scope.filter.order
             });
-            $scope.loaded.forEach(function(segment){
+            angular.forEach($scope.loaded,function(segment){
               if (segments.indexOf(segment)<0){
                 var alreadyDisplayed;
                 var index;
@@ -480,12 +482,11 @@ angular.module('doxelApp')
           }
 
           // for each segment loaded
-          segments.reduce(function(promise,segment){
-
-            return promise.then(function(){
+          function iter(segment) {
               var index;
               var alreadyDisplayed;
               alreadyDisplayed=false;
+
 
               // is the segment already displayed ?
               $scope.segments.some(function(_segment,i){
@@ -530,13 +531,16 @@ angular.module('doxelApp')
                   }
                 }
               }
-            });
+          }
 
-          },$q.resolve())
-          .finally(function(){
-            $scope.getPicturesCount(segments)
-            .finally(q.resolve);
-          });
+          var segment;
+          var si=0;
+          for(var si=0; si<segments.length; ++si) {
+              segment=segments[si];
+              iter(segment);
+          }
+          $scope.getPicturesCount(segments)
+          .finally(q.resolve);
 
         });
 
