@@ -155,16 +155,14 @@ angular.module('doxelApp')
 
       // display segment pictures
       viewSegment: function(segment){
-        if (!segment.pictures) {
+        if (!segment.pictures_promise) {
 
           // load picture ids
           segment.pictures_promise=Segment.pictures({
             id: segment.id,
-            fields: {
-              id: true,
-              timestamp: true
-            },
-            order: "timestamp ASC"
+            filter: {
+              order: "timestamp ASC"
+            }
 
           }, function(pictures){
 
