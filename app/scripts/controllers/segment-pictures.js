@@ -161,7 +161,8 @@ angular.module('doxelApp')
           segment.pictures_promise=Segment.pictures({
             id: segment.id,
             fields: {
-              id: true
+              id: true,
+              timestamp: true
             },
             order: "timestamp ASC"
 
