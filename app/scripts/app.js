@@ -316,6 +316,16 @@ var app=angular
 
         }
       })
+      .state('segment-files', {
+        url: '/segment/:segmentId/files',
+        controller: 'SegmentFilesCtrl',
+        templateUrl: 'views/segment-files.html',
+        params: {
+          segmentId: null,
+          needsAuth: true,
+          needsRole: 'foreman'
+        }
+      })
       .state('segment-pictures', {
         url: '/segment/:segmentId/pictures',
         controller: 'SegmentPicturesCtrl',

@@ -1,0 +1,45 @@
+.segment-files {
+  margin-top: 64px;
+  * {margin: 0; padding: 0; list-style: none;}
+  ul li {
+    margin-left: 25px;
+    position: relative;
+    padding-left: 5px;
+
+    input {
+      vertical-align: sub;
+      margin-right: 4px;
+    }
+
+  }
+  ul li::before {
+    content: " ";
+    position: absolute;
+    width: 1px;
+    background-color: #fff;
+    top: 5px;
+    bottom: -12px;
+    left: -10px;
+  }
+  > ul > li:first-child::before {top: 12px;}
+  ul li:not(:first-child):last-child::before {display: none;}
+  ul li:first-child:last-child::before {
+    content: " ";
+    position: absolute;
+    width: 1px;
+    background-color: #fff;
+    top: 5px;
+    bottom: 7px;
+    left: -10px;
+  }
+  ul li::after {
+    content: " ";
+    position: absolute;
+    left: -10px;
+    width: 10px;
+    height: 1px;
+    background-color: #fff;
+    top: 12px;
+  }
+
+}
