@@ -76,7 +76,7 @@ angular.module('doxelApp')
         '<li ng-repeat="(key, value) in obj" ' +
         "ng-if=\"key!='.'\">"+
     //    '<input type="checkbox">'+
-        "<a ng-href=\"/segment/{{segmentId+'/download/'+(obj['.'].length?obj['.']+'/':'')+key}}\">"+
+        "<a ng-href=\"/api/segments/{{segmentId}}/download/{{(obj['.'].length?obj['.']+'/':'')+key | encodeURIComponent}}\">"+
         '<span><i ng-class="{fa: true, \'fa-fw\': true, \'fa-folder-open\': value[\'.\'], \'fa-file\': !value[\'.\']}"></i>{{key}}</span> ' +
         '</a>'+
         '<ul ng-if="value[\'.\']" file-tree file-tree-obj="value"></ul>' +
@@ -89,3 +89,6 @@ angular.module('doxelApp')
       }
     }
   }])
+.filter('encodeURIComponent', [ '$window', function($window) {
+    return $window.encodeURIComponent;
+}]);
