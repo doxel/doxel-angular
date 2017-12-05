@@ -383,7 +383,6 @@ angular.module('doxelApp')
             console.log(err);
           });
 
-
         });
 
         $scope.$on('options.gallery.my-segments',function(event){
@@ -413,6 +412,15 @@ angular.module('doxelApp')
 
         $('.navbar .menu-handle').on('click',function(){
           $scope.invalidateSize();
+        });
+
+        $scope.updateShownSegments().then(function(){
+          $scope.skip=0;
+          $scope.end('forward',false);
+          $scope.end('backward',false);
+          $scope.loadSegments();
+        }).catch(function(err){
+          console.log(err);
         });
 
       }, // init
