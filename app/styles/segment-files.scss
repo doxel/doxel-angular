@@ -2,7 +2,7 @@
   margin-top: 64px;
   * {margin: 0; padding: 0; list-style: none;}
   ul li {
-    margin-left: 25px;
+    margin-left: 15px;
     position: relative;
     padding-left: 5px;
 
@@ -23,13 +23,15 @@
   }
   > ul > li:first-child::before {top: 12px;}
   ul li:not(:first-child):last-child::before {display: none;}
-  ul li:first-child:last-child::before {
+  ul li:only-child::before {
+    display: list-item;
     content: " ";
     position: absolute;
     width: 1px;
     background-color: #fff;
     top: 5px;
     bottom: 7px;
+    height: 7px;
     left: -10px;
   }
   ul li::after {
