@@ -335,9 +335,17 @@ angular.module('doxelApp')
         });
 
         // update
-        $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+        $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
           console.log(toState);
           $scope.updateVisibility(toState);
+
+          if (fromState.name=='gallery.view.map') {
+            $scope.segments.splice(0,$scope.segments.length);
+            $scope.skip=0;
+            $scope.end('forward',false);
+            $scope.end('backward',false);
+          }
+
         });
         $scope.updateVisibility($state.current);
 
@@ -406,11 +414,11 @@ angular.module('doxelApp')
           $scope.invalidateSize();
         });
 
-        $('.thumbs-handle').on('click',function(){
+        $('.thumbs-handle').on('click.gallery_map',function(){
           $scope.invalidateSize();
         });
 
-        $('.navbar .menu-handle').on('click',function(){
+        $('.navbar .menu-handle').on('click.gallery_map',function(){
           $scope.invalidateSize();
         });
 
@@ -421,6 +429,12 @@ angular.module('doxelApp')
           $scope.loadSegments();
         }).catch(function(err){
           console.log(err);
+        });
+
+        // unregister jQuery events on $scope $destroy
+        $scope.$on('$destroy',function($event){
+          window.jQuery('.thumbs-handle').off('.gallery_map');
+          window.jQuery('.navbar .menu-handle').off('.gallery_map');
         });
 
       }, // init
@@ -552,7 +566,15 @@ angular.module('doxelApp')
 
         });
 
-        return q.promise;
+        return q.promise.then(function(args){
+          // hide thumbs bar when epty
+          if (!$scope.segments.length) {
+            $('body').addClass('thumbs-hidden');
+          } else {
+            $('body').removeClass('thumbs-hidden');
+          }
+          return $q.resolve(args);
+        });
 
       }, // updateShownSegments
 
