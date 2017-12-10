@@ -27,6 +27,12 @@ angular.module('doxelApp')
               var data = JSON.parse(msg.data,false,4);
               console.log(data); // the change object
             });
+            src.addEventListener('error', function(err){
+              console.log('EventSource Failed',err);
+            });
+            src.addEventListener('open', function(){
+              console.log('EventSource open');
+            });
           }
         }
 
