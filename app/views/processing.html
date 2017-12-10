@@ -3,8 +3,8 @@
   <div class="progress-wrap" ng-if="loading">
     <div class="message">Loading unprocessed segments info...</div>
     <div class="progress">
-      <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="{{segments.length}}" aria-valuenow="{{loadingProgress}}" ng-style="progressStyle"></div>
-      <div class="progress-status">{{loadingProgress+' / '+segments.length}}</div>
+      <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="{{_segments.length}}" aria-valuenow="{{loadingProgress}}" ng-style="progressStyle"></div>
+      <div class="progress-status">{{loadingProgress+' / '+_segments.length}}</div>
     </div>
   </div>
 
@@ -71,7 +71,7 @@
     <tfoot>
       <tr>
         <td colspan="5" class="text-center">
-          <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+          <div st-template="/views/pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
         </td>
       </tr>
     </tfoot>
