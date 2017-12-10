@@ -8,10 +8,17 @@
  * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .service('segmentsService', function () {
+  .service('segmentsService', [
+    '$rootScope',
+    function ($rootScope) {
     // AngularJS will instantiate a singleton by calling "new" on this function
     var segmentsService=this;
     angular.extend(segmentsService,{
+      processing: {
+        segments: [],
+        segmentsPool: [],
+        segmentsVisible: []
+      },
       segments: [],
       loaded: [],
       tagLoaded: []
@@ -48,4 +55,21 @@ angular.module('doxelApp')
       }
     });
 
-  });
+    $rootScope.$on('serverEvent.Segments',function(e,args){
+      var segment=JSON.parse(args.data).data;
+      segmentsService.segments.some(function(seg){
+        if (seg.id==segment.id) {
+          seg.status=segment.status;
+          seg.status_timestamp=segment.status_timestamp;
+        }
+      });
+      segmentsService.processing.segments.some(function(seg){
+        if (seg.id==segment.id) {
+          seg.status=segment.status;
+          seg.status_timestamp=segment.status_timestamp;
+        }
+      });
+    });
+
+
+  }]);
