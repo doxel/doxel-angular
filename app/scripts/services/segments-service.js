@@ -8,10 +8,17 @@
  * Service in the doxelApp.
  */
 angular.module('doxelApp')
-  .service('segmentsService', function () {
+  .service('segmentsService', [
+    '$rootScope',
+    function ($rootScope) {
     // AngularJS will instantiate a singleton by calling "new" on this function
     var segmentsService=this;
     angular.extend(segmentsService,{
+      processing: {
+        segments: [],
+        segmentsPool: [],
+        segmentsVisible: []
+      },
       segments: [],
       loaded: [],
       tagLoaded: []
@@ -48,4 +55,39 @@ angular.module('doxelApp')
       }
     });
 
-  });
+    $rootScope.$on('serverEvent.Segments',function(e,args){
+      var msg=JSON.parse(args.data);
+      var segment=msg.data;
+
+      function updateSegments(segments) {
+        switch(msg.type) {
+          case 'update':
+            segments.some(function(_segment){
+              if (_segment.id==msg.target) {
+                // update attributes
+                for (var property in segment) {
+                  if (segment.hasOwnProperty(property)) {
+                    _segment[property]=segment[property];
+                  }
+                }
+                // remove non-existing properties
+                for (var property in _segment){
+                  if (segment[property]===undefined) {
+                    _segment.unsetAttribute(property);
+                  }
+                }
+              }
+            });
+            break;
+
+          default:
+            console.log('unhandled server event: Segments.'+msg.type);
+        }
+      }
+
+      updateSegments(segmentsService.loaded);
+      updateSegments(segmentsService.processing.segments);
+
+    });
+    
+  }]);

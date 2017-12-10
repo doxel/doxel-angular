@@ -20,6 +20,8 @@ angular.module('doxelApp')
   '$timeout',
   '$location',
   '$stateParams',
+  'serverEvents',
+  'segmentsService',
   function (
     $scope,
     $state,
@@ -31,7 +33,9 @@ angular.module('doxelApp')
     User,
     $timeout,
     $location,
-    $stateParams
+    $stateParams,
+    serverEvents,
+    segmentsService
   ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
@@ -41,8 +45,9 @@ angular.module('doxelApp')
 
     angular.extend($scope,{
       $state: $state,
-      segmentsPool: [],
-      segmentsVisible: [],
+      segments: segmentsService.processing.segments,
+      segmentsPool: segmentsService.processing.segmentsPool,
+      segmentsVisible:segmentsService.processing.segmentsVisible,
       picturesVisible: [],
       itemsPerPage: 18,
 /*
@@ -74,44 +79,46 @@ angular.module('doxelApp')
         $scope.$on('$locationChangeSuccess',function($event,newUrl,oldUrl,newState,oldState){
           console.log(arguments);
         });
-
       },
 
       init: function() {
         if ($state.current.name!="processing") {
           return;
         }
+
         $scope.initEventHandlers();
 
         // load unprocessed segments list
-        $scope.loading=true;
-        $scope.loadingProgress=0;
-        $scope.segmentsPromise=$scope.loadSegments()
-          .then(function(segments){
-            segments=loopbackFilters(segments,{
-              order: 'created DESC'
-            });
-            $scope.segments=segments;
-            // load and format segments data (must all be done at once for sortiing)
-            segments.reduce(function(promise, segment){
-              return $scope.getSegmentData(segment).then(function(){
-                ++$scope.loadingProgress;
-                $scope.progressStyle={
-                  width: ($scope.loadingProgress / segments.length * 100) + '%'
-                };
-              });
-            }, $q.resolve())
-            .then(function(){
+        if (!$scope.segments.length) {
+          $scope.loading=true;
+          $scope.loadingProgress=0;
+          $scope.segmentsPromise=$scope.loadSegments()
+            .then(function(segments){
               segments=loopbackFilters(segments,{
-                where: {
-                  picturesCount: {gt: 1}
-                }
+                order: 'created DESC'
               });
-              Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
-              $scope.loading=false;
+              // load and format segments data (must all be done at once for sortiing)
+              segments.reduce(function(promise, segment){
+                return $scope.getSegmentData(segment).then(function(){
+                  ++$scope.loadingProgress;
+                  $scope.progressStyle={
+                    width: ($scope.loadingProgress / segments.length * 100) + '%'
+                  };
+                  return segments;
+                });
+              }, $q.resolve())
+              .then(function(segments){
+                Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length].concat(loopbackFilters(segments,{
+                  where: {
+                    picturesCount: {gt: 1}
+                  }
+                })));
+                Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
+                $scope.loading=false;
+              });
+              return segments;
             });
-            return segments;
-          });
+          }
       },
 
       loadSegments: function(){
@@ -233,6 +240,7 @@ angular.module('doxelApp')
           operation: operation
 
         }).$promise.then(function(res){
+          return
           segment.status=(res.status&&res.status.length)?res.status:'new';
           segment.status_timestamp=(res.status_timestamp!==undefined)?res.status_timestamp:segment.status_timestamp;
         })
