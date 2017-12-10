@@ -94,29 +94,28 @@ angular.module('doxelApp')
           $scope.loadingProgress=0;
           $scope.segmentsPromise=$scope.loadSegments()
             .then(function(segments){
-              segments=loopbackFilters(segments,{
+              $scope._segments=loopbackFilters(segments,{
                 order: 'created DESC'
               });
               // load and format segments data (must all be done at once for sortiing)
-              segments.reduce(function(promise, segment){
+              $scope._segments.reduce(function(promise, segment){
                 return $scope.getSegmentData(segment).then(function(){
                   ++$scope.loadingProgress;
                   $scope.progressStyle={
-                    width: ($scope.loadingProgress / segments.length * 100) + '%'
+                    width: ($scope.loadingProgress / $scope._segments.length * 100) + '%'
                   };
-                  return segments;
                 });
               }, $q.resolve())
-              .then(function(segments){
-                Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length].concat(loopbackFilters(segments,{
+              .then(function(){
+                Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length].concat(loopbackFilters($scope._segments,{
                   where: {
                     picturesCount: {gt: 1}
                   }
                 })));
-                Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat(segments));
+                Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat($scope._segments));
                 $scope.loading=false;
               });
-              return segments;
+              return $scope._segments;
             });
           }
       },
