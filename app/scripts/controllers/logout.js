@@ -51,6 +51,7 @@ angular.module('doxelApp')
   'LoopBackAuth',
   '$cookies',
   'socketService',
+  '$state',
   'appConfig',
   function (
     $scope,
@@ -60,6 +61,7 @@ angular.module('doxelApp')
     LoopBackAuth,
     $cookies,
     socketService,
+    $state,
     appConfig
   ) {
     this.awesomeThings = [

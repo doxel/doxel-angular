@@ -10,6 +10,7 @@
 angular.module('doxelApp')
 .controller('ProcessingCtrl', [
   '$scope',
+  '$state',
   '$rootScope',
   '$q',
   'Segment',
@@ -18,10 +19,12 @@ angular.module('doxelApp')
   'User',
   '$timeout',
   '$location',
+  '$stateParams',
   'serverEvents',
   'segmentsService',
   function (
     $scope,
+    $state,
     $rootScope,
     $q,
     Segment,
@@ -30,6 +33,7 @@ angular.module('doxelApp')
     User,
     $timeout,
     $location,
+    $stateParams,
     serverEvents,
     segmentsService
   ) {
@@ -40,6 +44,7 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
+      $state: $state,
       segments: segmentsService.processing.segments,
       segmentsPool: segmentsService.processing.segmentsPool,
       segmentsVisible:segmentsService.processing.segmentsVisible,
