@@ -58,12 +58,15 @@ angular.module('doxelApp')
     $rootScope.$on('serverEvent.Segments',function(e,args){
       var msg=JSON.parse(args.data);
       var segment=msg.data;
+      console.log(e);
 
       function updateSegments(segments) {
         switch(msg.type) {
           case 'update':
+           console.log('updating '+msg.target);
             segments.some(function(_segment){
               if (_segment.id==msg.target) {
+                console.log('found '+_segment.id);
                 // update attributes
                 for (var property in segment) {
                   if (segment.hasOwnProperty(property)) {
@@ -86,8 +89,8 @@ angular.module('doxelApp')
       }
 
       updateSegments(segmentsService.loaded);
-      updateSegments(segmentsService.processing.segments);
+      updateSegments(segmentsService.processing.segmentsPool);
 
     });
-    
+
   }]);

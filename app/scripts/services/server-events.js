@@ -10,8 +10,10 @@
 angular.module('doxelApp')
   .service('serverEvents', [
     '$rootScope',
+    '$timeout',
     function (
-      $rootScope
+      $rootScope,
+      $timeout
     ) {
       // AngularJS will instantiate a singleton by calling "new" on this function
       var serverEvents=this;
@@ -23,9 +25,12 @@ angular.module('doxelApp')
             var urlToChangeStream = '/api/'+modelName+'/change-stream?_format=event-stream';
             var src = serverEvents.eventSource[modelName] = new EventSource(urlToChangeStream);
             src.addEventListener('data', function(msg) {
-              $rootScope.$broadcast('serverEvent.'+modelName,msg);
-              var data = JSON.parse(msg.data,false,4);
-              console.log(data); // the change object
+              $timeout(function(){
+                console.log('serverEvent.'+modelName)
+                $rootScope.$broadcast('serverEvent.'+modelName,msg);
+                var data = JSON.parse(msg.data,false,4);
+                console.log(data); // the change object
+              });
             });
             src.addEventListener('error', function(err){
               console.log('EventSource Failed',err);
