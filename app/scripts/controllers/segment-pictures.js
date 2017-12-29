@@ -60,7 +60,6 @@ angular.module('doxelApp')
   'formatTimestampFilter',
   '$timeout',
   '$location',
-  '$stateParams',
   function (
     $scope,
     $rootScope,
@@ -68,8 +67,7 @@ angular.module('doxelApp')
     Segment,
     formatTimestampFilter,
     $timeout,
-    $location,
-    $stateParams
+    $location
 
   ) {
     this.awesomeThings = [
@@ -112,7 +110,11 @@ angular.module('doxelApp')
         });
 
         $scope.$on('picture.click', function($event,picture){
-    //      $scope.picture=picture;
+          $scope.picture=picture;
+          $state.transitionTo('segment-pictures.details',{
+            segmentId: $scope.segment.id,
+            timestamp: picture.timestamp
+          });
         });
 
       },
@@ -187,7 +189,9 @@ angular.module('doxelApp')
           }).$promise;
         }
 
-        $scope.segment=segment;
+        segment.pictures_promise.then(function(){
+          $scope.segment=segment;
+        });
 
       },
 
