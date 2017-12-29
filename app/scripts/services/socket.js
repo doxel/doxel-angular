@@ -58,10 +58,10 @@ angular.module('doxelApp')
   ) {
     var self=this;
 
-    this.enabled=false;
+    this.enabled=true;
 
     this.init=function socketService_init(){
-      if (!self.enable) {
+      if (!self.enabled) {
         return;
       }
       $rootScope.$watch('currentUserId',function(newValue){
@@ -90,7 +90,7 @@ angular.module('doxelApp')
       //Creating connection with server
       var socket = self.ioSocket = io.connect(location.origin,{
         upgrade: false,
-        transports: ['websocket']
+        transports: ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling', 'polling']
       });
 //      console.log(socket);
 
@@ -98,6 +98,9 @@ angular.module('doxelApp')
       //If you are not using login page in you website then you should remove rest piece of code..
       var id = LoopBackAuth.accessTokenId;
       var userId = LoopBackAuth.currentUserId;
+      socket.on('error', function(){
+        console.log(arguments)
+      });
       socket.on('connect', function(){
           self.connected=true;
           socket.emit('authentication', {id: id, userId: userId });
