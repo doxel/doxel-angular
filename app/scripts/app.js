@@ -291,12 +291,14 @@ var app=angular
         controller: 'TosCtrl',
         controllerAs: 'tos'
       })
+      /*
       .state('segments', {
         url: '/segments',
         templateUrl: 'views/segments-tree.html',
         controller: 'SegmentsCtrl',
         controllerAs: 'segments',
       })
+      */
       .state('processing', {
         url: '/processing/:filter?/:segmentId?',
         templateUrl: 'views/processing.html',
@@ -313,7 +315,6 @@ var app=angular
           },
           needsAuth: true,
           needsRole: 'foreman'
-
         }
       })
       .state('segment-files', {
@@ -335,6 +336,16 @@ var app=angular
           needsRole: 'foreman'
         }
       })
+      .state('segment-pictures.details', {
+        controller: 'SegmentPictureDetailsCtrl',
+        url: '/:timestamp',
+        parent: 'segment-pictures',
+        templateUrl: 'views/segment-picture-details.html',
+        params: {
+          needsAuth: true,
+          needsRole: 'foreman'
+        }
+      })
       .state('segment-joblogs', {
         url: '/segment/:segmentId/joblogs',
         templateUrl: 'views/joblogs.html',
@@ -344,7 +355,6 @@ var app=angular
           segmentId: null,
           needsAuth: true,
           needsRole: 'foreman'
-
         }
       })
       /*
@@ -387,6 +397,7 @@ var app=angular
     '$timeout',
     'errorMessage',
     'uploaderService',
+    'socketService',
 
     function (
       $rootScope,
@@ -400,8 +411,12 @@ var app=angular
       appConfig,
       $timeout,
       errorMessage,
-      uploaderService
+      uploaderService,
+      socketService
     ) {
+
+    $rootScope.$state=$state;
+    $rootScope.$stateParams=$stateParams;
 
     $rootScope.params=angular.merge({},$location.search());
 
@@ -461,7 +476,7 @@ var app=angular
         $rootScope.previousState=$state.current.name;
       }
       $rootScope.authenticated=User.isAuthenticated();
-      console.log('auth',$rootScope.authenticated)
+      console.log('auth',$rootScope.authenticated);
 
       // When the user just logged in with passport,
       // bind and switch to parent user if any
