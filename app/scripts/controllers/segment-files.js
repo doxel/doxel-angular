@@ -10,12 +10,10 @@
 angular.module('doxelApp')
   .controller('SegmentFilesCtrl', [
     '$scope',
-    '$stateParams',
     'Segment',
     'ngNotify',
     function (
       $scope,
-      $stateParams,
       Segment,
       ngNotify
     ) {

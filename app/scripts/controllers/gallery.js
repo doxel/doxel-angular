@@ -46,8 +46,6 @@ angular.module('doxelApp')
   .controller('GalleryCtrl', [
     '$scope',
     '$rootScope',
-    '$state',
-    '$stateParams',
     'Segment',
     '$timeout',
     '$location',
@@ -59,8 +57,6 @@ angular.module('doxelApp')
     function (
       $scope,
       $rootScope,
-      $state,
-      $stateParams,
       Segment,
       $timeout,
       $location,

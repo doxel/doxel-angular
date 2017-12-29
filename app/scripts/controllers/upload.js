@@ -12,14 +12,12 @@ angular.module('doxelApp')
   '$scope',
   '$rootScope',
   'LoopBackAuth',
-  '$state',
   'uploaderService',
   '$window',
   function (
     $scope,
     $rootScope,
     LoopBackAuth,
-    $state,
     uploaderService,
     $window
   ) {

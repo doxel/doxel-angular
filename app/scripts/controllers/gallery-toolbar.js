@@ -46,12 +46,10 @@ angular.module('doxelApp')
 .controller('GalleryToolbarCtrl', [
   '$scope',
   '$rootScope',
-  '$state',
   '$location',
   function (
     $scope,
     $rootScope,
-    $state,
     $location
   ) {
     this.awesomeThings = [

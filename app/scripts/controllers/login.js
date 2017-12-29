@@ -55,7 +55,6 @@ angular.module('doxelApp')
   '$q',
   '$timeout',
   '$compile',
-  '$state',
   'appConfig',
   function (
     $window,
@@ -69,7 +68,6 @@ angular.module('doxelApp')
     $q,
     $timeout,
     $compile,
-    $state,
     appConfig
   ) {
   this.awesomeThings = [

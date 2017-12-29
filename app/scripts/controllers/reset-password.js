@@ -13,21 +13,17 @@ angular.module('doxelApp')
   '$cookies',
   'errorMessage',
   'LoopBackAuth',
-  '$stateParams',
   'User',
   '$rootScope',
   '$location',
-  '$state',
   function (
     $scope,
     $cookies,
     errorMessage,
     LoopBackAuth,
-    $stateParams,
     User,
     $rootScope,
-    $location,
-    $state
+    $location
   ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',

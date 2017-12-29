@@ -51,8 +51,6 @@ angular.module('doxelApp')
   '$location',
   '$q',
   'Segment',
-  '$state',
-  '$stateParams',
   '$http',
   'LoopBackAuth',
   'errorMessage',
@@ -63,8 +61,6 @@ angular.module('doxelApp')
     $location,
     $q,
     Segment,
-    $state,
-    $stateParams,
     $http,
     LoopBackAuth,
     errorMessage

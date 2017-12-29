@@ -17,10 +17,9 @@ angular.module('doxelApp')
   'PictureTag',
   'Pose',
   '$q',
-  '$state',
   '$timeout',
   'segmentsService',
-  function ($scope,$rootScope,Tag,SegmentTag,Segment,PictureTag,Pose,$q,$state,$timeout,segmentsService) {
+  function ($scope,$rootScope,Tag,SegmentTag,Segment,PictureTag,Pose,$q,$timeout,segmentsService) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
       'AngularJS',

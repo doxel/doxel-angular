@@ -25,15 +25,13 @@ angular.module('doxelApp')
     '$sce',
     '$compile',
     '$timeout',
-    '$stateParams',
     function(
       $scope,
       $rootScope,
       Segment,
       $sce,
       $compile,
-      $timeout,
-      $stateParams
+      $timeout
     ) {
       this.awesomeThings = [
         'HTML5 Boilerplate',

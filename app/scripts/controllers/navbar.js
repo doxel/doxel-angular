@@ -47,14 +47,10 @@ angular.module('doxelApp')
   '$scope',
   '$location',
   '$rootScope',
-  '$state',
-  '$stateParams',
   function (
     $scope,
     $location,
-    $rootScope,
-    $state,
-    $stateParams
+    $rootScope
   ) {
     this.awesomeThings=[
       'HTML5 Boilerplate',

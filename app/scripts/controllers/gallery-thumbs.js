@@ -52,8 +52,6 @@ angular.module('doxelApp')
     'Picture',
     '$q',
     '$location',
-    '$state',
-    '$stateParams',
     '$timeout',
     '$window',
     'elementSelection',
@@ -66,8 +64,6 @@ angular.module('doxelApp')
       Picture,
       $q,
       $location,
-      $state,
-      $stateParams,
       $timeout,
       $window,
       elementSelection
