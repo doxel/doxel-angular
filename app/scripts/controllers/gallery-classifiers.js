@@ -334,7 +334,7 @@ return;
           }
         });
 
-        $scope.update($scope.$state.current);
+        $scope.update($state.current);
 
       }, // init
 

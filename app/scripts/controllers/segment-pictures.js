@@ -60,6 +60,8 @@ angular.module('doxelApp')
   'formatTimestampFilter',
   '$timeout',
   '$location',
+  '$state',
+  '$stateParams',
   function (
     $scope,
     $rootScope,
@@ -67,7 +69,9 @@ angular.module('doxelApp')
     Segment,
     formatTimestampFilter,
     $timeout,
-    $location
+    $location,
+    $state,
+    $stateParams
 
   ) {
     this.awesomeThings = [

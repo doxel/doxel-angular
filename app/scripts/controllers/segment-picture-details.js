@@ -13,11 +13,15 @@ angular.module('doxelApp')
   '$rootScope',
   '$q',
   '$timeout',
+  '$state',
+  '$stateParams',
   function (
     $scope,
     $rootScope,
     $q,
-    $timeout
+    $timeout,
+    $state,
+    $stateParams
 
   ) {
     this.awesomeThings = [
