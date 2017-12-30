@@ -7,4 +7,24 @@ div.single-picture {
     width: 100%;
   }
 
+  a.next, a.prev {
+    text-decoration: none;
+    position: fixed;
+    top: 50%;
+    font-size: 2em;
+    cursor: pointer;
+  }
+
+  a.next:hover , a.prev:hover {
+    transform: scale(2.0);
+  }
+
+  a.prev {
+    left: 0.5em;
+  }
+
+  a.next {
+    right: 0.5em;
+  }
+
 }
