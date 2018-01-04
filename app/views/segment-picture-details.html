@@ -1,6 +1,7 @@
 <div class="single-picture" ng-if="picture">
-	<div class="picture">
+	<div class="picture" ng-click="click($event)">
 				<picture picture="picture" use-img />
-				<a class="prev fa fa-arrow-left"></a><a class="next fa fa-arrow-right"></a>
+				<a class="prev fa fa-arrow-left" ng-class="{hidden: firstPicture}"></a>
+				<a class="next fa fa-arrow-right" ng-class="{hidden: lastPicture}"></a>
 	</div>
 </div>

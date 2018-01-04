@@ -38,6 +38,21 @@ angular.module('doxelApp')
 
       },
 
+      click: function($event){
+        // display next or previous picture ?
+        var width=$($event.target).closest('.picture').width();
+        var incr=$event.pageX-width/2;
+        incr=incr/Math.abs(incr);
+
+        // show picture
+        if ($scope.picturesPool[$scope.pictureIndex+incr]) {
+          $state.transitionTo('segment-pictures.details',{
+            segmentId: $scope.segment.id,
+            timestamp: $scope.picturesPool[$scope.pictureIndex+incr].timestamp
+          });
+        }
+      }, // click
+
       init: function() {
         console.log($stateParams)
         if (!$scope.picture || ($scope.picture && $scope.picture.timestamp!=$stateParams.timestamp)) {
@@ -52,16 +67,35 @@ angular.module('doxelApp')
                 return;
               }
               $scope.segment.pictures_promise.then(function(){
-                $scope.$parent.picture=$scope.segment.pictures.find(function(picture){
+                $scope.pictureIndex=$scope.segment.pictures.findIndex(function(picture){
                   return picture.timestamp==$stateParams.timestamp;
                 });
+                if ($scope.pictureIndex>=0) {
+                  $scope.firstPicture=($scope.pictureIndex<=0)
+                  $scope.lastPicture=($scope.segment.pictures.length-$scope.pictureIndex==1);
+                  $scope.$parent.picture=$scope.segment.pictures[$scope.pictureIndex];
+                } else {
+                  $scope.lastPicture=true;
+                  $scope.firstPicture=true
+                }
               });
             })();
 
           });
+
+        } else {
+          $scope.pictureIndex=$scope.picturesPool.findIndex(function(picture){
+            return picture.timestamp==$stateParams.timestamp;
+          });
+          $scope.firstPicture=($scope.pictureIndex<=0)
+          if ($scope.pictureIndex<0) {
+            throw(new Error('picture not found !'));
+          }
+          $scope.lastPicture=($scope.segment.pictures.length-$scope.pictureIndex==1);
         }
         $scope.initEventHandlers();
-      }
+
+      } // init
 
     });
 
