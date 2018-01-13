@@ -80,7 +80,7 @@ angular.module('doxelApp')
 
       updateViewerVisibility: function(state) {
          console.log(state)
-        if (state==$scope.viewer_state) {
+        if (state.substr(0,$scope.viewer_state.length)==$scope.viewer_state) {
           if (!$scope.viewer_visible) {
             $scope.viewer_visible=true;
             $scope.show();
@@ -143,6 +143,7 @@ angular.module('doxelApp')
           // set viewer parameters
           var params=[];
           ($location.$$search.pose!==undefined) && params.push('pose='+$location.$$search.pose);
+          ($state.params.pose!==undefined) && params.push('pose='+$state.params.pose);
           var search=(params.length)?'?'+params.join('&'):'';
 
           var src=$('iframe.viewer').attr('src');

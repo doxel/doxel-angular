@@ -281,6 +281,10 @@ var app=angular
           }
         }
       })
+      .state('gallery.view.cloud.pose', {
+        url: '/:pose',
+        controller: 'GalleryViewerCtrl'
+      })
       .state('gallery.view.classifiers', {
         url: '/classifiers'
       })
