@@ -6,7 +6,7 @@
     "bootstrap-sass-official": "^3.2.0",
     "angular-animate": "^1.4.0",
     "angular-cookies": "^1.4.0",
-    "angular-messages": "ng-messages#*",
+    "angular-messages": "*",
     "angular-resource": "^1.4.0",
     "angular-route": "^1.4.0",
     "angular-sanitize": "^1.4.0",
