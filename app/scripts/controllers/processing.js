@@ -222,6 +222,13 @@ angular.module('doxelApp')
         $state.transitionTo('segment-pictures',{segmentId: segment.id});
       },
 
+      // display segment files
+      viewFiles: function(segment,$event){
+        if ($event) $event.stopPropagation();
+        $scope.segment=segment;
+        $state.transitionTo('segment-files',{segmentId: segment.id});
+      },
+
       viewCloud: function(segment,$event) {
         if ($event) $event.stopPropagation();
         if (segment.status=='published')

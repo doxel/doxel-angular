@@ -39,6 +39,14 @@
           </a>
         </td>
         <td>
+          <a ng-href="{{::'/app/#!/segment/'+row.id+'/files'}}" ng-click="preventDefault($event)">
+            <button type="button" ng-click="viewFiles(row,$event)" class="btn btn-sm btn-default" title="View segment files">
+              <i class="fa fa-fw fa-folder-o">
+              </i>
+            </button>
+          </a>
+        </td>
+        <td>
           <a ng-href="{{::'/app/#!/segment/'+row.id+'/pictures'}}" ng-click="preventDefault($event)">
             <button type="button" ng-click="viewSegment(row,$event)" class="btn btn-sm btn-default" title="View segment pictures">
               <i class="fa fa-fw fa-picture-o">
