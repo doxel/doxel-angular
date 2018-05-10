@@ -323,8 +323,8 @@ var app=angular
         templateUrl: 'views/segment-files.html',
         params: {
           segmentId: null,
-          needsAuth: true,
-          needsRole: 'foreman'
+          needsAuth: false
+//          needsRole: 'foreman'
         }
       })
       .state('segment-pictures', {
