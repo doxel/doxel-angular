@@ -173,7 +173,13 @@ angular.module('doxelApp')
       },
 
       hide: function(){
-      }
+      },
+
+      getPlyUrl: function(){
+        return '/api/segments/'+$stateParams.segmentId+'/ply';
+      },
+
+
 
     });
 

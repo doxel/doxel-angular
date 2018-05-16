@@ -1,3 +1,8 @@
 <div id='gallery-viewer' ng-if="viewer_visible">
   <iframe class="viewer"></iframe>
+  <a title="Download PLY" id="download-ply" ng-href="{{getPlyUrl()}}">
+    <div>
+      <i class="fa fa-fw fa-cloud-download"></i>
+    </div>
+  </a>
 </div>
