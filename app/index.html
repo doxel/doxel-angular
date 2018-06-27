@@ -111,11 +111,11 @@
                     </li-->
 
                     <li ng-class="getClass('gallery.view.cloud')"><a ng-href="{{getshref('gallery.view.cloud')}}" class="viewer fa fa-eye"><span>Viewer</span></a></li>
-                    <li ng-class="getClass('upload')"><a ui-sref="upload" class="upload fa fa-upload"><span>Upload</span></a></li>
+                    <li ng-class="getClass('upload')"><a ng-href="{{getshref('upload')}}" class="upload fa fa-upload"><span>Upload</span></a></li>
                     <li><a class="github-issues fa fa-bug" ng-href="{{githubHref+'/issues'}}" target="_blank" ng-click="goto('github-issues')"><span>Bug Report</span></a></li>
-                    <li ng-show="!authenticated" ng-class="getClass('login')"><a ui-sref="login" class="login fa fa-sign-in"><span>Login</span></a></li>
-                    <li ng-show="hasRole('foreman')" ng-class="getClass('processing')"><a ui-sref="processing" class="processing fa fa-industry"><span>Admin</span></a></li>
-                    <li ng-show="authenticated" ng-class="getClass('logout')"><a ui-sref="logout" class="logout fa fa-sign-out"><span>Logout</span></a></li>
+                    <li ng-show="!authenticated" ng-class="getClass('login')"><a ng-href="{{::getshref('login')}}" class="login fa fa-sign-in"><span>Login</span></a></li>
+                    <li ng-show="hasRole('foreman')" ng-class="getClass('processing')"><a ng-href="{{getshref('processing')}}" class="processing fa fa-industry"><span>Admin</span></a></li>
+                    <li ng-show="authenticated" ng-class="getClass('logout')"><a ng-href="{{::getshref('logout')}}" class="logout fa fa-sign-out"><span>Logout</span></a></li>
                     <!--li ng-class="getClass('/')"><a ng-click="goto('/')" class="home fa fa-home"><span>Home</span></a></li>
                     <li ng-class="getClass('gallery.view.map,gallery.view.earth')"><a ui-sref="gallery.view.map" class="map fa fa-globe"><span>Map</span></a></li>
                     <li><a class="github fa fa-github" ng-href="{{githubHref}}" target="_blank" ng-click="goto('github')"><span>GitHub</span></a></li>
