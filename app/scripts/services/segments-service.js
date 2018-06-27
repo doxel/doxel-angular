@@ -76,7 +76,11 @@ angular.module('doxelApp')
                 // remove non-existing properties
                 for (var property in _segment){
                   if (segment[property]===undefined) {
-                    _segment.unsetAttribute(property);
+                    if (_segment.unsetAttribute) {
+                      _segment.unsetAttribute(property);
+                    } else {
+                      delete _segment[property];
+                    }
                   }
                 }
               }
