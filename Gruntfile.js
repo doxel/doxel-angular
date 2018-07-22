@@ -9,6 +9,8 @@
 
 module.exports = function (grunt) {
 
+  require('load-grunt-tasks')(grunt);
+
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
@@ -30,6 +32,26 @@ module.exports = function (grunt) {
 
     // Project settings
     yeoman: appConfig,
+
+    babel: {
+      options: {
+        sourceMap: false,
+        presets: [["env",{
+          "targets": {
+            "browsers": ["last 2 versions", "safari >=7"]
+          }
+        }]]
+      },
+      dist: {
+        files: [{
+          expand: true,
+          src: ['.tmp/concat/scripts/*.js'],
+          dest: '.',
+          ext: '.js'
+        }]
+      }
+    },
+
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
@@ -222,14 +244,14 @@ module.exports = function (grunt) {
         fileTypes:{
           js: {
             block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-              detect: {
-                js: /'(.*\.js)'/gi
-              },
-              replace: {
-                js: '\'{{filePath}}\','
-              }
+            detect: {
+              js: /'(.*\.js)'/gi
+            },
+            replace: {
+              js: '\'{{filePath}}\','
             }
           }
+        }
       },
       sass: {
         src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
@@ -288,7 +310,7 @@ module.exports = function (grunt) {
         flow: {
           html: {
             steps: {
-              js: ['concat', 'uglifyjs'],
+              js: ['concat','uglifyjs'],
               css: ['cssmin']
             },
             post: {}
@@ -500,7 +522,7 @@ module.exports = function (grunt) {
     'postcss',
     'connect:test',
     'watch'//,
-//    'karma'
+    //    'karma'
   ]);
 
   grunt.registerTask('build', [
@@ -512,6 +534,7 @@ module.exports = function (grunt) {
     'postcss',
     'ngtemplates',
     'concat',
+    'babel',
     'ngAnnotate',
     'copy:dist',
     'cdnify',
@@ -524,7 +547,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
-//    'newer:jscs',
+    //    'newer:jscs',
     'test',
     'build'
   ]);
