@@ -112,10 +112,10 @@ angular.module('doxelApp')
                     picturesCount: {gt: 1}
                   }
                 })));
-                Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat($scope._segments));
+                Array.prototype.splice.apply($scope.segmentsPool,[0,$scope.segmentsPool.length].concat($scope.segments));
                 $scope.loading=false;
               });
-              return $scope._segments;
+              return $scope.segments;
             });
           }
       },
