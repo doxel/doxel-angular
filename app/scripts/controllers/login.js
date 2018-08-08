@@ -83,6 +83,13 @@ angular.module('doxelApp')
     angular.element('#username').focus();
   }
 
+  $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+    if (toState.name!='login') {
+      $scope.username='';
+      $scope.password='';
+    }
+  })
+
   $scope.serverErrors={};
   $scope.error={
     emailInvalid: {
@@ -178,6 +185,18 @@ angular.module('doxelApp')
     });
   };
 
+  // TODO: better not transmit clear text passwords, but existing users must change their passwords.
+  $scope.hashPassword=function(){
+    return $scope.password;
+ /*
+    return asmCrypto.SHA512.hex([
+      location.hostname,
+      $scope.username,
+      $scope.password
+    ].join(':'));
+*/
+  }
+
   $scope.doSignup=function(really){
     if (!really) {
       return;
@@ -187,7 +206,7 @@ angular.module('doxelApp')
       User.signup({
         email: $scope.email,
         username: $scope.username,
-        password: $scope.password,
+        password: $scope.hashPassword(),
         fingerprint: $scope.fingerprint
       },
       function(res) {
@@ -200,6 +219,7 @@ angular.module('doxelApp')
         LoopBackAuth.rememberMe=true;
         LoopBackAuth.setUser(res.result.session.id, res.result.session.userId, res.result);
         LoopBackAuth.save();
+        socketService.connect();
         appConfig.transitionToStateAfterSignin();
       },
       function(err){
@@ -273,7 +293,7 @@ angular.module('doxelApp')
     User.signin({
       email: $scope.email,
       username: $scope.username,
-      password: $scope.password
+      password: $scope.hashPassword()
     }).$promise
     .then(function(res) {
       if (res.result.error) {

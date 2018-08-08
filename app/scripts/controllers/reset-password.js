@@ -82,7 +82,7 @@ angular.module('doxelApp')
         $scope.errorMessage('passwordsDontMatch');
 
       } else {
-        User.changePassword({
+        User.setPassword({
             password: $scope.newpassword
 
           }, function(res){
