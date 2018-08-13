@@ -57,6 +57,7 @@ angular.module('doxelApp')
   '$compile',
   '$state',
   'appConfig',
+  '$cookies',
   function (
     $window,
     $scope,
@@ -70,7 +71,8 @@ angular.module('doxelApp')
     $timeout,
     $compile,
     $state,
-    appConfig
+    appConfig,
+    $cookies
   ) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
@@ -184,6 +186,7 @@ angular.module('doxelApp')
     }
     $scope.getBrowserFingerprint(function(fingerprint){
       $scope.fingerprint=fingerprint;
+      deauth();
       User.signup({
         email: $scope.email,
         username: $scope.username,
@@ -270,6 +273,8 @@ angular.module('doxelApp')
       return;
     }
 
+    deauth();
+
     User.signin({
       email: $scope.email,
       username: $scope.username,
@@ -336,6 +341,8 @@ angular.module('doxelApp')
       return;
     }
 
+    deauth();
+
     User.resetPassword({
       email: $scope.email
 
@@ -351,6 +358,15 @@ angular.module('doxelApp')
 
     });
   };
+
+
+  function deauth(){
+    $scope.$root.authenticated=false;
+    $cookies.remove('access_token',{path:'/'});
+    $cookies.remove('userId',{path:'/'});
+    $cookies.remove('pp-access_token',{path:'/'});
+    $cookies.remove('pp-userId',{path:'/'});
+  }
 
 
 }]);

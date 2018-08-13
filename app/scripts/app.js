@@ -541,11 +541,12 @@ var app=angular
         // already logged out
         if (toState.name=='logout') {
           event.preventDefault();
+          $state.transitionTo('home');
           return;
         }
       }
 
-      if (['login','logout'].indexOf(toState.name)<0) {
+      if (['login','logout','reset-password-form'].indexOf(toState.name)<0) {
         appConfig.stateAfterSignin={state: toState, params: toParams};
       }
 
@@ -559,7 +560,7 @@ var app=angular
       // Interceptor will redirect to login state automatically if not.
       // Also, when state.params.needsRole, we need to redirect
       // manually in case the role is not matched in currentUserData
-      if ((LoopBackAuth.accessTokenId && !LoopBackAuth.currentUserData)
+      if ((LoopBackAuth.accessTokenId && !LoopBackAuth.currentUserData && $state.current.name!='reset-password-form')
       || ($state.params && ($state.params.needsAuth || $state.params.needsRole)))
       {
         User.getCurrent(function(user){

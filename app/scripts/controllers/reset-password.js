@@ -18,6 +18,7 @@ angular.module('doxelApp')
   '$rootScope',
   '$location',
   '$state',
+  '$q',
   function (
     $scope,
     $cookies,
@@ -27,7 +28,8 @@ angular.module('doxelApp')
     User,
     $rootScope,
     $location,
-    $state
+    $state,
+    $q
   ) {
     this.awesomeThings = [
       'HTML5 Boilerplate',
@@ -69,7 +71,7 @@ angular.module('doxelApp')
       });
     }
 
-    $scope.changePassword=function($event){
+    $scope.setPassword=function($event){
       console.log($scope.newpassword,$scope.confirmpassword);
       $scope.errorMessage(null);
       if (!$scope.newpassword.length) {
@@ -82,38 +84,26 @@ angular.module('doxelApp')
         $scope.errorMessage('passwordsDontMatch');
 
       } else {
-        User.changePassword({
-            password: $scope.newpassword
-
-          }, function(res){
-            if (res.result.error) {
-              return $scope.errorMessage(res.result.error);
-            }
-            User.logout({
-              accessToken: LoopBackAuth.accessTokenId
-
-            }, function(resource){
-              $rootScope.authenticated=false;
-              $cookies.remove('access_token',{path:'/'});
-              $cookies.remove('userId',{path:'/'});
-              $cookies.remove('pp-access_token',{path:'/'});
-              $cookies.remove('pp-userId',{path:'/'});
-              $state.transitionTo('login');
-
-            }, function(err){
-              console.log('logout failed',err)
-              $cookies.remove('access_token',{path:'/'});
-              $cookies.remove('userId',{path:'/'});
-              $cookies.remove('pp-access_token',{path:'/'});
-              $cookies.remove('pp-userId',{path:'/'});
-              $state.transitionTo('login');
-            });
-
-          }, function(err){
-            console.log(err.message, err.stack);
-            return errorMessage.show('Internal server error');
-          }
-        );
+        $q.resolve(User.setPassword({
+            newPassword: $scope.newpassword
+        }))
+        .then(function(){
+          return User.logout({
+            accessToken: LoopBackAuth.accessTokenId
+          })
+        })
+        .catch(function(err){
+          console.log(err.message, err.stack);
+          return errorMessage.show('Internal server error');
+        })
+        .finally(function(){
+          $rootScope.authenticated=false;
+          $cookies.remove('access_token',{path:'/'});
+          $cookies.remove('userId',{path:'/'});
+          $cookies.remove('pp-access_token',{path:'/'});
+          $cookies.remove('pp-userId',{path:'/'});
+          $state.transitionTo('login');
+        })
       }
     }
 
