@@ -58,6 +58,7 @@ angular.module('doxelApp')
   '$state',
   'appConfig',
   '$cookies',
+  '$rootScope',
   function (
     $window,
     $scope,
@@ -72,7 +73,8 @@ angular.module('doxelApp')
     $compile,
     $state,
     appConfig,
-    $cookies
+    $cookies,
+    $rootScope
   ) {
   this.awesomeThings = [
     'HTML5 Boilerplate',
