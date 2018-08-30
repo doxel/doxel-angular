@@ -26,7 +26,6 @@ angular.module('doxelApp')
       'AngularJS',
       'Karma'
     ];
-return;
     angular.extend($scope,{
       minScore: 0.7,
       // tags in input
@@ -214,11 +213,11 @@ return;
 
       operator: 'or',
 
-      galleryFilter: function(direction,segment){
+      galleryFilter: function(/*direction,segment*/){
         /// {"tag": {"elemMatch":  {"tagId": "58e40dc0a15b4e3907a1717e"}}, "tag.score": {"gte" : 0.9}}
 //{"where":{"tag":{"elemMatch":{"score":{"$gt":0.6},"tagId":{"$eq":"58e40dbea15b4e3907a16e2c"}}}}}
         var filter={
-          skip: $scope.skip,
+//          skip: $scope.skip,
           where:{}
         };
 
@@ -243,6 +242,7 @@ return;
                    break;
         }
 
+        /*
         switch(direction){
         case 'forward':
           // load chunk after specified segment or, by default,
@@ -280,15 +280,16 @@ return;
 
         defaut: throw new Error('invalid direction: '+direction);
         }
+        */
 
         return $q.resolve(filter);
 
       }, // galleryFilter
 
       init: function(){
-        $scope._galleryFilter['segment-thumbs-tagged']=$scope.galleryFilter;
         $scope.initEventHandlers();
         $scope.classifiers_visible=false;
+        $scope._galleryFilter['segment-thumbs-tagged']=$scope.galleryFilter;
       }, // init
 
       initEventHandlers: function() {
@@ -298,19 +299,6 @@ return;
 
         $scope.$on('$stateChangeSuccess', function (event, toState) {
           $scope.update(toState);
-        });
-
-        $scope.$on('gallery-mode-change',function(event,from,to){
-          console.log(from,to);
-          if (to=='segment-thumbs-tagged') {
-            $scope.clearThumbsList();
-/*            if ($rootScope.params.s) {
-              $scope.updateSelection($rootScope.params.s);
-            } else {
-              $scope.loadSegments();
-            }
-            */
-          }
         });
 
         $scope.$on('segments-loaded',function(event,args){
@@ -340,12 +328,49 @@ return;
 
       update: function(toState){
         console.log(toState.name);
-        $scope.updateGalleryMode(toState);
-        $scope.classifiers_visible=(toState.name.split('.').pop()=='classifiers');
+        $scope.classifiers_visible=(toState.name.search('gallery')==0);
         if ($scope.classifiers_visible) {
           $scope.updateTags();
         }
       },
+
+      focus: function(e){
+        $scope._focus=true;
+      },
+
+      blur: function(e){
+//        $rootScope.tagsInputCollapsed=true;
+      },
+
+      collapsed: function(){
+        $('body').removeClass('tags-input-expanded');
+      },
+
+      collapsing: function(){
+        $('body').removeClass('tags-input-expanded');
+      },
+
+      expanding: function() {
+        $('body').addClass('tags-input-expanded');
+        // close expanded navbar
+        var hidden=$('body').hasClass('navbar-hidden');
+        var expanded=$('.navbar-toggle').attr('aria-expanded')=='true';
+        if (!hidden && expanded) {
+          setTimeout(function(){
+            $('.navbar-toggle').click();
+          });
+        }
+
+      },
+
+      expanded: function(){
+        $timeout(function(){
+          $('tags-input input').focus();
+        },1000);
+      },
+
+      getClass: function(){
+      }
 
     });
 

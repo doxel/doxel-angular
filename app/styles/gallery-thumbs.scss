@@ -130,6 +130,10 @@
 
 }
 
+.tags-input-expanded:not(.navbar-hidden) #main:not(.thumbs-bottom) #gallery-thumbs #segments {
+  top: 120px;
+}
+
 .navbar-hidden #gallery-thumbs #segments {
   top: 0px;
   padding-top: 8px;

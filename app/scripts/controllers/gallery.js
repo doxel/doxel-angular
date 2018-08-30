@@ -330,10 +330,13 @@ angular.module('doxelApp')
 
             // get current state filter
             var stateFilter=$scope._galleryFilter[$scope.galleryMode];
+            var tagsFilter=$scope._galleryFilter['segment-thumbs-tagged'];
             if (stateFilter) {
               stateFilter(direction,from).then(function(filter1){
-                var filter=angular.merge({},filter0,filter1);
-                q.resolve(filter);
+                tagsFilter().then(function(filter2){
+                  var filter=angular.merge({},filter0,filter1,filter2);
+                  q.resolve(filter);
+                });
               })
               .catch(q.reject);
 

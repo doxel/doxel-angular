@@ -421,6 +421,7 @@ var app=angular
 
     $rootScope.$state=$state;
     $rootScope.$stateParams=$stateParams;
+    $rootScope.tagsInputCollapsed=true;
 
     $rootScope.params=angular.merge({},$location.search());
 

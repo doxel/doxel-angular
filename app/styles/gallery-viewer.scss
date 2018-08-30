@@ -25,6 +25,11 @@
 
 }
 
+.tags-input-expanded:not(.navbar-hidden) #gallery-viewer iframe.viewer {
+  margin-top: 52px;
+  padding-bottom: 107px; /* marginTop+paddingBottom*/
+}
+
 .thumbs-left #gallery-viewer {
   iframe.viewer {
     left: 0;

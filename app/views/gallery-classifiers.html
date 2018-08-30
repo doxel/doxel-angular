@@ -1,6 +1,6 @@
 <div id="classifiers" ng-cloak ng-if="classifiers_visible">
   <div>
-  <tags-input ng-model="tags" add-on-paste="true">
+  <tags-input aria-expanded="false" id="tags-input" ng-model="tags" add-on-paste="true" ng-class="getClass()" class="collapse" uib-collapse="tagsInputCollapsed" collapsed="collapsed()" collapsing="collapsing()" expanding="expanding()" expanded="expanded()" ng-focus="focus($event)" ng-blur="blur($event)">
     <auto-complete source="loadTags($query)"
                    min-length="0"
                    max-results-to-show="100"
