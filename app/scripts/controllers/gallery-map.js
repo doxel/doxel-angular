@@ -369,7 +369,11 @@ angular.module('doxelApp')
           $scope.getSegment(segmentId).then(function(segment){
             if (elementSelection.isSelected('segment',segment)) {
               if (segment.pointCloudId) {
-                $state.transitionTo('gallery.view.cloud',{segmentId:segment.id});
+                var a=document.createElement('a');
+                a.target='_blank';
+                a.href='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html';
+                a.click();
+//                $state.transitionTo('gallery.view.cloud',{segmentId:segment.id});
               }
             } else {
               $rootScope.$broadcast('segment.click',segment,{show:true});
@@ -742,6 +746,10 @@ angular.module('doxelApp')
                 q.resolve(args);
               })
               .catch(q.reject);
+            },{
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
             });
 
           } catch(e) {

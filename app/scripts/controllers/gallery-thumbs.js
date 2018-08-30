@@ -488,11 +488,17 @@ if (false) // TODO: make it work without flickering -> dig into malihu
            var setView=options.setView;
 
           // in map view, switch to cloud on second click TODO: put it in gallery-map
-          if ($state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment)) {
+           if (($state.current.name=='gallery.view.classifiers' && !justRestoringSelection) || ($state.current.name=='gallery.view.map' && !justRestoringSelection && elementSelection.isSelected('segment',segment))) {
             if (segment.pointCloud) {
+              var a=document.createElement('a');
+              a.target='_blank';
+              a.href='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html';
+              a.click();
+              /*
               $state.transitionTo('gallery.view.cloud',{
                 segmentId: segment.id
               });
+              */
             }
             return;
           }
