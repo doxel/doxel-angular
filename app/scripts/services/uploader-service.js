@@ -117,27 +117,43 @@ angular.module('doxelApp')
           });
 
           uploader.filters.push({
-            name: 'syncFilter',
-            fn: function(item /*{File|FileLikeObject}*/, options) {
+            name: 'asyncFilter',
+            fn: function(item /*{File|FileLikeObject}*/, options, deferred) {
+              /*
+               * TODO: calling $digest (ie $apply or $timeout) stops adding files
+               * but we want to add some progress dialog
+               * /
+              if (uploader.pleaseWait) {
+                uploader.pleaseWait();
+              }
+              uploader.pleaseWait=$timeout(function(){
+                  uploader.pleaseWait=false;
+              },1000);
+              */
+
               if (item.type!='image/jpeg') {
                 ngNotify.set('Not a JPEG file: '+item.name);
-                return false;
+                deferred.reject();
+                return;
               }
               if (item.size>uploaderService.maxFileSize) {
                 ngNotify.set('File is too big: '+item.name);
-                return false;
+                deferred.reject();
+                return;
               }
               if (this.queue.length>uploaderService.maxQueueLength) {
                 if (this.queue.length==uploaderService.maxQueueLength+1) {
                   ngNotify.set('You cannot queue more than '+uploaderService.maxQueueLength+' files at once.')
                 }
-                return false;
+                deferred.reject();
+                return;
               }
               if (uploaderService.alreadyQueued(item)) {
                 ngNotify.set('Already queued: '+item.name);
-                return false;
+                deferred.reject();
+                return;
               }
-              return true;
+              deferred.resolve();
             }
           });
 
@@ -147,7 +163,7 @@ angular.module('doxelApp')
 //            console.info('onWhenAddingFileFailed', item, filter, options);
           };
           uploader.onAfterAddingFile = function(fileItem) {
-            // console.info('onAfterAddingFile', fileItem);
+//            console.info('onAfterAddingFile', fileItem);
           };
           uploader.onAfterAddingAll = function(addedFileItems) {
 //            console.info('onAfterAddingAll', addedFileItems);

@@ -15,7 +15,7 @@
   label {
     vertical-align: middle;
   }
-  
+
   #toggleShowThumb {
     margin-top: 13px;
   }
@@ -107,10 +107,10 @@
         background-color: transparent;
       }
     }
-      .uploader-total-progress {
-        border: 1px solid white;
-        border-top: 1px solid white
-      }
+    .uploader-total-progress {
+      border: 1px solid white;
+      border-top: 1px solid white
+    }
     .uploader-status.no-thumb {
       border: 0px;
       height: 8em;
@@ -118,6 +118,14 @@
       background-image: none;
     }
   }
+  .please-wait {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+  }
+
 }
 
 .navbar-hidden #doxel-upload {
