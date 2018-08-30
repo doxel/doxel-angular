@@ -137,19 +137,6 @@
         </div>
       </div>
 
-      <!--div id="classifiers" ng-cloak ng-if="$state.current.name.search('gallery')>=0" ng-show="$state.current.name.search('gallery')>=0" ng-controller="GalleryClassifiersCtrl">
-        <div>
-          <tags-input aria-expanded="false" id="tags-input" ng-model="tags" add-on-paste="true" class="">
-            <auto-complete source="loadTags($query)"
-                           min-length="0"
-                           max-results-to-show="100"
-                           add-from-autocomplete-only="true"
-                           on-tag-added="tagAdded($tag)"
-                           on-tag-removed="tagremoved($tag)"></auto-complete>
-          </tags-input>
-        </div>
-      </div-->
-
       <div class="container" ui-view></div>
       <div ui-view="gallery"></div>
 
