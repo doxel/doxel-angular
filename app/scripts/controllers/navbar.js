@@ -133,6 +133,14 @@ angular.module('doxelApp')
           }
 
           $('body').toggleClass('navbar-hidden');
+          if ($('body').hasClass('navbar-hidden')) {
+            $rootScope.tagsInputCollapsed=true;
+          } else {
+            var collapsed = !$('tags-input ti-tag-item').length || expanded;  
+            $rootScope.tagsInputCollapsed=collapsed;
+
+          }
+
         });
 
     //    $scope.autoHide();
