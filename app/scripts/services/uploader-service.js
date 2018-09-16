@@ -212,12 +212,24 @@ angular.module('doxelApp')
               promise=$q.resolve(data);
             }
 
+            function skipOnFail(action,errorMessage){
+              var q=$q.defer();
+              action(data)
+              .then(q.resolve)
+              .catch(function(err){
+                console.log(err);
+                ngNotify.set(errorMessage)
+                q.reject('skip');
+              });
+              return q.promise;
+            }
+
             promise.finally(function(){
               jpegFile.getBinaryString(data)
-              .then(jpegFile.getEXIF)
+              .then(skipOnFail(jpegFile.getEXIF,'Error reading EXIF for '+data.file.name))
               .then(jpegFile.getHash)
               .then(uploaderService.isHashUnique)
-              .then(jpegFile.updateEXIF)
+              .then(skipOnFail(jpegFile.updateEXIF,'Error updating EXIF for '+data.file.name))
               .then(jpegFile.getTimestamp)
               .then(jpegFile.getGPSCoords)
               .then(function(data){
