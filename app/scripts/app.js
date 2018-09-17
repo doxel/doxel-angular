@@ -553,7 +553,10 @@ var app=angular
 
     });
 
-    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams) {
+    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+      // allow state-related css rules
+      $('body').removeClass('_'+fromState.name.replace(/\./g,'_')).addClass('_'+toState.name.replace(/\./g,'_'));
+      $rootScope.navbarCollapsed=true;
 
       // When accessTokenId is defined but currentUserData is not,
       // it means page reload, we need to refresh currentUserData
