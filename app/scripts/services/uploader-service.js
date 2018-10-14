@@ -214,13 +214,19 @@ angular.module('doxelApp')
 
             function skipOnFail(action,errorMessage){
               var q=$q.defer();
-              action(data)
-              .then(q.resolve)
-              .catch(function(err){
+              function _catch(err){
                 console.log(err);
                 ngNotify.set(errorMessage)
                 q.reject('skip');
-              });
+              }
+              try {
+                action(data)
+                .then(q.resolve)
+                .catch(_catch);
+              } catch(e){
+                _catch(e);
+              }
+
               return q.promise;
             }
 

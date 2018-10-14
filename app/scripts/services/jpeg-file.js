@@ -101,7 +101,7 @@ angular.module('doxelApp')
         canvas.width=width;
         canvas.height=height;
         canvas.getContext('2d').drawImage(data.img,0,0,canvas.width,canvas.height)
-        data.img=null;
+          data.img=null;
       } catch(e) {
         console.log(e);
         return $q.reject(e);
@@ -127,19 +127,14 @@ angular.module('doxelApp')
     }, // getBinaryString
     /**
      * @method jpegFile.getEXIF
-     * @description load exif with piexif as data.res
+     * @description load exif with piexif as data.exif
      * @param data (object)
      * @returns promise
      */
     getEXIF: function(data){
       try {
-        var res=piexif.load(data.jpeg);
-        angular.extend(data,{
-          res: res,
-          exif: res.exif_dict,
-          exifReader: res.exifReader,
-          b64: res.b64
-        });
+        data.jpeg_segments=piexif.splitIntoSegments(data.jpeg);
+        data.exif=piexif.load(data.jpeg_segments);
         return $q.resolve(data);
 
       } catch(e) {
@@ -154,65 +149,70 @@ angular.module('doxelApp')
      * @returns promise
      */
     updateEXIF: function (data) {
-        var exif=data.exif;
-        var exifReader=data.exifReader;
-        var b64=data.b64;
+      var exif=data.exif;
 
-        if (exif) {
-          // TODO: date should come from the server
-          exif['0th'][piexif.ImageIFD.Copyright]="Copyright (c) "+(new Date()).getFullYear()+" by DOXEL.org at Alsenet SA. CCBY-SA.";
+      if (exif) {
+        // TODO: date should come from the server
+        exif['0th'][piexif.ImageIFD.Copyright]="Copyright (c) "+(new Date()).getFullYear()+" by DOXEL.org at Alsenet SA. CCBY-SA.";
 
-          var bytes;
-          try {
-            // get modified exif bytes
-            bytes=piexif.dump(exif);
+        var bytes;
+        try {
+          // get modified exif bytes
+          bytes=piexif.dump(exif);
 
-            // add or replace app1 exif segment
-            if (exifReader.app1_segmentIndex===undefined) {
-              data.jpeg_new=piexif.insert(bytes,exifReader);
+          // add or replace app1 exif segment
+          data.jpeg_segments=piexif.insert(bytes,data.jpeg_segments);
 
-            } else {
-              data.jpeg_new=piexif.replace(bytes,exifReader,b64);
-            }
-
-          } catch(err) {
-            console.log('Could not update exif for '+data.file.name);
-            console.log(err);
-            // continue anyway
-          }
-
-          return $q.when(data);
-
-        } else {
-          if (!exif) {
-            console.log('no exif !');
-          }
+        } catch(err) {
+          console.log('Could not update exif for '+data.file.name);
+          console.log(err);
+          // continue anyway
         }
 
-        return $q.when(data);
+        return $q.resolve(data);
+
+      } else {
+        if (!exif) {
+          console.log('no exif !');
+        }
+      }
+
+      return $q.resolve(data);
 
     }, // updateExif
 
     /**
      * @method jpegFile.getHash
-     * @description get sha256 from piexif's data.exifReader (excluding exif data)
+     * @description get sha256 from jpeg (excluding exif and some other blocks)
      * @param data (object)
      * @returns promise
      */
     getHash: function (data) {
-        var exifReader=data.exifReader;
+      var dontStrip=[
+        "\xff\xc0",
+        "\xff\xc1",
+        "\xff\xc2",
+        "\xff\xc3",
+        "\xff\xc5",
+        "\xff\xc6",
+        "\xff\xc7",
+        "\xff\xc9",
+        "\xff\xca",
+        "\xff\xcb",
+        "\xff\xcd",
+        "\xff\xce",
+        "\xff\xcf",
+        "\xff\xd8",
+        //        "\xff\xd9",
+        "\xff\xda",
+        //      "\xff\xe0",
+        //      "\xff\xdb",
+        //      "\xff\xc4",
+        "\xff\xdd"
+          ];
 
-        if (exifReader) {
-          // skip exif data
-          data.sha256=asmCrypto.SHA256.hex(exifReader.getJpegData());
-          return $q.when(data);
-
-        } else {
-          // no exif data
-          data.sha256=asmCrypto.SHA256.hex(data.jpeg);
-          return $q.when(data);
-        }
-
+      data.sha256=asmCrypto.SHA256.hex(piexif.stripAllBut(data.jpeg_segments,dontStrip).join(''));
+      return $q.resolve(data);
     }, // getHash
 
     /**
@@ -222,40 +222,44 @@ angular.module('doxelApp')
      * @returns promise
      */
     getTimestamp: function(data){
+      if (!data.exif){
+        return $q.resolve(data);
+      }
+
       var dateTimeOriginal=data.exif['Exif'][piexif.ExifIFD.DateTimeOriginal];
       var subSecTimeOriginal=data.exif['Exif'][piexif.ExifIFD.SubSecTimeOriginal];
-      
+
       if (dateTimeOriginal) {
-      
+
         // try to convert date to numerical timestamp
         try {
           var _timestamp=new Date(dateTimeOriginal.replace(/([0-9]{4}):([0-9]{2}):([0-9]{2})/,"$1/$2/$3")).getTime();
-      
+
           if (isNaN(_timestamp)) {
-             _timestamp=new Date(dateTimeOriginal.replace(/([0-9]{4}):([0-9]{2}):([0-9]{2})/,"$1-$2-$3")).getTime();
+            _timestamp=new Date(dateTimeOriginal.replace(/([0-9]{4}):([0-9]{2}):([0-9]{2})/,"$1-$2-$3")).getTime();
           }
-      
+
           if (isNaN(_timestamp)) {
             throw new Error('Could not convert EXIF timestamp');
-      
+
           } else {
-      
+
             if (subSecTimeOriginal) {
               data.timestamp=String(_timestamp).substr(0,10)+'_'+String(subSecTimeOriginal).trim().substr(0,6);
               while(data.timestamp.length<17) data.timestamp+='0';
-      
+
             } else {
               data.timestamp=String(_timestamp).replace(/([0-9]{10})/,'$1_')+'000';
             }
           }
-      
+
         } catch(e) {
           console.log(dateTimeOriginal,subSecTimeOriginal,e);
           return $q.reject(e);
         }
       }
-      
-      return $q.when(data);
+
+      return $q.resolve(data);
 
     }, // getTimestamp,
 
@@ -266,6 +270,10 @@ angular.module('doxelApp')
      * @returns promise
      */
     getGPSCoords: function(data){
+      if (!data.exif) {
+        return $q.resolve(data);
+      }
+
       // get GPS coordinates
       try {
         var rawdms=data.exif['GPS'][piexif.GPSIFD.GPSLongitude];
@@ -278,21 +286,21 @@ angular.module('doxelApp')
 
           // convert to decimal
           data.lon=dms[0]+dms[1]/60+dms[2]/3600;
-      
+
           // set negative value for west coordinate
           if (data.exif['GPS'][piexif.GPSIFD.GPSLongitudeRef]=='W') {
             data.lon=-Math.abs(data.lon);
           }
-      
+
         }
       } catch(e) {
         console.log(e);
         return $q.reject(e);
       }
-      
+
       try {
         var rawdms=data.exif['GPS'][piexif.GPSIFD.GPSLatitude];
-      
+
         if (rawdms) {
           var dms=[
             parseInt(rawdms[0][0])/parseInt(rawdms[0][1]),
@@ -302,20 +310,20 @@ angular.module('doxelApp')
 
           // convert to signed decimal
           data.lat=dms[0]+dms[1]/60+dms[2]/3600;
-      
+
           // set negative value for south coordinate
           if (data.exif['GPS'][piexif.GPSIFD.GPSLongitudeRef]=='S') {
             data.lat=-Math.abs(data.lat);
           }
-      
+
         }
-      
+
       } catch(e) {
         console.log(e);
         return $q.reject(e);
       }
 
-      return $q.when(data);
+      return $q.resolve(data);
 
     } // getGPSCoords
 
