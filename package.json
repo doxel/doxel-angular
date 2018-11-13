@@ -51,6 +51,7 @@
   },
   "author": "",
   "dependencies": {
-    "lr-infinite-scroll": "git+https://github.com/lorenzofox3/lrInfiniteScroll.git"
+    "lr-infinite-scroll": "git+https://github.com/lorenzofox3/lrInfiniteScroll.git",
+    "q": "^1.5.1"
   }
 }
