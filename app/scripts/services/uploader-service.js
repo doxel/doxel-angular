@@ -183,15 +183,16 @@ angular.module('doxelApp')
 
             uploaderService.currentItem=item;
 
-            var promise;
             var q=$q.defer();
             var data={
 							item: item,
               file: item._file_orig || item._file
             };
+            var promise=$q.when(data);
 
             if (uploaderService.showThumb) {
-              promise= jpegFile.getFileDataURL(data)
+              promise=promise
+              .then(jpegFile.getFileDataURL)
               .then(jpegFile.preloadImage)
               .then(jpegFile.getThumb)
               .then(function(data){
@@ -205,11 +206,11 @@ angular.module('doxelApp')
                     'background-image': 'url('+uploader.thumbDataURL+')'
                   };
                 }
-                return $q.resolve(data);
+                return data;
               })
 
             } else {
-              promise=$q.resolve(data);
+              promise=$q.when(data);
             }
 
             function skipOnFail(action,errorMessage){
@@ -220,7 +221,7 @@ angular.module('doxelApp')
                 q.reject('skip');
               }
               try {
-                action(data)
+                action()
                 .then(q.resolve)
                 .catch(_catch);
               } catch(e){
@@ -231,13 +232,14 @@ angular.module('doxelApp')
             }
 
             promise.finally(function(){
-              jpegFile.getBinaryString(data)
-              .then(skipOnFail(jpegFile.getEXIF,'Error reading EXIF for '+data.file.name))
-              .then(jpegFile.getHash)
-              .then(uploaderService.isHashUnique)
-              .then(skipOnFail(jpegFile.updateEXIF,'Error updating EXIF for '+data.file.name))
-              .then(jpegFile.getTimestamp)
-              .then(jpegFile.getGPSCoords)
+              $q.when(data)
+              .then(function(data){return jpegFile.getBinaryString(data)})
+              .then(function(data){return skipOnFail(function(){return jpegFile.getEXIF(data)},'Error reading EXIF for '+data.file.name)})
+              .then(function(data){return jpegFile.getHash(data)})
+              .then(function(data){return uploaderService.isHashUnique(data)})
+              .then(function(data){return skipOnFail(function(){return jpegFile.updateEXIF(data)},'Error updating EXIF for '+data.file.name)})
+              .then(function(data){return jpegFile.getTimestamp(data)})
+              .then(function(data){return jpegFile.getGPSCoords(data)})
               .then(function(data){
                 var jpeg=data.jpeg_new||data.jpeg;
                 var blob=new Blob([stringToBinary(jpeg)],{type: 'image/jpeg'});
