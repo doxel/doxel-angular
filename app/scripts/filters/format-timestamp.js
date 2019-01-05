@@ -10,13 +10,17 @@
  */
 angular.module('doxelApp')
   .filter('formatTimestamp', function () {
-    var formatter={
-      month: new Intl.DateTimeFormat(navigator.language, {
-        month: 'long'
-      }),
-      day:  new Intl.DateTimeFormat(navigator.language, {
-        weekday: 'long'
-      })
+    try {
+      var formatter={
+        month: new Intl.DateTimeFormat(navigator.language, {
+          month: 'long'
+        }),
+        day:  new Intl.DateTimeFormat(navigator.language, {
+          weekday: 'long'
+        })
+      }
+    } catch(e) {
+      console.log(e);
     }
     return function (timestamp,format) {
       if (!timestamp) {
@@ -38,7 +42,7 @@ angular.module('doxelApp')
           return hh+':'+mi+':'+ss;
         case 'locale':
         console.log(timestamp)
-          return date.getFullYear()+' '+formatter.month.format(date)+' '+dd+' '+formatter.day.format(date);
+          if (formatter) return date.getFullYear()+' '+formatter.month.format(date)+' '+dd+' '+formatter.day.format(date);
         case 'ymdhm':
           return date.getFullYear()+'/'+mm+'/'+dd+', '+hh+':'+mi;
         case 'ymdhms':
