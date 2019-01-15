@@ -376,18 +376,16 @@ var app=angular
         }
       })
       .state('segment-job', {
-        url: '/segment/:segmentId/job/:jobId?',
-        templateUrl: 'views/job.html',
-        controller: 'JobCtrl',
-        controllerAs: 'job',
+        url: '/segment/:segmentId/job-config/:jobId?',
+        templateUrl: 'views/job-config.html',
+        controller: 'SegmentJobConfigCtrl',
+        controllerAs: 'jobConfig',
         params: {
           jobId: {
             value: null,
             squash: true
           },
-          segmentId: null,
-          needsAuth: true,
-          needsRole: 'foreman'
+          needsAuth: true
         }
       })
       /*
