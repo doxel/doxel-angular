@@ -65,7 +65,9 @@ var app=angular
     'angularFileUpload',
     'ngNotify',
     'smart-table',
-    'cp.ng.fix-image-orientation'
+    'cp.ng.fix-image-orientation',
+    'datatables',
+    'schemaForm'
 
   ])
   .config([
@@ -359,6 +361,19 @@ var app=angular
           segmentId: null,
           needsAuth: true,
           needsRole: 'foreman'
+        }
+      })
+      .state('segment-job', {
+        url: '/segment/:segmentId/job-config/:jobId?',
+        templateUrl: 'views/job-config.html',
+        controller: 'SegmentJobConfigCtrl',
+        controllerAs: 'jobConfig',
+        params: {
+          jobId: {
+            value: null,
+            squash: true
+          },
+          needsAuth: true
         }
       })
       /*
