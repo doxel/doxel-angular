@@ -1,0 +1,11 @@
+#segment-jobs {
+  transition-property: margin-top;
+  transition-duration: 0.5s;
+  margin-top: 64px;
+}
+
+.navbar-hidden {
+  #segment-jobs {
+    margin-top: 0;
+  }
+}

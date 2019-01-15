@@ -10,6 +10,7 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 @import "font-awesome/scss/font-awesome.scss";
 @import "bootstrap-social/bootstrap-social.scss";
 @import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "datatables-scroller/css/scroller.dataTables.scss";
 // endbower
 
 @media screen and (min-width: 768px) {
@@ -368,4 +369,6 @@ a * {
 @import "../styles/segment-pictures.scss";
 @import "../styles/segment-picture-details.scss";
 @import "../styles/segment-files.scss";
+@import "../styles/segment-jobs.scss";
 @import "../styles/joblogs.scss";
+@import "../styles/job-set.scss";

@@ -52,6 +52,10 @@
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css" />
     <link rel="stylesheet" href="bower_components/select2/select2.css" />
+    <link rel="stylesheet" href="bower_components/datatables/media/css/jquery.dataTables.css" />
+    <link rel="stylesheet" href="bower_components/datatables.net-dt/css/jquery.dataTables.css" />
+    <link rel="stylesheet" href="bower_components/angular-datatables/dist/css/angular-datatables.css" />
+    <link rel="stylesheet" href="bower_components/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -215,6 +219,26 @@
         <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
         <script src="bower_components/exif-js/exif.js"></script>
         <script src="bower_components/angular-fix-image-orientation/angular-fix-image-orientation.js"></script>
+        <script src="bower_components/tv4/tv4.js"></script>
+        <script src="bower_components/objectpath/lib/ObjectPath.js"></script>
+        <script src="bower_components/angular-schema-form/dist/schema-form.js"></script>
+        <script src="bower_components/angular-schema-form/dist/bootstrap-decorator.js"></script>
+        <script src="bower_components/angular-schema-form-bootstrap/bootstrap-decorator.min.js"></script>
+        <script src="bower_components/datatables/media/js/jquery.dataTables.js"></script>
+        <script src="bower_components/datatables.net/js/jquery.dataTables.js"></script>
+        <script src="bower_components/angular-datatables/dist/angular-datatables.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/bootstrap/angular-datatables.bootstrap.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/colreorder/angular-datatables.colreorder.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/columnfilter/angular-datatables.columnfilter.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/light-columnfilter/angular-datatables.light-columnfilter.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/colvis/angular-datatables.colvis.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/fixedcolumns/angular-datatables.fixedcolumns.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/fixedheader/angular-datatables.fixedheader.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/scroller/angular-datatables.scroller.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/tabletools/angular-datatables.tabletools.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/buttons/angular-datatables.buttons.js"></script>
+        <script src="bower_components/angular-datatables/dist/plugins/select/angular-datatables.select.js"></script>
+        <script src="bower_components/datatables-scroller/js/dataTables.scroller.js"></script>
         <!-- endbower -->
         <script src="scripts/webglearth2/api.js"></script>
         <!-- endbuild -->
@@ -241,6 +265,8 @@
         <script src="scripts/directives/dnd.js"></script>
         <script src="scripts/directives/picture-set.js"></script>
         <script src="scripts/directives/segment-set.js"></script>
+        <script src="scripts/directives/job-set.js"></script>
+        <script src="scripts/directives/job-details.js"></script>
         <script src="scripts/services/layout.js"></script>
         <script src="scripts/services/socket.js"></script>
         <script src="scripts/services/app-config.js"></script>
@@ -272,6 +298,7 @@
         <script src="scripts/controllers/segment-pictures.js"></script>
         <script src="scripts/controllers/segment-picture-details.js"></script>
         <script src="scripts/controllers/segment-files.js"></script>
+        <script src="scripts/controllers/segment-jobs.js"></script>
         <script src="scripts/services/server-events.js"></script>
         <!-- endbuild -->
         <!--script src="scripts/directives/picture-details.js"></script>

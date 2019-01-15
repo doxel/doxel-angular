@@ -1,0 +1,28 @@
+<div class="job-set">
+   <table datatable="ng" dt-options="dtOptions" dt-columns="dtColumns" class="row-border hover">
+     <thead>
+       <tr>
+         <th>Job</th>
+         <th>Type</th>
+         <th>User</th>
+         <th>Progressed</th>
+         <th>Assigned</th>
+         <th>Started</th>
+         <th>Completed</th>
+         <th>Status</th>
+       </tr>
+     </thead>
+     <tbody>
+      <tr ng-repeat="(index, job) in jobs" data-jobId="{{::job.id}}" ng-click="click($event,index)">
+          <td>{{::job.id}}</td>
+          <td>{{::job.type}}</td>
+          <td><userinfo user-id="job.userId"></user></td>
+          <td>{{::job.progressed | date:'yyyy/MM/dd, HH:mm':'utc' }}</td>
+          <td>{{::job.assigned | date:'yyyy/MM/dd, HH:mm':'utc' }}</td>
+          <td>{{::job.started | date:'yyyy/MM/dd, HH:mm':'utc' }}</td>
+          <td>{{::job.completed | date:'yyyy/MM/dd, HH:mm':'utc' }}</td>
+          <td>{{::job.completion_status}}</td>
+      </tr>
+    </tbody>
+    </table>
+</div>
