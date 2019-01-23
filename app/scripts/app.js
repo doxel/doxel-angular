@@ -283,8 +283,8 @@ var app=angular
           }
         }
       })
-      .state('gallery.view.cloud.pose', {
-        url: '/:pose',
+      .state('gallery.view.cloud.id', {
+        url: '/:id',
         controller: 'GalleryViewerCtrl'
       })
       .state('gallery.view.classifiers', {
@@ -363,6 +363,17 @@ var app=angular
           needsRole: 'foreman'
         }
       })
+      .state('segment-jobs', {
+        url: '/segment/:segmentId/jobs',
+        templateUrl: 'views/segment-jobs.html',
+        controller: 'SegmentJobsCtrl',
+        controllerAs: 'segmentJobs',
+        params: {
+          segmentId: null,
+          needsAuth: true,
+          needsRole: 'foreman'
+        }
+      })
       .state('segment-job', {
         url: '/segment/:segmentId/job-config/:jobId?',
         templateUrl: 'views/job-config.html',
@@ -433,6 +444,13 @@ var app=angular
       uploaderService,
       socketService
     ) {
+
+      $rootScope.$watch(function(){
+            return $location.path();
+      }, function(value){
+            console.log(value);
+            $rootScope.$broadcast('hashChange');
+      })
 
     $rootScope.$state=$state;
     $rootScope.$stateParams=$stateParams;
