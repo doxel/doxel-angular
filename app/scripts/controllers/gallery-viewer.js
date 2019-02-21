@@ -101,8 +101,14 @@ angular.module('doxelApp')
           $scope.updateViewerVisibility(toState.name);
         });
 
+        $scope.$on('hashChange',function(event){
+          if ($state.current.name.substr(0,$scope.viewer_state.length)==$scope.viewer_state) {
+            $scope.show();
+          }
+        });
+
         $scope.$on('segment.setview',function(event,segment){
-          if ($state.current.name==$scope.viewer_state) {
+          if ($state.current.name.substr(0,$scope.viewer_state.length)==$scope.viewer_state) {
             $scope.show();
           }
         });
@@ -147,7 +153,7 @@ angular.module('doxelApp')
           var search=(params.length)?'?'+params.join('&'):'';
 
           var src=$('iframe.viewer').attr('src');
-          var toSrc='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+'/viewer.html'+search;
+          var toSrc='/api/segments/viewer/'+segment.id+'/'+segment.timestamp+(isNaN($state.params.id)?'':'/'+$state.params.id)+'/viewer.html'+search;
           if (src!=toSrc) {
             $http.head(toSrc,{
               headers: {

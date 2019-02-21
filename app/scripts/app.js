@@ -284,8 +284,8 @@ var app=angular
           }
         }
       })
-      .state('gallery.view.cloud.pose', {
-        url: '/:pose',
+      .state('gallery.view.cloud.id', {
+        url: '/:id',
         controller: 'GalleryViewerCtrl'
       })
       .state('gallery.view.classifiers', {
@@ -445,6 +445,13 @@ var app=angular
       uploaderService,
       socketService
     ) {
+
+      $rootScope.$watch(function(){
+            return $location.path();
+      }, function(value){
+            console.log(value);
+            $rootScope.$broadcast('hashChange');
+      })
 
     $rootScope.$state=$state;
     $rootScope.$stateParams=$stateParams;
