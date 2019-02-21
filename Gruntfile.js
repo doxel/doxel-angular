@@ -14,12 +14,15 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  grunt.loadNpmTasks('grunt-contrib-less');
+
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
     ngtemplates: 'grunt-angular-templates',
     cdnify: 'grunt-google-cdn'
   });
+
 
   // Configurable paths for the application
   var appConfig = {
@@ -77,6 +80,10 @@ module.exports = function (grunt) {
       compass: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['compass:server', 'postcss:server']
+      },
+      less: {
+        files: ['<%= yeoman.app %>/styles/bootstrap/{,*/}*.less'],
+        tasks: ['less']
       },
       gruntfile: {
         files: ['Gruntfile.js']
@@ -258,6 +265,17 @@ module.exports = function (grunt) {
         ignorePath: /(\.\.\/){1,2}bower_components\//
       }
     }, 
+
+    less: {
+      bootstrap: {
+        options: {
+        },
+        files: {
+          '<%= yeoman.app %>/styles/bootstrap.scss': '<%= yeoman.app %>/styles/bootstrap/bootstrap.less'
+        }
+      }
+    },
+
 
     // Compiles Sass to CSS and generates necessary files if requested
     compass: {

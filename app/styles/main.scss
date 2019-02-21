@@ -293,6 +293,10 @@ a * {
   cursor: pointer;
 }
 
+.btn[disabled] * {
+  cursor: not-allowed;
+}
+
 .footer p {
   margin: 0;
 }
@@ -372,3 +376,4 @@ a * {
 @import "../styles/segment-jobs.scss";
 @import "../styles/joblogs.scss";
 @import "../styles/job-set.scss";
+@import "../styles/bootstrap.scss";
