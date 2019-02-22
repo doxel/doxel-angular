@@ -41,14 +41,14 @@ module.exports = function (grunt) {
         sourceMap: false,
         presets: [["env",{
           "targets": {
-            "browsers": ["last 2 versions", "safari >=7"]
+            "browsers": ["last 2 versions"]
           }
         }]]
       },
       dist: {
         files: [{
           expand: true,
-          src: ['.tmp/concat/scripts/*.js'],
+          src: ['<%= yeoman.dist %>/scripts/*.js'],
           dest: '.',
           ext: '.js'
         }]
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
       },
       jsTest: {
         files: ['test/spec/{,*/}*.js'],
-        tasks: ['newer:jshint:test'/*, 'newer:jscs:test', 'karma'*/]
+        tasks: ['newer:jshint:test', /*'newer:jscs:test',*/ 'karma']
       },
       compass: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
@@ -214,7 +214,7 @@ module.exports = function (grunt) {
     postcss: {
       options: {
         processors: [
-          require('autoprefixer-core')({browsers: ['last 1 version']})
+          require('autoprefixer')({browsers: ['last 2 versions']})
         ]
       },
       server: {
@@ -328,7 +328,7 @@ module.exports = function (grunt) {
         flow: {
           html: {
             steps: {
-              js: ['concat','uglifyjs'],
+              js: ['concat','uglify'],
               css: ['cssmin']
             },
             post: {}
@@ -364,21 +364,31 @@ module.exports = function (grunt) {
     //       '<%= yeoman.dist %>/styles/main.css': [
     //         '.tmp/styles/{,*/}*.css'
     //       ]
-    //     }
-    //   }
-    // },
-    // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%= yeoman.dist %>/scripts/scripts.js': [
-    //         '<%= yeoman.dist %>/scripts/scripts.js'
-    //       ]
-    //     }
-    //   }
-    // },
+    //      }
+    //    }
+    //  },
+    //  uglify: {
+    //    dist: {
+    //     files: [{
+    //       expand: true,
+    //       src: ['.tmp/concat/scripts/*.js'],
+    //       dest: '.',
+    //       ext: '.js'
+    //     }]
+    //    }
+    //  },
     // concat: {
     //   dist: {}
     // },
+    //
+//    uglify: {
+//      options: {
+//        mangle: {
+//          reserved: ['angular']
+//        }
+//      }
+//    },
+
 
     imagemin: {
       dist: {
@@ -438,11 +448,10 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '.tmp/concat/scripts',
-          src: '*.js',
-          dest: '.tmp/concat/scripts'
+          src: ['.tmp/concat/scripts/*.js'],
+          dest: '.'
         }]
-      }
+        }
     },
 
     // Replace Google CDN references
@@ -502,14 +511,12 @@ module.exports = function (grunt) {
     },
 
     // Test settings
-    /*
     karma: {
       unit: {
         configFile: 'test/karma.conf.js',
         singleRun: true
       }
     }
-    */
   });
 
 
@@ -520,7 +527,9 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'browserify',
       'wiredep',
+      'less',
       'concurrent:server',
       'postcss:server',
       'connect:livereload',
@@ -535,12 +544,14 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
+    'browserify',
     'wiredep',
+    'less',
     'concurrent:test',
-    'postcss',
+    'postcss:server',
     'connect:test',
-    'watch'//,
-    //    'karma'
+    'watch',
+    'karma'
   ]);
 
   grunt.registerTask('build', [
@@ -548,25 +559,33 @@ module.exports = function (grunt) {
     'browserify',
     'wiredep',
     'useminPrepare',
+    'less',
     'concurrent:dist',
-    'postcss',
+    'postcss:dist',
     'ngtemplates',
-    'concat',
+    'concat:generated',
+    'babel',
     'ngAnnotate',
-//    'babel',
     'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
+//    'cdnify',
+    'cssmin:generated',
+    'uglify:generated',
     'filerev',
     'usemin',
     'htmlmin'
+ 
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
+    'clean:server',
+    //'newer:jshint',
     //    'newer:jscs',
-    'test',
-    'build'
+    'browserify',
+    'wiredep',
+    'less',
+    'concurrent:server',
+    'postcss:server',
+    'connect:test',
+    'watch'
   ]);
 };
