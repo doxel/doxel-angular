@@ -40,6 +40,14 @@
         <td class="first-uppercase">{{row.status}}</td>
         <td>{{row.status_timestamp | fromNow }}</td>
         <td>
+          <a ng-href="{{::'/app/#!/segment/'+row.id+'/job-config'}}">
+            <button type="button" class="btn btn-sm btn-default" title="Edit post-processing config">
+              <i class="fa fa-fw fa-cog">
+              </i>
+            </button>
+          </a>
+        </td>
+        <td>
           <a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/joblogs' : '')}}" ng-click="preventDefault($event)">
             <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row,$event)" class="btn btn-sm btn-default" title="View processing history">
               <i class="fa fa-fw fa-history">
@@ -48,16 +56,16 @@
           </a>
         </td>
         <td>
-          <a ng-href="{{::'/app/#!/segment/'+row.id+'/files'}}" ng-click="preventDefault($event)">
-            <button type="button" ng-click="viewFiles(row,$event)" class="btn btn-sm btn-default" title="View segment files">
+          <a ng-href="{{::'/app/#!/segment/'+row.id+'/files'}}">
+            <button type="button" class="btn btn-sm btn-default" title="View segment files">
               <i class="fa fa-fw fa-folder-o">
               </i>
             </button>
           </a>
         </td>
         <td>
-          <a ng-href="{{::'/app/#!/segment/'+row.id+'/pictures'}}" ng-click="preventDefault($event)">
-            <button type="button" ng-click="viewSegment(row,$event)" class="btn btn-sm btn-default" title="View segment pictures">
+          <a ng-href="{{::'/app/#!/segment/'+row.id+'/pictures'}}">
+            <button type="button" class="btn btn-sm btn-default" title="View segment pictures">
               <i class="fa fa-fw fa-picture-o">
               </i>
             </button>
@@ -65,20 +73,20 @@
         </td>
         <td>
           <a ng-href="{{::(row.pointCloudId ? '/api/segments/viewer/'+row.id+'/'+row.timestamp+'/viewer.html' : '')}}" target="_blank">
-            <button ng-disabled="!row.pointCloudId" type="button" ng-click="/*viewCloud(row,$event)*/" class="btn btn-sm btn-default" title="Preview pointcloud">
+            <button ng-disabled="!row.pointCloudId" type="button" class="btn btn-sm btn-default" title="Preview pointcloud">
               <i class="fa fa-fw fa-eye">
               </i>
             </button>
           </a>
         </td>
         <td>
-          <button ng-disabled="isCancelButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
+          <button ng-disabled="isBackwardButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{backwardButtonTitle(row)}}">
             <i class="fa fa-fw fa-arrow-left">
             </i>
           </button>
         </td>
         <td>
-          <button ng-disabled="isCheckButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{checkButtonTitle(row)}}">
+          <button ng-disabled="isForwardButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{forwardButtonTitle(row)}}">
             <i class="fa fa-fw fa-arrow-right">
             </i>
           </button>

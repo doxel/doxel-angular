@@ -280,7 +280,7 @@ angular.module('doxelApp')
         $scope.locked=false;
       },
 
-      isCheckButtonDisabled: function(segment){
+      isForwardButtonDisabled: function(segment){
         return [
           'processing',
           'processed',
@@ -290,7 +290,7 @@ angular.module('doxelApp')
         ].indexOf(segment.status)>=0;
       },
 
-      checkButtonTitle: function(segment){
+      forwardButtonTitle: function(segment){
         switch(segment.status) {
           default:
             return '';
@@ -316,14 +316,14 @@ angular.module('doxelApp')
         }
       },
 
-      isCancelButtonDisabled: function(segment){
+      isBackwardButtonDisabled: function(segment){
         return [
           'discarded'
 
         ].indexOf(segment.status)>=0;
       },
 
-      cancelButtonTitle: function(segment){
+      backwardButtonTitle: function(segment){
         switch(segment.status) {
           case 'discarded':
           default:
