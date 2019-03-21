@@ -95,16 +95,18 @@ angular.module('doxelApp')
           $scope.segmentsPromise=$scope.loadSegments()
             .then(function(segments){
               $scope._segments=loopbackFilters(segments,{
-                order: 'created DESC'
+                order: 'status_timestamp DESC'
               });
               // load and format segments data (must all be done at once for sortiing)
               $scope._segments.reduce(function(promise, segment){
-                return $scope.getSegmentData(segment).then(function(){
-                  ++$scope.loadingProgress;
-                  $scope.progressStyle={
-                    width: ($scope.loadingProgress / $scope._segments.length * 100) + '%'
-                  };
-                });
+//                return promise.then(function(){
+                  return $scope.getSegmentData(segment).then(function(){
+                    ++$scope.loadingProgress;
+                    $scope.progressStyle={
+                      width: ($scope.loadingProgress / $scope._segments.length * 100) + '%'
+                    };
+                  });
+ //               });
               }, $q.resolve())
               .then(function(){
                 Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length].concat(loopbackFilters($scope._segments,{
@@ -130,7 +132,8 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: where,
-        //    limit: 10,
+            limit: 10,
+            order: 'status_timestamp DESC',
             fields: {
               id: true,
               previewId: true,
@@ -239,20 +242,22 @@ angular.module('doxelApp')
       },
 
       proceed: function(segment, operation){
+        console.log(segment.status,segment.status_timestamp);
         return Segment.proceed({
           id: segment.id,
           status: segment.status||'new',
-          status_timestamp: segment.status_timestamp||Date.now(),
+          status_timestamp: segment.status_timestamp||Date.now()/*Date.now() looks useless*/,
           operation: operation
 
         }).$promise.then(function(res){
-          return
-          segment.status=(res.status&&res.status.length)?res.status:'new';
-          segment.status_timestamp=(res.status_timestamp!==undefined)?res.status_timestamp:segment.status_timestamp;
+          console.log(segment.status,segment.status_timestamp);
+          $scope.$apply();
+          resolve();
         })
         .catch(function(err){
           console.log(err);
           $scope.error=err;
+          reject(err)
         });
       },
 
@@ -291,7 +296,11 @@ angular.module('doxelApp')
             return '';
 
           case 'new':
+          case 'error':
             return 'Queue for processing';
+
+          case 'publishable':
+            return 'Publish this segment';
 
           case 'processed':
             return 'Waiting for pointcloud injection';
@@ -324,6 +333,7 @@ angular.module('doxelApp')
           case 'processed':
           case 'publishable':
           case 'published':
+          case 'error':
             return 'Discard this segment';
 
           case 'queued':

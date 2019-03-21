@@ -3,13 +3,24 @@
 }
 
 #processing {
-  position: fixed;
   left: 0;
   padding-top: 64px;
   height: 100%;
   width: 100%;
   align-content: center;
   overflow: auto;
+
+  .overlay {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    z-index: 9999999;
+    background-color: rgba(0,0,0,0.5);
+  }
+
+  table {
+    width: auto;
+  }
 
   th, td {
     cursor: pointer;
@@ -36,7 +47,7 @@
     left: 35%;
     margin-top: -128px;
     height: 256px;
-    background: black;
+    background: darkSlateGray;
     border: solid 1px white;
 
     .message {

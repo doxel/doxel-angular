@@ -8,7 +8,14 @@
     </div>
   </div>
 
-  <table ng-show="$state.current.name=='processing' && !loading" st-table="segmentsVisible" st-persist="processingTable" st-safe-src="segmentsPool" class="table table-striped">
+  <div class="overlay" ng-if="showOverlay">
+    <div class="message">Please wait...</div>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped" role="progressbar"></div>
+    </div>
+  </div>
+
+  <table ng-show="$state.current.name=='processing' && !loading" st-table="segmentsVisible" st-persist="processingTable" st-safe-src="segmentsPool" class="table table-striped" align="center">
     <thead>
       <tr>
         <th>Preview</th>
@@ -17,9 +24,10 @@
         <th st-sort="_username">User</th>
         <th st-sort="picturesCount">Pictures</th>
         <th st-sort="status">Status</th>
+        <th st-sort="status">Updated</th>
       </tr>
       <tr>
-        <th colspan="6"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
+        <th colspan="7"><input st-search="" class="form-control" placeholder="global search ..." type="text"/></th>
       </tr>
     </thead>
     <tbody>
@@ -30,6 +38,7 @@
         <td><userinfo user="row.user" /></td>
         <td>{{row.picturesCount}}</td>
         <td class="first-uppercase">{{row.status}}</td>
+        <td>{{row.status_timestamp | fromNow }}</td>
         <td>
           <a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/joblogs' : '')}}" ng-click="preventDefault($event)">
             <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row,$event)" class="btn btn-sm btn-default" title="View processing history">
@@ -63,14 +72,14 @@
           </a>
         </td>
         <td>
-          <button ng-disabled="isCheckButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{checkButtonTitle(row)}}">
-            <i class="fa fa-fw fa-check">
+          <button ng-disabled="isCancelButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
+            <i class="fa fa-fw fa-arrow-left">
             </i>
           </button>
         </td>
         <td>
-          <button ng-disabled="isCancelButtonDisabled(row)" type="button" ng-click="cancel(row)" class="btn btn-sm btn-default" ng-attr-title="{{cancelButtonTitle(row)}}">
-            <i class="fa fa-fw fa-times">
+          <button ng-disabled="isCheckButtonDisabled(row)" type="button" ng-click="proceedFurther(row)" class="btn btn-sm btn-default" ng-attr-title="{{checkButtonTitle(row)}}">
+            <i class="fa fa-fw fa-arrow-right">
             </i>
           </button>
         </td>
@@ -78,7 +87,7 @@
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="5" class="text-center">
+        <td colspan="7" class="text-center">
           <div st-template="/views/pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
         </td>
       </tr>
