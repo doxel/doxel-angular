@@ -11,6 +11,12 @@
   align-content: center;
   overflow: auto;
 
+  table {
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
   th, td {
     cursor: pointer;
     vertical-align: middle;

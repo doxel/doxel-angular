@@ -80,7 +80,7 @@ angular.module('doxelApp')
         },
 
         cancel: function() {
-          document.location.reload();
+          window.history.back();
         }
 
       });  // extend $scope
