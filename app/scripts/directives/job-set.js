@@ -47,15 +47,18 @@ angular.module('doxelApp')
       restrict: 'E',
       replace: false,
       scope: {
-        jobs: '='
+        jobs: '=',
+        jobClick: '&'
       },
       controller: [
+        '$compile',
         '$scope',
         '$q',
         'errorMessage',
         'DTOptionsBuilder',
         'DTColumnDefBuilder',
         function(
+          $compile,
           $scope,
           $q,
           errorMessage,
@@ -67,7 +70,10 @@ angular.module('doxelApp')
           .withDOM('lfrti')
           .withScroller()
           .withOption('deferRender', true)
-          // Do not forget to add the scorllY option!!!
+          .withOption('initComplete', function(elem) {
+            $compile(angular.element(elem))($scope);
+          })
+          // Do not forget to add the scrollY option!!!
           .withOption('scrollY', 400);
 //          .withPaginationType('full_numbers');
           $scope.dtColumnDefs=[

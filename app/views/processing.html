@@ -48,8 +48,9 @@
           </a>
         </td>
         <td>
-          <a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/joblogs' : '')}}" ng-click="preventDefault($event)">
-            <button ng-disabled="!row.jobs.length" type="button" ng-click="viewHistory(row,$event)" class="btn btn-sm btn-default" title="View processing history">
+          <!--a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/joblogs' : '')}}" ng-click="preventDefault($event)"-->
+          <a ng-href="{{(row.jobs.length ? '/app/#!/segment/'+row.id+'/jobs' : '')}}">
+            <button ng-disabled="!row.jobs.length" type="button" class="btn btn-sm btn-default" title="View processing history">
               <i class="fa fa-fw fa-history">
               </i>
             </button>
