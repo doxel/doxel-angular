@@ -68,8 +68,7 @@ var app=angular
     'cp.ng.fix-image-orientation',
     'schemaForm',
     'datatables',
-    'datatables.scroller',
-    'yaru22.angular-timeago'
+    'datatables.scroller'
 
   ])
   .config([
