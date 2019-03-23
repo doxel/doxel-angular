@@ -54,7 +54,10 @@ angular.module('doxelApp')
               $scope.model=angular.merge({},json.defaults,segment.params.jobConfig||{});
               $scope.schema=json.schema;
               $scope.form=[
-                "*",
+                { key: "openMVG" },
+                { key: "densification_method" },
+                { key: "cmvspmvs", condition: "model.densification_method=='pmvs'" },
+                { key: "smvs", condition: "model.densification_method=='smvs'" },
                 {
                   type: "actions",
                   items: [
