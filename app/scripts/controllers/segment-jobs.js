@@ -33,19 +33,12 @@ angular.module('doxelApp')
     ];
 
     angular.extend($scope,{
-      initEventHandlers: function(){
-        $scope.$on('$locationChangeSuccess',function($event,newUrl,oldUrl,newState,oldState){
-          console.log(arguments);
-        });
-
-      },
-
-      click: function($event){
+      jobClick: function($event){
         $state.transitionTo('segment-job.details',{
           segmentId: $scope.segment.id,
-          timestamp: $scope.picturesPool[$scope.pictureIndex+incr].timestamp
+          jobId: $($event.target).closest('tr').data('jobid')
         });
-      }, // click
+      }, // jobClick
 
       init: function() {
         console.log($stateParams)
@@ -61,14 +54,10 @@ angular.module('doxelApp')
             $scope.segment=segment;
             $scope.visible=true;
           });
-
         }
-        $scope.initEventHandlers();
-
       } // init
 
     });
-
     $scope.init();
   }
 

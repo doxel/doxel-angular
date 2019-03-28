@@ -1,5 +1,5 @@
 /*
- * segment-details.js
+ * job-details.js
  *
  * Copyright (c) 2015-2018 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
@@ -37,53 +37,40 @@
 
 /**
  * @ngdoc directive
- * @name doxelApp.directive:segmentDetails
+ * @name doxelApp.directive:jobDetails
  * @description
  * # segment-details
  */
 angular.module('doxelApp')
-  .directive('segmentDetails', function () {
+  .directive('jobDetails', function () {
     return {
       restrict: 'E',
       replace: false,
       scope: {
-        segment: '=',
-        segmentDetailsClass: '@'
+        jobId: '=',
+        job: '='
       },
-      controller: ['$scope', '$q', '$http', 'errorMessage', 'Picture', function($scope, $q, $http, errorMessage, Picture) {
-        $scope.updateSegmentDetails=function(){
-          var segment=$scope.segment;
-          if (segment.pictures) {
-            $scope.count=segment.pictures.length;
-
-          } else {
-            if (segment.picturesCount) {
-              $scope.count=segment.picturesCount;
-
-            } else {
-              Picture.count({
-                  where: {
-                    segmentId: segment.id
-                  }
-              },function(result){
-                $scope.count=segment.picturesCount=result && result.count;
-              },function(err){
-                errorMessage.show(err);
-              });
-            }
-          }
-
-        }; // updateSegmentDetails
-
+      controller: ['$scope', '$q', '$http', 'errorMessage', 'Job', function($scope, $q, $http, errorMessage, Job) {
+        if (!$scope.job) {
+          Job.findById($scope.jobId)
+          .then(function(job){
+            $scope.job=job;
+          })
+          .catch(function(err)){
+            console.log(err);
+            errorMessage('Could not fetch job '+jobId+' details.');
+          });
+        }
       }],
+/*
       link: function(scope,element,attrs) {
-        scope.$watch('segment',function(newValue, oldValue){
+        scope.$watch('job',function(newValue, oldValue){
           if (newValue) {
-            scope.updateSegmentDetails();
+            scope.updateJobDetails();
           }
         });
-
+*/
       },
-      templateUrl: 'views/segment-details.html'
+      templateUrl: 'views/job-details.html'
     };
   });

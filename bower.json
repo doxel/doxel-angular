@@ -2,6 +2,7 @@
   "name": "doxel",
   "version": "0.0.0",
   "dependencies": {
+    "jquery": "^3.2.1",
     "angular": "^1.6.1",
     "bootstrap-sass-official": "^3.2.0",
     "angular-animate": "^1.4.0",
@@ -48,14 +49,13 @@
     "angular-ui-select3": "ui-select#*",
     "bootstrap": "^3.3.7",
     "bootstrap-sass": "bootstrap-sass-official#^3.3.7",
-    "jquery": "^3.2.1",
     "angular-fix-image-orientation": "czarpino/angular-fix-image-orientation",
     "angular-schema-form": "^0.8.14",
     "angular-schema-form-bootstrap": "^0.2.0",
     "datatables": "^1.10.19",
     "angular-datatables": "v0.6.2",
     "datatables-scroller": "^1.5.1",
-    "angular-timeago": "^0.4.6"
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "angular-mocks": "^1.4.0"
@@ -65,7 +65,7 @@
   "overrides": {
     "angular": {
       "dependencies": {
-        "jquery": ">=3.2.0"
+        "jquery": ">=3.2.1"
       }
     },
     "bootstrap": {

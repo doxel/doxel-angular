@@ -7421,6 +7421,50 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
 
             /**
              * @ngdoc method
+             * @name lbServices.Segment#getOrUpdateStatus
+             * @methodOf lbServices.Segment
+             *
+             * @description
+             *
+             * <em>
+             * (The remote method definition does not provide any description.)
+             * </em>
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *  - `id` – `{string}` -
+             *
+             *  - `timestamp` – `{string=}` -
+             *
+             *  - `status` – `{string=}` -
+             *
+             *  - `req` – `{object=}` -
+             *
+             *  - `res` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * Data properties:
+             *
+             *  - `status` – `{string=}` -
+             *
+             *  - `status_timestamp` – `{number=}` -
+             */
+            "getOrUpdateStatus": {
+              url: urlBase + "/Segments/:id/status",
+              method: "GET",
+            },
+
+            /**
+             * @ngdoc method
              * @name lbServices.Segment#merge
              * @methodOf lbServices.Segment
              *
@@ -7550,7 +7594,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
              *
              *  - `id` – `{string}` -
              *
-             *  - `requestedPath` – `{string}` -
+             *  - `requestedPath` – `{string=}` -
              *
              *  - `req` – `{object=}` -
              *
@@ -7607,6 +7651,49 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' &&
             "ply": {
               url: urlBase + "/Segments/:id/ply",
               method: "GET",
+            },
+
+            /**
+             * @ngdoc method
+             * @name lbServices.Segment#setJobConfig
+             * @methodOf lbServices.Segment
+             *
+             * @description
+             *
+             * <em>
+             * (The remote method definition does not provide any description.)
+             * </em>
+             *
+             * @param {Object=} parameters Request parameters.
+             *
+             *   This method does not accept any parameters.
+             *   Supply an empty object or omit this argument altogether.
+             *
+             * @param {Object} postData Request data.
+             *
+             *  - `id` – `{string}` -
+             *
+             *  - `jobConfig` – `{object}` -
+             *
+             *  - `req` – `{object=}` -
+             *
+             *  - `res` – `{object=}` -
+             *
+             * @param {function(Object,Object)=} successCb
+             *   Success callback with two arguments: `value`, `responseHeaders`.
+             *
+             * @param {function(Object)=} errorCb Error callback with one argument:
+             *   `httpResponse`.
+             *
+             * @returns {Object} An empty reference that will be
+             *   populated with the actual data once the response is returned
+             *   from the server.
+             *
+             * This method returns no data.
+             */
+            "setJobConfig": {
+              url: urlBase + "/Segments/:id/setJobConfig",
+              method: "POST",
             },
 
             // INTERNAL. Use User.segments.findById() instead.

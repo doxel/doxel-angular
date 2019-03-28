@@ -1,3 +1,4 @@
-<div id="segmentJobConfig">
-    <form sf-schema="schema" sf-form="form" sf-model="model"></form>
+<div id="jobConfig">
+    <form ng-if="showForm" sf-schema="schema" sf-form="form" sf-model="model"></form>
+    <textarea ng-if="showJSON"></textarea>
 </div>
