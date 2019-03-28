@@ -132,7 +132,7 @@ angular.module('doxelApp')
         return Segment.find({
           filter: {
             where: where,
-            limit: 10,
+       //     limit: 10,
             order: 'status_timestamp DESC',
             fields: {
               id: true,
@@ -251,7 +251,7 @@ angular.module('doxelApp')
 
         }).$promise.then(function(res){
           console.log(segment.status,segment.status_timestamp);
-          $scope.$apply();
+          setTimeout($scope.$apply,150);
           resolve();
         })
         .catch(function(err){
