@@ -58,7 +58,7 @@ angular.module('doxelApp')
           })
           .catch(function(err)){
             console.log(err);
-            errorMessage('Could not fetch job '+jobId+' details.');
+            errorMessage.show('Could not fetch job '+jobId+' details.');
           });
         }
       }],

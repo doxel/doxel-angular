@@ -13,7 +13,7 @@ angular.module('doxelApp')
     '$stateParams',
     function(
       $scope,
-      $stateParams,
+      $stateParams
     ) {
       this.awesomeThings = [
         'HTML5 Boilerplate',
@@ -27,7 +27,5 @@ angular.module('doxelApp')
         showForm: true,
         segmentId: $stateParams.segmentId
       });  // extend $scope
-
-      $scope.init();
    }
  ]);

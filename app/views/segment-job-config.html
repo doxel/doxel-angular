@@ -1,3 +1,7 @@
-<div id="segmentJobConfig">
-    <job-config jobId="jobId" show-form="showForm" show-json="showJSON"></job-config>
+<div class="segmentJobConfig">
+  <div class="btn-group" role="group" aria-label="Display mode">
+    <button class="btn btn-default" ng-class="{active: showForm}" ng-click="showForm=true">Form</button>
+    <button class="btn btn-default" ng-class="{active: !showForm}" ng-click="showForm=false">JSON</button>
+  </div>
+  <job-config segment="segment" show-form="showForm"></job-config>
 </div>

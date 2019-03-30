@@ -1,0 +1,19 @@
+job-config {
+  height: 100%;
+  width: 100%;
+  padding-bottom: 1em;
+  .job-config {
+    width: 100%;
+    height: 100%;
+    form {
+      padding-bottom: 1em;
+    }
+    textarea {
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: white;
+      margin-bottom: 1em;
+    }
+  }
+}

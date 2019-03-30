@@ -1,11 +1,12 @@
-#segmentJobConfig {
+.segmentJobConfig {
   padding-top: 64px;
   padding-bottom: 1em;
-  form {
-    max-width: 460px;
-  }
+  height: 100%;
+  max-width: 480px;
+  margin: auto;
+  padding-bottom: 1em;
 }
 
-.navbar-hidden #segmentJobConfig {
+.navbar-hidden .segmentJobConfig {
   padding-top: 1em;
 }
