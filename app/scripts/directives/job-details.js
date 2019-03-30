@@ -56,7 +56,7 @@ angular.module('doxelApp')
           .then(function(job){
             $scope.job=job;
           })
-          .catch(function(err)){
+          .catch(function(err){
             console.log(err);
             errorMessage.show('Could not fetch job '+jobId+' details.');
           });
