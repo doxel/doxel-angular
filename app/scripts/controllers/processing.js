@@ -86,6 +86,10 @@ angular.module('doxelApp')
           return;
         }
 
+        var objectIdToTimestamp = function (objectId) {
+            return parseInt(objectId.substring(0, 8), 16) * 1000;
+        };
+
         $scope.initEventHandlers();
 
         // load unprocessed segments list
@@ -94,11 +98,10 @@ angular.module('doxelApp')
           $scope.loadingProgress=0;
           $scope.segmentsPromise=$scope.loadSegments()
             .then(function(segments){
-              $scope._segments=loopbackFilters(segments,{
-                order: 'status_timestamp DESC'
-              });
               // load and format segments data (must all be done at once for sortiing)
+              $scope._segments=segments;
               $scope._segments.reduce(function(promise, segment){
+                  if (!segment.status_timestamp) segment.status_timestamp=objectIdToTimestamp(segment.id);
 //                return promise.then(function(){
                   return $scope.getSegmentData(segment).then(function(){
                     ++$scope.loadingProgress;
@@ -110,6 +113,7 @@ angular.module('doxelApp')
               }, $q.resolve())
               .then(function(){
                 Array.prototype.splice.apply($scope.segments,[0,$scope.segments.length].concat(loopbackFilters($scope._segments,{
+                  order: 'status_timestamp DESC',
                   where: {
                     picturesCount: {gt: 1}
                   }
