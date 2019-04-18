@@ -140,7 +140,7 @@
         </div>
       </div>
 
-      <div class="container" ui-view></div>
+      <div ng-if="!$state.current.name.toString().match('gallery')" class="container" ui-view></div>
       <div ui-view="gallery"></div>
 
       <div class="views">
