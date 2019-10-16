@@ -44,7 +44,7 @@ angular.module('doxelApp')
                     }
                   }
                 }, function(user){
-                  usersCache[userId]=user;
+                  if (usersCache) usersCache[userId]=user;
                   $scope.user=user;
                 }, function(err){
                   console.log(userId,err);

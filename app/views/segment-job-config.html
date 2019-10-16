@@ -3,5 +3,5 @@
     <button class="btn btn-default" ng-class="{active: showForm}" ng-click="showForm=true">Form</button>
     <button class="btn btn-default" ng-class="{active: !showForm}" ng-click="showForm=false">JSON</button>
   </div>
-  <job-config segment="segment" show-form="showForm"></job-config>
+  <job-config ng-if="segment" segment="segment" show-form="showForm"></job-config>
 </div>

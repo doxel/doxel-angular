@@ -72,7 +72,6 @@ angular.module('doxelApp')
     }
 
     $scope.setPassword=function($event){
-      console.log($scope.newpassword,$scope.confirmpassword);
       $scope.errorMessage(null);
       if (!$scope.newpassword.length) {
         $scope.errorMessage('noPassword');

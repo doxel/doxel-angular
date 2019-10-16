@@ -41,6 +41,8 @@ angular.module('doxelApp')
       },
 
       init: function() {
+        $scope.segmentId=$stateParams.segmentId;
+        $scope.jobId=$stateParams.jobId;
         console.log($stateParams)
         $scope.visible=true;
         $scope.initEventHandlers();

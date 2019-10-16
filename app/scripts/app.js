@@ -390,17 +390,20 @@ var app=angular
         }
       })
       .state('segment-jobs.details', {
-        parent: 'segment-jobs',
         url: '/:jobId',
-        templateUrl: 'views/segment-job-details.html',
-        controller: 'SegmentJobDetailsCtrl',
-        controllerAs: 'SegmentJobDetails',
-        params: {
-          jobId: {
-            value: null
-          },
-          needsAuth: true,
-          needsRole: 'foreman'
+        views: {
+          'job-details': {
+            templateUrl: 'views/segment-jobs-details.html',
+            controller: 'SegmentJobsDetailsCtrl',
+            controllerAs: 'SegmentJobsDetails',
+            params: {
+              jobId: {
+                value: null
+              },
+              needsAuth: true,
+              needsRole: 'foreman'
+            }
+          }
         }
       })
       /*

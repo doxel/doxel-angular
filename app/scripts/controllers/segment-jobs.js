@@ -34,7 +34,7 @@ angular.module('doxelApp')
 
     angular.extend($scope,{
       jobClick: function($event){
-        $state.transitionTo('segment-job.details',{
+        $state.transitionTo('segment-jobs.details',{
           segmentId: $scope.segment.id,
           jobId: $($event.target).closest('tr').data('jobid')
         });

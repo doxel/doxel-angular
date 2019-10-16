@@ -69,8 +69,8 @@ angular.module('doxelApp')
             scope.updateJobDetails();
           }
         });
-*/
       },
+*/
       templateUrl: 'views/job-details.html'
     };
   });

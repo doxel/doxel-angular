@@ -14,13 +14,13 @@ angular.module('doxelApp')
     replace: false,
     templateUrl: 'views/job-config.html',
     scope: {
-      segment: '&',
-      job: '&',
-      jobConfig: '&',
-      jobId: '<',
-      _save: '&save',
-      _cancel: '&cancel',
-      showForm: '='
+      segment: '=?',
+      job: '=?',
+      jobConfig: '=?',
+      jobId: '<?',
+      save: '&?',
+      cancel: '&?',
+      showForm: '=?'
     },
     link: function(scope, element, attrs) {
       scope.element=element;
@@ -48,6 +48,7 @@ angular.module('doxelApp')
         var self=this;
 
         angular.extend($scope, {
+          zeroValue: {},
           init: function() {
             self.config_promise=$q.defer();
             fetch('/job-config.json')
@@ -61,10 +62,7 @@ angular.module('doxelApp')
             });
 
             if (!$scope.segment && !$scope.jobConfig && !$scope.job) {
-              Jobs.findById({
-                id:$scope.jobId
-              })
-              .then(function(job){
+              Job.findById($scope.jobId).$promise.then(function(job){
                 setJobConfig(job&&job.config);
               })
               .catch(function(err){
@@ -72,13 +70,30 @@ angular.module('doxelApp')
                 errorMessage.show('Could not fetch job '+$scope.jobId+' details.');
               });
             } else {
-              setJobConfig(($scope.segment&&$scope.segment.params&&$scope.params.jobConfig)||$scope.jobConfig||$scope.job.config||{});
+              setJobConfig(
+                ($scope.segment && ($scope.segment.params&&$scope.segment.params.jobConfig || {}) )
+                || $scope.jobConfig
+                || $scope.job.config
+                || {}
+              );
             }
 
             function updateJson() {
               $scope.json=JSON.stringify(noNullProp($scope.model),false,4);
               $('textarea',$scope.element).val($scope.json);
             }
+
+            function addWatcher() {
+              var unwatch=$scope.$watch('model',function(newValue, oldValue){
+                if (!angular.equals(oldValue, newValue)) {
+                  if (oldValue) $scope.changed=true;
+                  $('button.save').attr('disabled',!$scope.changed);
+                  unwatch();
+                  addWatcher();
+                }
+              }, true);
+            }
+            addWatcher();
 
             $scope.$watch('showForm', function(newValue, oldValue) {
               if (newValue==oldValue) return;
@@ -113,13 +128,13 @@ angular.module('doxelApp')
                   {
                     type: "actions",
                     items: [
-                      { type: 'button', style: 'btn-success', title: 'Save', onClick: $scope.save },
-                      { type: 'button', style: 'btn-info', title: 'Cancel', onClick: $scope.cancel }
+                      { type: 'button', style: 'btn-success save', title: 'Save', onClick: $scope._save },
+                      { type: 'button', style: 'btn-info cancel', title: 'Cancel', onClick: $scope._cancel }
                     ]
                   }
                 ];
                 $scope.visible=true;
-                $scope.$broadcast('schemaFormRedraw')
+                $scope.$broadcast('schemaFormRedraw');
               })
               .catch(function(err){
                 console.log(err);
@@ -128,21 +143,26 @@ angular.module('doxelApp')
             }
           },
 
-          save: function() {
-            if ($scope._save) {
-              $scope._save($scope.model);
+          _save: function() {
+            if ($scope.save) {
+              $scope.save($scope.model);
             } else {
               $scope.segment.params.jobConfig=$scope.model;
               var promise=$scope.segment.$setJobConfig({jobConfig:$scope.model});
-              promise.then(console.log).catch(function(err){
+              promise.then(function(segment){
+                window.alert("Settings were saved successfuly.");
+                $scope.zeroValue=angular.merge({},$scope.model);
+                $scope.changed=false;
+                $('button.save').attr('disabled',!$scope.changed);
+              }).catch(function(err){
                 window.alert("An error occured while trying to save the config");
                 console.error(err);
               });
             }
           },
 
-          cancel: function() {
-            if ($scope._cancel) $scope.cancel();
+          _cancel: function() {
+            if ($scope.cancel) $scope.cancel();
             else window.history.back();
           }
 

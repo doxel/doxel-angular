@@ -16,7 +16,7 @@
        <tr ng-repeat="(index, job) in jobs" data-jobId="{{::job.id}}" ng-click="jobClick()($event)">
           <td>{{::job.id}}</td>
           <td>{{::job.type}}</td>
-          <td><userinfo user-id="job.userId"></user></td>
+          <td><user user-id="job.userId"></user></td>
           <td>{{job.started?'':(job.assigned | fromNow)}}</td>
           <td>{{job.completed?'':(job.started | fromNow)}}</td>
           <td>{{job.completed?'':(job.progressed | fromNow) }}</td>
