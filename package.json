@@ -59,6 +59,7 @@
   },
   "author": "",
   "dependencies": {
+    "bower": "^1.8.8",
     "lr-infinite-scroll": "git+https://github.com/lorenzofox3/lrInfiniteScroll.git",
     "no-null-prop": "^1.0.0",
     "q": "^1.5.1"
