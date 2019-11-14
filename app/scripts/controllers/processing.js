@@ -79,9 +79,13 @@ angular.module('doxelApp')
         $scope.$on('$locationChangeSuccess',function($event,newUrl,oldUrl,newState,oldState){
           console.log(arguments);
         });
+        $scope.$on('hashChange',function(event){
+          $scope.init({reinit:true});
+	});
       },
 
-      init: function() {
+      init: function(options) {
+        options=options||{};
         if ($state.current.name!="processing") {
           return;
         }
@@ -90,10 +94,12 @@ angular.module('doxelApp')
             return parseInt(objectId.substring(0, 8), 16) * 1000;
         };
 
-        $scope.initEventHandlers();
+        if (!options.reinit) {
+          $scope.initEventHandlers();
+        }
 
         // load unprocessed segments list
-        if (!$scope.segments.length) {
+        if (!$scope.segments.length || options.reinit) {
           $scope.loading=true;
           $scope.loadingProgress=0;
           $scope.segmentsPromise=$scope.loadSegments()
