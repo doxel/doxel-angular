@@ -102,6 +102,7 @@ angular.module('doxelApp')
         if (!$scope.segments.length || options.reinit) {
           $scope.loading=true;
           $scope.loadingProgress=0;
+          $scope._segments=[];
           $scope.segmentsPromise=$scope.loadSegments()
             .then(function(segments){
               // load and format segments data (must all be done at once for sortiing)
