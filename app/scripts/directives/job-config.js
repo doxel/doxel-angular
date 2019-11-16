@@ -123,8 +123,8 @@ angular.module('doxelApp')
                 $scope.form=[
                   { key: "openmvg" },
                   { key: "densification_method" },
-                  { key: "cmvspmvs", condition: "model.densification_method=='pmvs'" },
-                  { key: "smvs", condition: "model.densification_method=='smvs'" },
+                  { key: "cmvspmvs" },
+                  { key: "smvs" },
                   {
                     type: "actions",
                     items: [
